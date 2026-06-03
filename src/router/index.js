@@ -265,6 +265,153 @@ const routes = [
     path: '/system-manage/dynamic-route',
     name: 'systemManageDynamicRoute',
     component: () => import('../views/system-manage/DynamicRoute.vue')
+  },
+  // 投诉管理模块
+  {
+    path: '/complaint/faq',
+    name: 'complaintFaq',
+    component: () => import('../views/complaint/Faq.vue')
+  },
+  {
+    path: '/complaint/feedback-manage',
+    name: 'complaintFeedbackManage',
+    component: () => import('../views/complaint/FeedbackManage.vue')
+  },
+  {
+    path: '/complaint/feedback-type',
+    name: 'complaintFeedbackType',
+    component: () => import('../views/complaint/FeedbackType.vue')
+  },
+  {
+    path: '/complaint/statistics',
+    name: 'complaintStatistics',
+    component: () => import('../views/complaint/Statistics.vue')
+  },
+  {
+    path: '/complaint/settings',
+    name: 'complaintSettings',
+    component: () => import('../views/complaint/Settings.vue')
+  },
+  {
+    path: '/complaint/my-feedback',
+    name: 'complaintMyFeedback',
+    component: () => import('../views/complaint/MyFeedback.vue')
+  },
+  // 移动端H5页面
+  {
+    path: '/h5/complaint/submit',
+    name: 'h5ComplaintSubmit',
+    component: () => import('../views/h5/ComplaintSubmit.vue')
+  },
+  {
+    path: '/h5/complaint/list',
+    name: 'h5ComplaintList',
+    component: () => import('../views/h5/ComplaintList.vue')
+  },
+  {
+    path: '/h5/complaint/detail/:id',
+    name: 'h5ComplaintDetail',
+    component: () => import('../views/h5/ComplaintDetail.vue')
+  },
+  {
+    path: '/h5/faq',
+    name: 'h5Faq',
+    component: () => import('../views/h5/Faq.vue')
+  },
+  {
+    path: '/h5/satisfaction',
+    name: 'h5Satisfaction',
+    component: () => import('../views/h5/Satisfaction.vue')
+  },
+  // 个人备忘录
+  {
+    path: '/memo',
+    name: 'memo',
+    component: () => import('../views/memo/Index.vue')
+  },
+  // 科室架构管理
+  {
+    path: '/settings/department-manage',
+    name: 'settingsDepartmentManage',
+    component: () => import('../views/settings/DepartmentManage.vue')
+  },
+  // 投诉原因管理
+  {
+    path: '/settings/complaint-reason',
+    name: 'settingsComplaintReason',
+    component: () => import('../views/settings/ComplaintReason.vue')
+  },
+  // 功能权限管理
+  {
+    path: '/system-auth/function-permission',
+    name: 'systemAuthFunctionPermission',
+    component: () => import('../views/system-auth/FunctionPermission.vue')
+  },
+  // 权限配置
+  {
+    path: '/system-auth/permission-config',
+    name: 'systemAuthPermissionConfig',
+    component: () => import('../views/system-auth/PermissionConfig.vue')
+  },
+  // 结案反馈
+  {
+    path: '/process-cases/feedback',
+    name: 'processCasesFeedback',
+    component: () => import('../views/process-cases/Feedback.vue')
+  },
+  // 通讯录更新配置
+  {
+    path: '/contacts/sync-config',
+    name: 'contactsSyncConfig',
+    component: () => import('../views/contacts/ContactSync.vue')
+  },
+  // 多模块录入
+  {
+    path: '/process-cases/multi-module',
+    name: 'processCasesMultiModule',
+    component: () => import('../views/process-cases/MultiModuleAdd.vue')
+  },
+  // 数据可视化看板
+  {
+    path: '/statistics/dashboard',
+    name: 'statisticsDashboard',
+    component: () => import('../views/statistics/Dashboard.vue')
+  },
+  // 报表分析
+  {
+    path: '/statistics/report-analysis',
+    name: 'statisticsReportAnalysis',
+    component: () => import('../views/statistics/ReportAnalysis.vue')
+  },
+  // 导出中心
+  {
+    path: '/statistics/export-center',
+    name: 'statisticsExportCenter',
+    component: () => import('../views/statistics/ExportCenter.vue')
+  },
+  // 案件闭环管理
+  {
+    path: '/process-cases/case-tracking',
+    name: 'processCasesCaseTracking',
+    component: () => import('../views/process-cases/CaseTracking.vue')
+  },
+  // 知识库
+  {
+    path: '/knowledge',
+    name: 'knowledge',
+    component: () => import('../views/knowledge/Index.vue')
+  },
+  // 消息通知
+  {
+    path: '/notifications',
+    name: 'notifications',
+    component: () => import('../views/notifications/Index.vue')
+  },
+  // 高级设置
+  {
+    path: '/settings/advanced',
+    name: 'settingsAdvanced',
+    component: () => import('../views/settings/Advanced.vue')
   }
 ]
 

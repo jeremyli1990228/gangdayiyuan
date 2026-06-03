@@ -1,5 +1,5 @@
 <template>
-  <aside class="sidebar">
+  <aside class="sidebar" :class="{ 'collapsed': collapsed }">
     <div class="sidebar-header">
       <svg class="logo" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
         <circle cx="30" cy="30" r="28" fill="#1890ff"/>
@@ -7,7 +7,7 @@
         <circle cx="24" cy="24" r="6" fill="#FFFFFF"/>
         <circle cx="36" cy="36" r="6" fill="#FFFFFF"/>
       </svg>
-      <div class="logo-text">
+      <div class="logo-text" v-show="!collapsed">
         <div class="logo-title">香港大学深圳医院</div>
         <div class="logo-subtitle">The University of Hong Kong<br/>Shenzhen Hospital</div>
       </div>
@@ -19,15 +19,17 @@
           <path d="M9 22V12H15V22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         <span>首页</span>
+        <div class="menu-tooltip">首页</div>
       </router-link>
       <div class="menu-submenu" v-for="submenu in menuData" :key="submenu.key">
-        <div class="menu-item" @click="toggleSubmenu(submenu.key)">
+        <div class="menu-item" @click="handleMenuClick(submenu.key)">
           <svg class="menu-icon" :viewBox="submenu.iconViewBox" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
             <path :d="submenu.iconPath" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             <path v-if="submenu.iconPath2" :d="submenu.iconPath2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
           <span>{{ submenu.title }}</span>
-          <svg v-if="submenu.items.length > 0" class="expand-icon" :class="{ 'expanded': openMenus.includes(submenu.key) }" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <div class="menu-tooltip">{{ submenu.title }}</div>
+          <svg v-if="submenu.items.length > 0 && !collapsed" class="expand-icon" :class="{ 'expanded': openMenus.includes(submenu.key) }" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </div>
@@ -44,6 +46,11 @@
         </div>
       </div>
     </div>
+    <button class="collapse-btn" @click="$emit('toggle')">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M15 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
   </aside>
 </template>
 
@@ -51,8 +58,32 @@
 import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
+const props = defineProps({
+  collapsed: {
+    type: Boolean,
+    default: false
+  }
+})
+
+defineEmits(['toggle'])
+
 const route = useRoute()
 const openMenus = ref(['my-cases'])
+
+const handleMenuClick = (key) => {
+  if (!props.collapsed) {
+    toggleSubmenu(key)
+  }
+}
+
+const toggleSubmenu = (key) => {
+  const index = openMenus.value.indexOf(key)
+  if (index > -1) {
+    openMenus.value.splice(index, 1)
+  } else {
+    openMenus.value.push(key)
+  }
+}
 
 const menuData = [
   {
@@ -75,6 +106,20 @@ const menuData = [
     ]
   },
   {
+    key: 'complaint',
+    title: '投诉管理',
+    iconViewBox: '0 0 24 24',
+    iconPath: 'M21 15A2 2 0 0 1 19 17H7L3 21V5C3 3.89543 3.89543 3 5 3H19C20.1046 3 21 3.89543 21 5V15Z',
+    items: [
+      { name: '常见问题', path: '/complaint/faq' },
+      { name: '反馈管理', path: '/complaint/feedback-manage' },
+      { name: '反馈类型', path: '/complaint/feedback-type' },
+      { name: '数据统计', path: '/complaint/statistics' },
+      { name: '反馈设置', path: '/complaint/settings' },
+      { name: '我的反馈', path: '/complaint/my-feedback' }
+    ]
+  },
+  {
     key: 'process-cases',
     title: '处理案件',
     iconViewBox: '0 0 24 24',
@@ -83,7 +128,10 @@ const menuData = [
     items: [
       { name: '新增案件', path: '/process-cases/add' },
       { name: '所有案件', path: '/process-cases/all' },
-      { name: '草稿箱', path: '/process-cases/drafts' }
+      { name: '草稿箱', path: '/process-cases/drafts' },
+      { name: '结案反馈', path: '/process-cases/feedback' },
+      { name: '多模块录入', path: '/process-cases/multi-module' },
+      { name: '案件闭环管理', path: '/process-cases/case-tracking' }
     ]
   },
   {
@@ -118,6 +166,15 @@ const menuData = [
     ]
   },
   {
+    key: 'knowledge',
+    title: '知识库',
+    iconViewBox: '0 0 24 24',
+    iconPath: 'M12 6.25278V19.2528M12 6.25278C10.8321 5.47686 9.24649 5 7.5 5C5.75351 5 4.16789 5.47686 3 6.25278V19.2528C4.16789 18.4769 5.75351 18 7.5 18C9.24649 18 10.8321 18.4769 12 19.2528M12 6.25278C13.1679 5.47686 14.7535 5 16.5 5C18.2465 5 19.8321 5.47686 21 6.25278V19.2528C19.8321 18.4769 18.2465 18 16.5 18C14.7535 18 13.1679 18.4769 12 19.2528',
+    items: [
+      { name: '知识库首页', path: '/knowledge' }
+    ]
+  },
+  {
     key: 'statistics',
     title: '数据统计',
     iconViewBox: '0 0 24 24',
@@ -130,7 +187,10 @@ const menuData = [
       { name: '工作量统计', path: '/statistics/workload-statistics' },
       { name: '结案时长统计', path: '/statistics/case-duration' },
       { name: '满意度样本数统计', path: '/statistics/satisfaction-sample' },
-      { name: '满意度分项指标', path: '/statistics/satisfaction-indicators' }
+      { name: '满意度分项指标', path: '/statistics/satisfaction-indicators' },
+      { name: '数据可视化看板', path: '/statistics/dashboard' },
+      { name: '报表分析', path: '/statistics/report-analysis' },
+      { name: '导出中心', path: '/statistics/export-center' }
     ]
   },
   {
@@ -156,7 +216,8 @@ const menuData = [
       { name: '员工组', path: '/contacts/employee-group' },
       { name: '组织关系', path: '/contacts/organization' },
       { name: '反馈人名单', path: '/contacts/feedback-list' },
-      { name: '患者名单', path: '/contacts/patient-list' }
+      { name: '患者名单', path: '/contacts/patient-list' },
+      { name: '更新配置', path: '/contacts/sync-config' }
     ]
   },
   {
@@ -168,7 +229,8 @@ const menuData = [
       { name: '站内信', path: '/messages/inbox' },
       { name: '邮件记录', path: '/messages/email-records' },
       { name: '短信记录', path: '/messages/sms-records' },
-      { name: '系统日志', path: '/messages/system-log' }
+      { name: '系统日志', path: '/messages/system-log' },
+      { name: '消息中心', path: '/notifications' }
     ]
   },
   {
@@ -179,7 +241,20 @@ const menuData = [
     items: [
       { name: '公共词库', path: '/settings/public-thesaurus' },
       { name: '个人词库', path: '/settings/personal-thesaurus' },
-      { name: '审批设置', path: '/settings/approval-settings' }
+      { name: '审批设置', path: '/settings/approval-settings' },
+      { name: '科室架构', path: '/settings/department-manage' },
+      { name: '投诉原因', path: '/settings/complaint-reason' },
+      { name: '系统设置', path: '/settings/advanced' }
+    ]
+  },
+  {
+    key: 'memo',
+    title: '个人备忘录',
+    iconViewBox: '0 0 24 24',
+    iconPath: 'M19 3H5C3.89543 3 3 3.89543 3 5V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19V5C21 3.89543 20.1046 3 19 3Z',
+    iconPath2: 'M7 7H17M7 12H17M7 17H12',
+    items: [
+      { name: '备忘录列表', path: '/memo' }
     ]
   },
   {
@@ -191,7 +266,9 @@ const menuData = [
     items: [
       { name: '用户管理', path: '/system-auth/user-manage' },
       { name: '角色管理', path: '/system-auth/role-manage' },
-      { name: '菜单管理', path: '/system-auth/menu-manage' }
+      { name: '菜单管理', path: '/system-auth/menu-manage' },
+      { name: '功能权限', path: '/system-auth/function-permission' },
+      { name: '权限配置', path: '/system-auth/permission-config' }
     ]
   },
   {
@@ -210,20 +287,15 @@ const menuData = [
   }
 ]
 
-const toggleSubmenu = (key) => {
-  const index = openMenus.value.indexOf(key)
-  if (index > -1) {
-    openMenus.value.splice(index, 1)
-  } else {
-    openMenus.value.push(key)
-  }
-}
-
 // 根据当前路由自动展开对应的菜单
 watch(() => route.path, (newPath) => {
   if (newPath.startsWith('/my-cases')) {
     if (!openMenus.value.includes('my-cases')) {
       openMenus.value.push('my-cases')
+    }
+  } else if (newPath.startsWith('/complaint')) {
+    if (!openMenus.value.includes('complaint')) {
+      openMenus.value.push('complaint')
     }
   } else if (newPath.startsWith('/process-cases')) {
     if (!openMenus.value.includes('process-cases')) {
@@ -241,6 +313,10 @@ watch(() => route.path, (newPath) => {
     if (!openMenus.value.includes('learning')) {
       openMenus.value.push('learning')
     }
+  } else if (newPath.startsWith('/knowledge')) {
+    if (!openMenus.value.includes('knowledge')) {
+      openMenus.value.push('knowledge')
+    }
   } else if (newPath.startsWith('/statistics')) {
     if (!openMenus.value.includes('statistics')) {
       openMenus.value.push('statistics')
@@ -257,9 +333,17 @@ watch(() => route.path, (newPath) => {
     if (!openMenus.value.includes('messages')) {
       openMenus.value.push('messages')
     }
+  } else if (newPath.startsWith('/notifications')) {
+    if (!openMenus.value.includes('messages')) {
+      openMenus.value.push('messages')
+    }
   } else if (newPath.startsWith('/settings')) {
     if (!openMenus.value.includes('settings')) {
       openMenus.value.push('settings')
+    }
+  } else if (newPath.startsWith('/memo')) {
+    if (!openMenus.value.includes('memo')) {
+      openMenus.value.push('memo')
     }
   } else if (newPath.startsWith('/system-auth')) {
     if (!openMenus.value.includes('system-auth')) {
@@ -285,6 +369,11 @@ watch(() => route.path, (newPath) => {
   left: 0;
   top: 0;
   z-index: 100;
+  transition: width 0.3s ease, transform 0.3s ease;
+}
+
+.sidebar.collapsed {
+  width: 64px;
 }
 
 .sidebar-header {
@@ -293,12 +382,22 @@ watch(() => route.path, (newPath) => {
   display: flex;
   align-items: center;
   gap: 12px;
+  justify-content: center;
+}
+
+.collapsed .sidebar-header {
+  padding: 12px;
 }
 
 .logo {
   width: 48px;
   height: 48px;
   flex-shrink: 0;
+}
+
+.collapsed .logo {
+  width: 40px;
+  height: 40px;
 }
 
 .logo-text {
@@ -335,6 +434,12 @@ watch(() => route.path, (newPath) => {
   transition: all 0.2s;
   gap: 10px;
   text-decoration: none;
+  position: relative;
+}
+
+.collapsed .menu-item {
+  padding: 12px;
+  justify-content: center;
 }
 
 .menu-item:hover {
@@ -365,6 +470,36 @@ watch(() => route.path, (newPath) => {
   transform: rotate(90deg);
 }
 
+.menu-tooltip {
+  display: none;
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #374151;
+  color: #FFFFFF;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  white-space: nowrap;
+  z-index: 200;
+  margin-left: 8px;
+}
+
+.menu-tooltip::before {
+  content: '';
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 6px solid transparent;
+  border-right-color: #374151;
+}
+
+.collapsed .menu-item:hover .menu-tooltip {
+  display: block;
+}
+
 .submenu-items {
   max-height: 0;
   overflow: hidden;
@@ -373,6 +508,10 @@ watch(() => route.path, (newPath) => {
 
 .submenu-items.open {
   max-height: 500px;
+}
+
+.collapsed .submenu-items {
+  display: none;
 }
 
 .submenu-item {
@@ -393,5 +532,79 @@ watch(() => route.path, (newPath) => {
 .submenu-item.active {
   background-color: #FFFFFF;
   color: #333;
+}
+
+.collapse-btn {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 40px;
+  border: none;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #FFFFFF;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.collapse-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.collapse-btn svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.3s ease;
+}
+
+.collapsed .collapse-btn svg {
+  transform: rotate(180deg);
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+    width: 260px;
+  }
+  
+  .sidebar.collapsed {
+    transform: translateX(0);
+    width: 260px;
+  }
+  
+  .sidebar.collapsed .menu-tooltip {
+    display: none;
+  }
+  
+  .collapse-btn {
+    display: none;
+  }
+  
+  .logo {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .logo-text {
+    display: flex !important;
+  }
+  
+  .menu-item {
+    padding: 12px 20px !important;
+    justify-content: flex-start !important;
+  }
+  
+  .expand-icon {
+    display: block !important;
+  }
+  
+  .submenu-items {
+    display: block !important;
+  }
 }
 </style>

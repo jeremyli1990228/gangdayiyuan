@@ -8,6 +8,22 @@
       <span class="breadcrumb-item active">新增案件</span>
     </div>
     
+    <!-- 自动保存提示 -->
+    <div class="auto-save-bar" v-if="lastSaveTime">
+      <div class="auto-save-info">
+        <span class="save-icon">💾</span>
+        <span>已自动保存于 {{ lastSaveTime }}</span>
+      </div>
+      <div class="auto-save-actions">
+        <button class="btn-text" @click="manualSave">立即保存</button>
+        <button class="btn-text" @click="clearDraft">清除草稿</button>
+      </div>
+    </div>
+    
+    <div id="auto-save-tip" class="save-toast" style="display: none;">
+      <span>💾 已自动保存</span>
+    </div>
+    
     <div class="form-wrapper">
       <div id="section-1" class="form-section">
         <div class="section-title">01.患者信息</div>
@@ -382,6 +398,9 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 
 const activeSection = ref('section-1')
+const autoSaveTimer = ref(null)
+const lastSaveTime = ref('')
+const formData = ref({})
 
 const scrollToSection = (sectionId) => {
   const element = document.getElementById(sectionId)
@@ -402,12 +421,102 @@ const handleScroll = () => {
   }
 }
 
+// 收集所有表单数据
+const collectFormData = () => {
+  const inputs = document.querySelectorAll('.form-input, .form-select, .form-textarea')
+  const data = {}
+  inputs.forEach(input => {
+    if (input.name) {
+      data[input.name] = input.value
+    }
+  })
+  return data
+}
+
+// 保存到本地存储
+const saveToLocalStorage = () => {
+  const data = {
+    formData: collectFormData(),
+    lastSaveTime: new Date().toLocaleString('zh-CN'),
+    caseType: 'process-cases-add'
+  }
+  localStorage.setItem('process_cases_add_draft', JSON.stringify(data))
+  lastSaveTime.value = data.lastSaveTime
+  
+  // 显示保存提示
+  const saveTip = document.getElementById('auto-save-tip')
+  if (saveTip) {
+    saveTip.style.display = 'block'
+    setTimeout(() => {
+      saveTip.style.display = 'none'
+    }, 3000)
+  }
+}
+
+// 从本地存储恢复数据
+const loadFromLocalStorage = () => {
+  const saved = localStorage.getItem('process_cases_add_draft')
+  if (saved) {
+    try {
+      const data = JSON.parse(saved)
+      if (data.formData) {
+        // 恢复表单数据
+        Object.keys(data.formData).forEach(key => {
+          const input = document.querySelector(`[name="${key}"]`)
+          if (input) {
+            input.value = data.formData[key]
+          }
+        })
+      }
+      if (data.lastSaveTime) {
+        lastSaveTime.value = data.lastSaveTime
+      }
+      return true
+    } catch (e) {
+      console.error('加载保存数据失败:', e)
+    }
+  }
+  return false
+}
+
+// 清除本地存储
+const clearLocalStorage = () => {
+  localStorage.removeItem('process_cases_add_draft')
+}
+
+// 自动保存定时器
+const startAutoSave = () => {
+  autoSaveTimer.value = setInterval(() => {
+    saveToLocalStorage()
+  }, 120000) // 2分钟自动保存一次
+}
+
+// 手动保存
+const manualSave = () => {
+  saveToLocalStorage()
+  alert('保存成功')
+}
+
+// 清除草稿
+const clearDraft = () => {
+  if (confirm('确定要清除已保存的草稿吗？')) {
+    clearLocalStorage()
+    lastSaveTime.value = ''
+    location.reload()
+  }
+}
+
 onMounted(() => {
   window.addEventListener('scroll', handleScroll)
+  loadFromLocalStorage()
+  startAutoSave()
 })
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
+  if (autoSaveTimer.value) {
+    clearInterval(autoSaveTimer.value)
+  }
 })
 </script>
 
@@ -428,7 +537,75 @@ onUnmounted(() => {
   top: 56px;
   background-color: #f0f2f5;
   z-index: 10;
-  padding-top: 10px;
+}
+
+.auto-save-bar {
+  position: fixed;
+  top: 56px;
+  left: 220px;
+  right: 0;
+  background-color: #e6f7ff;
+  border-bottom: 1px solid #91d5ff;
+  padding: 8px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  z-index: 20;
+}
+
+.auto-save-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #1890ff;
+}
+
+.auto-save-actions {
+  display: flex;
+  gap: 16px;
+}
+
+.btn-text {
+  background: none;
+  border: none;
+  color: #1890ff;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 4px 8px;
+}
+
+.btn-text:hover {
+  text-decoration: underline;
+}
+
+.save-toast {
+  position: fixed;
+  top: 100px;
+  right: 20px;
+  background-color: #52c41a;
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 4px;
+  font-size: 14px;
+  z-index: 1000;
+  animation: fadeInOut 3s ease-in-out;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateY(-20px); }
+  10% { opacity: 1; transform: translateY(0); }
+  90% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-20px); }
+}
+
+@media (max-width: 768px) {
+  .auto-save-bar {
+    left: 0;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px 12px;
+  }
 }
 
 .breadcrumb-item {
