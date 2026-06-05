@@ -15,16 +15,7 @@ export default defineConfig({
     outDir: 'dist',
     assetsDir: 'assets',
     sourcemap: false,
-    minify: 'terser',
-    chunkSizeWarningLimit: 1500,
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          'element-plus': ['element-plus'],
-          'vue-core': ['vue', 'vue-router', 'pinia']
-        }
-      }
-    }
+    chunkSizeWarningLimit: 1500
   },
   // 开发服务器配置
   server: {
