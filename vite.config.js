@@ -10,7 +10,7 @@ export default defineConfig({
     }
   },
   // GitHub Pages 部署配置
-  base: '/gangdayiyuan/',
+  base: './',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
