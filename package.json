@@ -2,10 +2,12 @@
   "name": "hku-shenzhen-hospital",
   "version": "1.0.0",
   "private": true,
+  "homepage": "https://jeremyli1990228.github.io/gangdayiyuan",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "npm run build && gh-pages -d dist"
   },
   "dependencies": {
     "vue": "^3.4.21",
@@ -14,6 +16,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",
-    "vite": "^5.2.8"
+    "vite": "^5.2.8",
+    "gh-pages": "^6.1.1"
   }
 }
