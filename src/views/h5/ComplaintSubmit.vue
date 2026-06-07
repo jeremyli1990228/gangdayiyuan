@@ -321,7 +321,12 @@ const submitForm = () => {
 }
 
 const goBack = () => {
-  router.back()
+  if (showSuccess.value) {
+    // 提交成功后跳转到反馈列表
+    router.push('/h5/complaint/list')
+  } else {
+    router.back()
+  }
 }
 </script>
 

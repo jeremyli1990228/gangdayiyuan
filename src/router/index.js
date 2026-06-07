@@ -273,6 +273,16 @@ const routes = [
     component: () => import('../views/complaint/Faq.vue')
   },
   {
+    path: '/complaint/wechat-feedback',
+    name: 'complaintWechatFeedback',
+    component: () => import('../views/complaint/WechatFeedback.vue')
+  },
+  {
+    path: '/complaint/web-feedback',
+    name: 'complaintWebFeedback',
+    component: () => import('../views/complaint/WebFeedback.vue')
+  },
+  {
     path: '/complaint/feedback-manage',
     name: 'complaintFeedbackManage',
     component: () => import('../views/complaint/FeedbackManage.vue')
@@ -299,6 +309,11 @@ const routes = [
   },
   // 移动端H5页面
   {
+    path: '/h5/home',
+    name: 'h5Home',
+    component: () => import('../views/h5/Home.vue')
+  },
+  {
     path: '/h5/complaint/submit',
     name: 'h5ComplaintSubmit',
     component: () => import('../views/h5/ComplaintSubmit.vue')
@@ -322,6 +337,11 @@ const routes = [
     path: '/h5/satisfaction',
     name: 'h5Satisfaction',
     component: () => import('../views/h5/Satisfaction.vue')
+  },
+  {
+    path: '/h5/profile',
+    name: 'h5Profile',
+    component: () => import('../views/h5/Profile.vue')
   },
   // 个人备忘录
   {

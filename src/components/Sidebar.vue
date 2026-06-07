@@ -112,7 +112,8 @@ const menuData = [
     iconPath: 'M21 15A2 2 0 0 1 19 17H7L3 21V5C3 3.89543 3.89543 3 5 3H19C20.1046 3 21 3.89543 21 5V15Z',
     items: [
       { name: '常见问题', path: '/complaint/faq' },
-      { name: '反馈管理', path: '/complaint/feedback-manage' },
+      { name: '公众号反馈管理', path: '/complaint/wechat-feedback' },
+      { name: '网站反馈管理', path: '/complaint/web-feedback' },
       { name: '反馈类型', path: '/complaint/feedback-type' },
       { name: '数据统计', path: '/complaint/statistics' },
       { name: '反馈设置', path: '/complaint/settings' },
