@@ -97,6 +97,11 @@ const routes = [
     component: () => import('../views/questionnaire/Promotion.vue')
   },
   {
+    path: '/questionnaire/survey-records',
+    name: 'questionnaireSurveyRecords',
+    component: () => import('../views/questionnaire/SurveyRecords.vue')
+  },
+  {
     path: '/learning/document-center',
     name: 'learningDocumentCenter',
     component: () => import('../views/learning/DocumentCenter.vue')

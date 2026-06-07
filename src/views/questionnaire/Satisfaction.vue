@@ -23,9 +23,15 @@
         </button>
         <button class="btn btn-secondary">
           <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <path d="M19 11H5M19 11C20.1046 11 21 11.8954 21 13V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V13C3 11.8954 3.89543 11 5 11M19 11V9C19 7.89543 18.1046 7 17 7M5 11V9C5 7.89543 5.89543 7 7 7" stroke-width="2"/>
+            <path d="M19 11H5M19 11C20.1046 11 21 11.8954 21 13V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V13C3 11.89543 3.89543 11 5 11M19 11V9C19 7.89543 18.1046 7 17 7M5 11V9C5 7.89543 5.89543 7 7 7" stroke-width="2"/>
           </svg>
           答卷统计
+        </button>
+        <button class="btn btn-info" @click="goToSurveyRecords">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-width="2"/>
+          </svg>
+          答卷记录
         </button>
         <button class="btn btn-success">
           <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -130,8 +136,16 @@
 </template>
 
 <script setup>
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
 const goBack = () => {
   window.history.back()
+}
+
+const goToSurveyRecords = () => {
+  router.push('/questionnaire/survey-records')
 }
 </script>
 
@@ -252,6 +266,15 @@ const goBack = () => {
 
 .btn-success:hover {
   background-color: #73d13d;
+}
+
+.btn-info {
+  background-color: #722ed1;
+  color: #fff;
+}
+
+.btn-info:hover {
+  background-color: #9254de;
 }
 
 .search-form {

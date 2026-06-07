@@ -100,13 +100,27 @@ const showSuccess = ref(false)
 const autoSaveTimer = ref(null)
 const lastSaveTime = ref('')
 
-// 从URL参数获取患者信息
+// 从URL参数获取患者信息和来源渠道
 const patientInfo = ref({
   name: route.query.patientName || '',
   patientNo: route.query.patientNo || '',
   phone: route.query.phone || '',
   visitDate: route.query.visitDate || ''
 })
+
+// 检测来源渠道
+const getSourceFromUrl = () => {
+  const source = route.query.source
+  if (source === 'qrcode') {
+    return 'qrcode'
+  } else if (source === 'link') {
+    return 'link'
+  }
+  // 默认来源
+  return 'link'
+}
+
+const surveySource = ref(getSourceFromUrl())
 
 // 监听患者信息变化，自动保存
 watch(patientInfo, (newVal) => {
@@ -254,7 +268,7 @@ const submitSurvey = () => {
     }
   }
   
-  // 构建完整的提交数据，包含患者信息关联
+  // 构建完整的提交数据，包含患者信息关联和来源渠道
   const submitData = {
     patientInfo: patientInfo.value,
     surveyAnswers: questions.value.map(q => ({
@@ -263,7 +277,8 @@ const submitSurvey = () => {
       answers: q.answers || []
     })),
     submitTime: new Date().toISOString(),
-    source: 'mobile_h5'
+    source: 'mobile_h5',
+    surveySource: surveySource.value // link 或 qrcode
   }
   
   console.log('提交数据:', submitData)
