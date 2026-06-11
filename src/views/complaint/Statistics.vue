@@ -82,81 +82,145 @@
       </div>
     </div>
 
-    <!-- 反馈类型分布 + 提交趋势 -->
-    <div class="content-row">
-      <!-- 反馈类型分布 -->
-      <div class="data-card">
-        <div class="card-header">
-          <h3 class="card-title">反馈类型分布</h3>
-          <span class="card-total">合计 256</span>
-        </div>
-        <div class="card-body">
-          <div class="type-list">
-            <div class="type-item" v-for="(item, idx) in typeDistribution" :key="idx">
-              <div class="type-row">
-                <span class="type-name" :class="'type-' + (idx + 1)">{{ item.name }}</span>
-                <span class="type-count">{{ item.count }}</span>
-              </div>
-              <div class="type-progress-wrap">
-                <div class="type-progress-bar" :style="{ width: item.percent + '%' }" :class="'bar-' + (idx + 1)"></div>
-              </div>
-              <div class="type-meta">
-                <span class="type-percent">{{ item.percent }}%</span>
-                <span class="type-ratio">{{ item.count }} / 256</span>
-              </div>
-            </div>
-          </div>
-        </div>
+    <!-- 三图并列：饼图 + 折线图 + 柱状图 -->
+    <div class="data-card charts-card">
+      <div class="card-header">
+        <h3 class="card-title">数据分析图表</h3>
+        <span class="card-total">合计 256 件 · 平均满意度 4.23</span>
       </div>
-
-      <!-- 提交趋势 -->
-      <div class="data-card">
-        <div class="card-header">
-          <h3 class="card-title">一周提交趋势</h3>
-          <div class="legend-inline">
-            <span class="legend-dot dot-blue"></span>投诉
-            <span class="legend-dot dot-green"></span>建议
+      <div class="card-body charts-body">
+        <!-- 饼图：反馈类型分布 -->
+        <div class="chart-block">
+          <div class="chart-title">
+            <span>反馈类型分布</span>
+            <span class="chart-sub">占比分析</span>
+          </div>
+          <div class="pie-wrap">
+            <svg class="pie-svg" viewBox="0 0 200 200">
+              <g transform="translate(100, 100)">
+                <!-- 中心装饰 -->
+                <circle r="48" fill="#fff" stroke="#eef0f4" stroke-width="1"/>
+                <text y="-4" text-anchor="middle" class="pie-total-num">256</text>
+                <text y="12" text-anchor="middle" class="pie-total-label">总件数</text>
+              </g>
+              <!-- 饼图各扇区 -->
+              <g transform="translate(100, 100)" v-for="(slice, idx) in pieSlices" :key="'slice-' + idx">
+                <path :d="slice.path" :fill="slice.color" class="pie-slice" :stroke="'#fff'" stroke-width="2"/>
+              </g>
+            </svg>
+          </div>
+          <div class="pie-legend">
+            <div class="legend-item" v-for="(item, idx) in typeDistribution" :key="'lg-' + idx">
+              <span class="legend-dot" :style="{ background: chartColors[idx] }"></span>
+              <span class="legend-name">{{ item.name }}</span>
+              <span class="legend-value">{{ item.percent }}%</span>
+            </div>
           </div>
         </div>
-        <div class="card-body">
-          <div class="trend-grid">
-            <div class="trend-cell" v-for="(day, idx) in weekTrend" :key="idx">
-              <div class="trend-day">{{ day.label }}</div>
-              <div class="trend-bars">
-                <div class="mini-bar" :style="{ height: day.complaint * 2 + 'px' }">
-                  <span class="mini-val">{{ day.complaint }}</span>
-                </div>
-                <div class="mini-bar bar-green" :style="{ height: day.suggestion * 2 + 'px' }">
-                  <span class="mini-val">{{ day.suggestion }}</span>
-                </div>
-              </div>
-              <div class="trend-total">{{ day.complaint + day.suggestion }}</div>
-            </div>
+
+        <!-- 折线图：一周提交趋势 -->
+        <div class="chart-block">
+          <div class="chart-title">
+            <span>一周提交趋势</span>
+            <span class="chart-sub">日均 12.7 件</span>
           </div>
-          <!-- 快速统计 -->
-          <div class="quick-stats">
-            <div class="quick-stat">
-              <div class="quick-label">本周总提交</div>
-              <div class="quick-value">89<span class="quick-unit">件</span></div>
-            </div>
-            <div class="quick-stat">
-              <div class="quick-label">日均提交</div>
-              <div class="quick-value">12.7<span class="quick-unit">件</span></div>
-            </div>
-            <div class="quick-stat">
-              <div class="quick-label">峰值日</div>
-              <div class="quick-value emphasis">周六</div>
-            </div>
-            <div class="quick-stat">
-              <div class="quick-label">投诉占比</div>
-              <div class="quick-value">62<span class="quick-unit">%</span></div>
-            </div>
+          <div class="line-wrap">
+            <svg class="line-svg" viewBox="0 0 400 220" preserveAspectRatio="none">
+              <!-- 背景网格线 -->
+              <line v-for="i in 4" :key="'grid-' + i"
+                    :x1="40" :x2="385"
+                    :y1="20 + i * 40" :y2="20 + i * 40"
+                    stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
+              <!-- Y轴标签 -->
+              <text v-for="(val, i) in [20, 15, 10, 5, 0]" :key="'ylbl-' + i"
+                    x="35" :y="25 + i * 40" text-anchor="end" class="line-axis-label">{{ val }}</text>
+              <!-- 面积（投诉） -->
+              <path :d="complaintAreaPath" fill="url(#complaintGradient)" opacity="0.25"/>
+              <!-- 面积（建议） -->
+              <path :d="suggestionAreaPath" fill="url(#suggestionGradient)" opacity="0.2"/>
+              <!-- 折线 - 投诉 -->
+              <path :d="complaintLinePath" fill="none" stroke="#1890ff" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+              <!-- 折线 - 建议 -->
+              <path :d="suggestionLinePath" fill="none" stroke="#52c41a" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+              <!-- 数据点 -->
+              <g v-for="(p, idx) in complaintPoints" :key="'cp-' + idx">
+                <circle :cx="p.x" :cy="p.y" r="4" fill="#fff" stroke="#1890ff" stroke-width="2"/>
+              </g>
+              <g v-for="(p, idx) in suggestionPoints" :key="'sp-' + idx">
+                <circle :cx="p.x" :cy="p.y" r="4" fill="#fff" stroke="#52c41a" stroke-width="2"/>
+              </g>
+              <!-- X轴标签 -->
+              <g v-for="(day, idx) in weekTrend" :key="'xlbl-' + idx">
+                <text :x="40 + idx * 50" y="210" text-anchor="middle" class="line-axis-label">{{ day.label }}</text>
+              </g>
+              <!-- 渐变定义 -->
+              <defs>
+                <linearGradient id="complaintGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#1890ff"/>
+                  <stop offset="100%" stop-color="#1890ff" stop-opacity="0"/>
+                </linearGradient>
+                <linearGradient id="suggestionGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#52c41a"/>
+                  <stop offset="100%" stop-color="#52c41a" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <div class="line-legend">
+            <span class="legend-item"><span class="legend-line line-blue"></span>投诉 <b>89</b></span>
+            <span class="legend-item"><span class="legend-line line-green"></span>建议 <b>52</b></span>
+            <span class="legend-item">峰值日 <b class="text-orange">周六</b></span>
+          </div>
+        </div>
+
+        <!-- 柱状图：处理效率对比 -->
+        <div class="chart-block">
+          <div class="chart-title">
+            <span>各类型处理情况</span>
+            <span class="chart-sub">提交 vs 已处理</span>
+          </div>
+          <div class="bar-wrap">
+            <svg class="bar-svg" viewBox="0 0 400 220" preserveAspectRatio="none">
+              <!-- 水平网格线 -->
+              <line v-for="i in 4" :key="'bgrid-' + i"
+                    :x1="50" :x2="390"
+                    :y1="20 + i * 40" :y2="20 + i * 40"
+                    stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
+              <!-- Y轴标签 -->
+              <text v-for="(val, i) in [60, 45, 30, 15, 0]" :key="'bylbl-' + i"
+                    x="45" :y="25 + i * 40" text-anchor="end" class="bar-axis-label">{{ val }}</text>
+              <!-- 柱状图数据 -->
+              <g v-for="(item, idx) in barData" :key="'bargroup-' + idx" :transform="'translate(' + (55 + idx * 48) + ', 0)'">
+                <!-- 提交柱 -->
+                <rect x="0" :y="item.submitY" width="18" :height="item.submitH" rx="3" class="bar-submit"/>
+                <!-- 已处理柱 -->
+                <rect x="22" :y="item.resolvedY" width="18" :height="item.resolvedH" rx="3" class="bar-resolved"/>
+                <!-- X轴标签 -->
+                <text x="20" y="210" text-anchor="middle" class="bar-axis-label">{{ item.label }}</text>
+              </g>
+              <!-- 渐变定义 -->
+              <defs>
+                <linearGradient id="barSubmitGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#40a9ff"/>
+                  <stop offset="100%" stop-color="#1890ff"/>
+                </linearGradient>
+                <linearGradient id="barResolvedGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#73d13d"/>
+                  <stop offset="100%" stop-color="#52c41a"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <div class="line-legend">
+            <span class="legend-item"><span class="legend-line bar-blue"></span>提交</span>
+            <span class="legend-item"><span class="legend-line bar-green"></span>已处理</span>
+            <span class="legend-item">平均处理率 <b class="text-green">77%</b></span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 处理效率 -->
+    <!-- 处理效率详细卡片 -->
     <div class="data-card">
       <div class="card-header">
         <h3 class="card-title">处理效率统计</h3>
@@ -244,9 +308,14 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const activeTime = ref('month')
+
+const chartColors = [
+  '#1890ff', '#52c41a', '#fa8c16', '#ff4d4f',
+  '#722ed1', '#13c2c2', '#8c8c8c'
+]
 
 // 反馈类型分布
 const typeDistribution = ref([
@@ -291,6 +360,99 @@ const statisticsData = ref([
   { type: '医德医风', submitCount: 18, pendingCount: 4, resolvedCount: 12, ratedCount: 10, avgTime: '4.0小时', satisfaction: 4.6 },
   { type: '其他', submitCount: 27, pendingCount: 3, resolvedCount: 22, ratedCount: 18, avgTime: '2.8小时', satisfaction: 3.9 }
 ])
+
+// ============= 饼图计算 =============
+const pieSlices = computed(() => {
+  const radius = 78
+  const total = typeDistribution.value.reduce((s, i) => s + i.count, 0)
+  let startAngle = -Math.PI / 2 // 从顶部开始
+  const slices = []
+  typeDistribution.value.forEach((item, idx) => {
+    const angle = (item.count / total) * Math.PI * 2
+    const endAngle = startAngle + angle
+    const x1 = Math.cos(startAngle) * radius
+    const y1 = Math.sin(startAngle) * radius
+    const x2 = Math.cos(endAngle) * radius
+    const y2 = Math.sin(endAngle) * radius
+    const largeArc = angle > Math.PI ? 1 : 0
+    const path = `M 0 0 L ${x1.toFixed(2)} ${y1.toFixed(2)} A ${radius} ${radius} 0 ${largeArc} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z`
+    slices.push({
+      path,
+      color: chartColors[idx % chartColors.length]
+    })
+    startAngle = endAngle
+  })
+  return slices
+})
+
+// ============= 折线图计算 =============
+const complaintPoints = computed(() => {
+  // 绘图区：x 40-385，y 20-180
+  const maxVal = 20
+  const xStart = 40
+  const xStep = 50
+  const yBase = 180
+  const yScale = (yBase - 20) / maxVal
+  return weekTrend.value.map((d, i) => ({
+    x: xStart + i * xStep,
+    y: yBase - d.complaint * yScale
+  }))
+})
+
+const suggestionPoints = computed(() => {
+  const maxVal = 20
+  const xStart = 40
+  const xStep = 50
+  const yBase = 180
+  const yScale = (yBase - 20) / maxVal
+  return weekTrend.value.map((d, i) => ({
+    x: xStart + i * xStep,
+    y: yBase - d.suggestion * yScale
+  }))
+})
+
+const complaintLinePath = computed(() => {
+  return complaintPoints.value.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ')
+})
+
+const suggestionLinePath = computed(() => {
+  return suggestionPoints.value.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ')
+})
+
+const complaintAreaPath = computed(() => {
+  const pts = complaintPoints.value
+  if (pts.length === 0) return ''
+  const line = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ')
+  return `${line} L ${pts[pts.length - 1].x} 180 L ${pts[0].x} 180 Z`
+})
+
+const suggestionAreaPath = computed(() => {
+  const pts = suggestionPoints.value
+  if (pts.length === 0) return ''
+  const line = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ')
+  return `${line} L ${pts[pts.length - 1].x} 180 L ${pts[0].x} 180 Z`
+})
+
+// ============= 柱状图计算 =============
+const barData = computed(() => {
+  // 选前6类（不包含"其他"和"总计"），避免过挤
+  const items = efficiencyData.value.slice(0, 6)
+  const maxVal = 70
+  const yBase = 180
+  const yTop = 20
+  const scale = (yBase - yTop) / maxVal
+  return items.map(item => {
+    const submitH = Math.max(2, item.submit * scale)
+    const resolvedH = Math.max(2, item.resolved * scale)
+    return {
+      label: item.name.slice(0, 2),
+      submitY: yBase - submitH,
+      submitH,
+      resolvedY: yBase - resolvedH,
+      resolvedH
+    }
+  })
+})
 </script>
 
 <style scoped>
@@ -346,7 +508,7 @@ const statisticsData = ref([
   background: #fff;
   padding: 14px 20px;
   border-radius: 10px;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
   border: 1px solid #eef0f4;
 }
 
@@ -465,21 +627,10 @@ const statisticsData = ref([
   width: 3px;
 }
 
-.summary-primary::before {
-  background: linear-gradient(180deg, #1890ff 0%, #096dd9 100%);
-}
-
-.summary-warn::before {
-  background: linear-gradient(180deg, #ff7a45 0%, #fa541c 100%);
-}
-
-.summary-success::before {
-  background: linear-gradient(180deg, #52c41a 0%, #389e0d 100%);
-}
-
-.summary-orange::before {
-  background: linear-gradient(180deg, #fa8c16 0%, #d46b08 100%);
-}
+.summary-primary::before { background: linear-gradient(180deg, #1890ff 0%, #096dd9 100%); }
+.summary-warn::before { background: linear-gradient(180deg, #ff7a45 0%, #fa541c 100%); }
+.summary-success::before { background: linear-gradient(180deg, #52c41a 0%, #389e0d 100%); }
+.summary-orange::before { background: linear-gradient(180deg, #fa8c16 0%, #d46b08 100%); }
 
 .summary-label {
   font-size: 13px;
@@ -507,33 +658,15 @@ const statisticsData = ref([
   font-weight: 600;
 }
 
-.summary-trend.up {
-  color: #389e0d;
-  background: #f6ffed;
-}
+.summary-trend.up { color: #389e0d; background: #f6ffed; }
+.summary-trend.down { color: #cf1322; background: #fff1f0; }
 
-.summary-trend.down {
-  color: #cf1322;
-  background: #fff1f0;
-}
-
-.trend-icon {
-  width: 12px;
-  height: 12px;
-}
+.trend-icon { width: 12px; height: 12px; }
 
 .summary-sub {
   margin-top: 4px;
   font-size: 11px;
   color: #9ca3af;
-}
-
-/* 内容行 */
-.content-row {
-  display: grid;
-  grid-template-columns: 1fr 1.3fr;
-  gap: 14px;
-  margin-bottom: 14px;
 }
 
 /* 通用卡片 */
@@ -570,213 +703,184 @@ const statisticsData = ref([
 }
 
 .card-body {
-  padding: 18px 20px;
+  padding: 16px 20px;
 }
 
-.legend-inline {
+/* ============= 图表卡片 ============= */
+.charts-card {
+  margin-bottom: 14px;
+}
+
+.charts-body {
+  display: grid;
+  grid-template-columns: 1fr 1.35fr 1.35fr;
+  gap: 20px;
+  padding: 20px;
+}
+
+.chart-block {
+  background: #fafbfc;
+  border-radius: 8px;
+  padding: 14px;
+  border: 1px solid #f0f2f5;
+}
+
+.chart-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 10px;
+}
+
+.chart-sub {
+  font-size: 11px;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+/* 饼图 */
+.pie-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.pie-svg {
+  width: 170px;
+  height: 170px;
+}
+
+.pie-slice {
+  transition: opacity 0.2s, transform 0.2s;
+  transform-origin: center;
+}
+
+.pie-slice:hover {
+  opacity: 0.85;
+}
+
+.pie-total-num {
+  font-size: 22px;
+  font-weight: 700;
+  fill: #1f2937;
+}
+
+.pie-total-label {
+  font-size: 10px;
+  fill: #9ca3af;
+}
+
+.pie-legend {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 10px;
+}
+
+.legend-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 12px;
+  gap: 6px;
+  font-size: 11px;
   color: #6b7280;
 }
 
 .legend-dot {
-  display: inline-block;
   width: 8px;
   height: 8px;
   border-radius: 2px;
-  margin-right: 4px;
-  margin-left: 6px;
-  vertical-align: middle;
+  flex-shrink: 0;
 }
 
-.dot-blue {
-  background: #1890ff;
-}
-
-.dot-green {
-  background: #52c41a;
-}
-
-/* 类型列表 */
-.type-list {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.type-item + .type-item {
-  padding-top: 14px;
-  border-top: 1px dashed #f0f2f5;
-}
-
-.type-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 6px;
-}
-
-.type-name {
-  font-size: 13px;
-  font-weight: 600;
+.legend-name {
+  flex: 1;
+  font-weight: 500;
   color: #374151;
 }
 
-.type-name.type-1 { color: #1890ff; }
-.type-name.type-2 { color: #52c41a; }
-.type-name.type-3 { color: #fa8c16; }
-.type-name.type-4 { color: #ff4d4f; }
-.type-name.type-5 { color: #722ed1; }
-.type-name.type-6 { color: #13c2c2; }
-.type-name.type-7 { color: #8c8c8c; }
-
-.type-count {
-  font-size: 14px;
-  font-weight: 700;
-  color: #1f2937;
-}
-
-.type-progress-wrap {
-  height: 6px;
-  background: #f3f4f6;
-  border-radius: 3px;
-  overflow: hidden;
-  margin-bottom: 4px;
-}
-
-.type-progress-bar {
-  height: 100%;
-  border-radius: 3px;
-  transition: width 0.6s ease;
-}
-
-.bar-1 { background: linear-gradient(90deg, #1890ff 0%, #40a9ff 100%); }
-.bar-2 { background: linear-gradient(90deg, #52c41a 0%, #73d13d 100%); }
-.bar-3 { background: linear-gradient(90deg, #fa8c16 0%, #ffc069 100%); }
-.bar-4 { background: linear-gradient(90deg, #ff4d4f 0%, #ff7875 100%); }
-.bar-5 { background: linear-gradient(90deg, #722ed1 0%, #9254de 100%); }
-.bar-6 { background: linear-gradient(90deg, #13c2c2 0%, #36cfc9 100%); }
-.bar-7 { background: linear-gradient(90deg, #8c8c8c 0%, #adadad 100%); }
-
-.type-meta {
-  display: flex;
-  justify-content: space-between;
-  font-size: 11px;
-  color: #9ca3af;
-}
-
-.type-percent {
+.legend-value {
   font-weight: 600;
-  color: #6b7280;
-}
-
-/* 趋势网格 */
-.trend-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 8px;
-  margin-bottom: 16px;
-}
-
-.trend-cell {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 10px 6px;
-  border-radius: 8px;
-  background: #fafbfc;
-  transition: background 0.2s;
-}
-
-.trend-cell:hover {
-  background: #f0f9ff;
-}
-
-.trend-day {
-  font-size: 12px;
-  color: #6b7280;
-  font-weight: 500;
-  margin-bottom: 8px;
-}
-
-.trend-bars {
-  display: flex;
-  gap: 4px;
-  align-items: flex-end;
-  justify-content: center;
-  height: 70px;
-}
-
-.mini-bar {
-  width: 10px;
-  background: linear-gradient(180deg, #1890ff 0%, #40a9ff 100%);
-  border-radius: 3px 3px 0 0;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  min-height: 12px;
-  position: relative;
-}
-
-.mini-bar.bar-green {
-  background: linear-gradient(180deg, #52c41a 0%, #73d13d 100%);
-}
-
-.mini-val {
-  font-size: 9px;
-  color: #fff;
-  font-weight: 700;
-  padding-top: 2px;
-}
-
-.trend-total {
-  margin-top: 6px;
-  font-size: 13px;
-  font-weight: 700;
   color: #1f2937;
 }
 
-/* 快速统计 */
-.quick-stats {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  padding-top: 16px;
-  border-top: 1px dashed #e5e7eb;
+/* 折线图 */
+.line-wrap {
+  width: 100%;
+  margin-bottom: 10px;
 }
 
-.quick-stat {
-  text-align: center;
-  padding: 10px 6px;
-  background: #fafbfc;
-  border-radius: 6px;
+.line-svg {
+  width: 100%;
+  height: 180px;
 }
 
-.quick-label {
-  font-size: 11px;
-  color: #9ca3af;
-  margin-bottom: 4px;
-}
-
-.quick-value {
-  font-size: 16px;
-  font-weight: 700;
-  color: #1f2937;
-}
-
-.quick-value.emphasis {
-  color: #fa8c16;
-  font-size: 14px;
-}
-
-.quick-unit {
+.line-axis-label {
   font-size: 10px;
+  fill: #9ca3af;
   font-weight: 500;
-  color: #9ca3af;
+}
+
+.line-legend {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.line-legend .legend-item {
+  font-size: 11px;
+  gap: 4px;
+}
+
+.line-legend .legend-item b {
+  color: #1f2937;
+  font-weight: 700;
   margin-left: 2px;
 }
+
+.text-orange { color: #fa8c16 !important; }
+.text-green { color: #52c41a !important; }
+
+.legend-line {
+  display: inline-block;
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+  vertical-align: middle;
+}
+
+.line-blue { background: #1890ff; }
+.line-green { background: #52c41a; }
+
+/* 柱状图 */
+.bar-wrap {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.bar-svg {
+  width: 100%;
+  height: 180px;
+}
+
+.bar-axis-label {
+  font-size: 10px;
+  fill: #9ca3af;
+  font-weight: 500;
+}
+
+.bar-submit {
+  fill: url(#barSubmitGrad);
+}
+
+.bar-resolved {
+  fill: url(#barResolvedGrad);
+}
+
+.bar-blue { background: linear-gradient(180deg, #40a9ff, #1890ff); }
+.bar-green { background: linear-gradient(180deg, #73d13d, #52c41a); }
 
 /* 处理效率网格 */
 .efficiency-grid {
@@ -819,20 +923,9 @@ const statisticsData = ref([
   border-radius: 4px;
 }
 
-.eff-score.score-excellent {
-  color: #389e0d;
-  background: #f6ffed;
-}
-
-.eff-score.score-good {
-  color: #fa8c16;
-  background: #fff7e6;
-}
-
-.eff-score.score-normal {
-  color: #4b5563;
-  background: #f3f4f6;
-}
+.eff-score.score-excellent { color: #389e0d; background: #f6ffed; }
+.eff-score.score-good { color: #fa8c16; background: #fff7e6; }
+.eff-score.score-normal { color: #4b5563; background: #f3f4f6; }
 
 .eff-row {
   display: grid;
@@ -854,13 +947,8 @@ const statisticsData = ref([
   color: #1f2937;
 }
 
-.eff-cell.eff-pending .eff-num {
-  color: #fa541c;
-}
-
-.eff-cell.eff-done .eff-num {
-  color: #389e0d;
-}
+.eff-cell.eff-pending .eff-num { color: #fa541c; }
+.eff-cell.eff-done .eff-num { color: #389e0d; }
 
 .eff-sub {
   font-size: 10px;
@@ -912,19 +1000,12 @@ const statisticsData = ref([
   gap: 4px;
 }
 
-.mini-icon {
-  width: 11px;
-  height: 11px;
-}
+.mini-icon { width: 11px; height: 11px; }
 
-.eff-sat {
-  font-weight: 500;
-}
+.eff-sat { font-weight: 500; }
 
 /* 表格 */
-.table-container {
-  overflow: hidden;
-}
+.table-container { overflow: hidden; }
 
 .table-header {
   display: flex;
@@ -943,13 +1024,8 @@ const statisticsData = ref([
   transition: background 0.2s;
 }
 
-.table-row:hover {
-  background: #f9fafb;
-}
-
-.table-row:last-child {
-  border-bottom: none;
-}
+.table-row:hover { background: #f9fafb; }
+.table-row:last-child { border-bottom: none; }
 
 .table-cell {
   padding: 12px 16px;
@@ -967,17 +1043,8 @@ const statisticsData = ref([
   font-size: 12px;
 }
 
-.cell-idx {
-  flex: 0 0 60px;
-  min-width: 60px;
-  max-width: 60px;
-}
-
-.cell-type {
-  flex: 0 0 150px;
-  min-width: 150px;
-  max-width: 150px;
-}
+.cell-idx { flex: 0 0 60px; min-width: 60px; max-width: 60px; }
+.cell-type { flex: 0 0 150px; min-width: 150px; max-width: 150px; }
 
 .type-tag {
   display: inline-block;
@@ -1012,31 +1079,32 @@ const statisticsData = ref([
 }
 
 /* 响应式 */
-@media (max-width: 1200px) {
-  .summary-grid {
-    grid-template-columns: repeat(2, 1fr);
+@media (max-width: 1400px) {
+  .charts-body {
+    grid-template-columns: 1fr 1fr;
   }
-  .efficiency-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .chart-block:nth-child(1) {
+    grid-column: 1 / -1;
   }
 }
 
+@media (max-width: 1200px) {
+  .summary-grid { grid-template-columns: repeat(2, 1fr); }
+  .efficiency-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
 @media (max-width: 900px) {
-  .content-row {
+  .charts-body {
     grid-template-columns: 1fr;
   }
-  .quick-stats {
-    grid-template-columns: repeat(2, 1fr);
+  .chart-block:nth-child(1) {
+    grid-column: auto;
   }
 }
 
 @media (max-width: 600px) {
-  .summary-grid {
-    grid-template-columns: 1fr;
-  }
-  .efficiency-grid {
-    grid-template-columns: 1fr;
-  }
+  .summary-grid { grid-template-columns: 1fr; }
+  .efficiency-grid { grid-template-columns: 1fr; }
   .filter-card {
     flex-direction: column;
     gap: 12px;
