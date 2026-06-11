@@ -19,7 +19,7 @@
     </div>
 
     <!-- 时间筛选 -->
-    <div class="time-filter">
+    <div class="filter-card">
       <div class="quick-btns">
         <button :class="['quick-btn', activeTime === 'today' ? 'active' : '']" @click="activeTime = 'today'">今日</button>
         <button :class="['quick-btn', activeTime === 'week' ? 'active' : '']" @click="activeTime = 'week'">本周</button>
@@ -28,213 +28,214 @@
       </div>
       <div class="date-range">
         <input type="date" class="form-input" style="width: 140px;">
-        <span style="margin: 0 8px; color: #999;">至</span>
+        <span class="date-sep">至</span>
         <input type="date" class="form-input" style="width: 140px;">
         <button class="btn btn-primary">查询</button>
       </div>
     </div>
 
-    <!-- 统计概览卡片 -->
-    <div class="stat-cards">
-      <div class="stat-card">
-        <div class="stat-icon" style="background: #e6f7ff;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#1890ff">
-            <path d="M14 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V8L14 2Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M14 2V8H20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- 核心指标概览 -->
+    <div class="summary-grid">
+      <div class="summary-card summary-primary">
+        <div class="summary-label">总提交次数</div>
+        <div class="summary-value">256</div>
+        <div class="summary-trend up">
+          <svg class="trend-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M7 17L17 7M17 7H9M17 7V15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
+          12.5%
         </div>
-        <div class="stat-info">
-          <div class="stat-value">256</div>
-          <div class="stat-label">总提交次数</div>
-        </div>
+        <div class="summary-sub">较上周期</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-icon" style="background: #fff1f0;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#ff4d4f">
-            <circle cx="12" cy="12" r="10" stroke-width="2"/>
-            <path d="M12 6V12L16 14" stroke-width="2" stroke-linecap="round"/>
+      <div class="summary-card summary-warn">
+        <div class="summary-label">待处理次数</div>
+        <div class="summary-value">48</div>
+        <div class="summary-trend down">
+          <svg class="trend-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M7 7L17 17M17 17H9M17 17V9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
+          3.2%
         </div>
-        <div class="stat-info">
-          <div class="stat-value">48</div>
-          <div class="stat-label">待处理次数</div>
-        </div>
+        <div class="summary-sub">较上周期</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-icon" style="background: #f6ffed;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#52c41a">
-            <path d="M22 11.08V12C21.9988 14.1564 21.1505 16.2124 19.595 17.595C18.0395 18.9776 15.9429 19.7379 13.7884 19.6923C11.6339 19.6467 9.57094 18.7989 8.07889 17.3232C6.58684 15.8475 5.77817 13.7934 5.82455 11.6388C5.87094 9.48433 6.76835 7.45894 8.27159 6.04805C9.77483 4.63716 11.7686 3.84655 13.9236 3.82682C16.0786 3.80708 18.0872 4.55967 19.6167 5.94098C21.1462 7.32229 22.0762 9.22461 22.2191 11.2758" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M9 12L11 14L15 10" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <div class="summary-card summary-success">
+        <div class="summary-label">已处理次数</div>
+        <div class="summary-value">198</div>
+        <div class="summary-trend up">
+          <svg class="trend-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M7 17L17 7M17 7H9M17 7V15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
+          18.7%
         </div>
-        <div class="stat-info">
-          <div class="stat-value">198</div>
-          <div class="stat-label">已处理次数</div>
-        </div>
+        <div class="summary-sub">较上周期</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-icon" style="background: #fff7e6;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#fa8c16">
-            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <div class="summary-card summary-orange">
+        <div class="summary-label">评价次数</div>
+        <div class="summary-value">156</div>
+        <div class="summary-trend up">
+          <svg class="trend-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M7 17L17 7M17 7H9M17 7V15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
+          8.3%
         </div>
-        <div class="stat-info">
-          <div class="stat-value">156</div>
-          <div class="stat-label">评价次数</div>
-        </div>
+        <div class="summary-sub">较上周期</div>
       </div>
     </div>
 
-    <!-- 图表区域 -->
-    <div class="charts-row">
-      <div class="chart-card">
-        <div class="chart-header">
-          <h3 class="chart-title">反馈类型分布</h3>
+    <!-- 反馈类型分布 + 提交趋势 -->
+    <div class="content-row">
+      <!-- 反馈类型分布 -->
+      <div class="data-card">
+        <div class="card-header">
+          <h3 class="card-title">反馈类型分布</h3>
+          <span class="card-total">合计 256</span>
         </div>
-        <div class="chart-body">
-          <div class="pie-chart">
-            <svg viewBox="0 0 200 200" class="pie-svg">
-              <!-- 饼图扇形 -->
-              <circle cx="100" cy="100" r="80" fill="none" stroke="#1890ff" stroke-width="40" stroke-dasharray="125.6 376.8" stroke-dashoffset="0"/>
-              <circle cx="100" cy="100" r="80" fill="none" stroke="#52c41a" stroke-width="40" stroke-dasharray="100.48 401.92" stroke-dashoffset="-125.6"/>
-              <circle cx="100" cy="100" r="80" fill="none" stroke="#fa8c16" stroke-width="40" stroke-dasharray="75.36 427.04" stroke-dashoffset="-226.08"/>
-              <circle cx="100" cy="100" r="80" fill="none" stroke="#ff4d4f" stroke-width="40" stroke-dasharray="50.24 452.16" stroke-dashoffset="-301.44"/>
-              <circle cx="100" cy="100" r="80" fill="none" stroke="#722ed1" stroke-width="40" stroke-dasharray="50.24 452.16" stroke-dashoffset="-351.68"/>
-            </svg>
-          </div>
-          <div class="chart-legend">
-            <div class="legend-item">
-              <span class="legend-color" style="background: #1890ff;"></span>
-              <span class="legend-text">服务态度</span>
-              <span class="legend-value">25%</span>
-            </div>
-            <div class="legend-item">
-              <span class="legend-color" style="background: #52c41a;"></span>
-              <span class="legend-text">医疗质量</span>
-              <span class="legend-value">20%</span>
-            </div>
-            <div class="legend-item">
-              <span class="legend-color" style="background: #fa8c16;"></span>
-              <span class="legend-text">就医流程</span>
-              <span class="legend-value">15%</span>
-            </div>
-            <div class="legend-item">
-              <span class="legend-color" style="background: #ff4d4f;"></span>
-              <span class="legend-text">环境卫生</span>
-              <span class="legend-value">10%</span>
-            </div>
-            <div class="legend-item">
-              <span class="legend-color" style="background: #722ed1;"></span>
-              <span class="legend-text">其他</span>
-              <span class="legend-value">30%</span>
+        <div class="card-body">
+          <div class="type-list">
+            <div class="type-item" v-for="(item, idx) in typeDistribution" :key="idx">
+              <div class="type-row">
+                <span class="type-name" :class="'type-' + (idx + 1)">{{ item.name }}</span>
+                <span class="type-count">{{ item.count }}</span>
+              </div>
+              <div class="type-progress-wrap">
+                <div class="type-progress-bar" :style="{ width: item.percent + '%' }" :class="'bar-' + (idx + 1)"></div>
+              </div>
+              <div class="type-meta">
+                <span class="type-percent">{{ item.percent }}%</span>
+                <span class="type-ratio">{{ item.count }} / 256</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="chart-card">
-        <div class="chart-header">
-          <h3 class="chart-title">提交趋势</h3>
+
+      <!-- 提交趋势 -->
+      <div class="data-card">
+        <div class="card-header">
+          <h3 class="card-title">一周提交趋势</h3>
+          <div class="legend-inline">
+            <span class="legend-dot dot-blue"></span>投诉
+            <span class="legend-dot dot-green"></span>建议
+          </div>
         </div>
-        <div class="chart-body">
-          <div class="line-chart">
-            <svg viewBox="0 0 400 200" class="line-svg">
-              <!-- 网格线 -->
-              <line x1="50" y1="20" x2="380" y2="20" stroke="#f0f0f0" stroke-width="1"/>
-              <line x1="50" y1="60" x2="380" y2="60" stroke="#f0f0f0" stroke-width="1"/>
-              <line x1="50" y1="100" x2="380" y2="100" stroke="#f0f0f0" stroke-width="1"/>
-              <line x1="50" y1="140" x2="380" y2="140" stroke="#f0f0f0" stroke-width="1"/>
-              <line x1="50" y1="180" x2="380" y2="180" stroke="#f0f0f0" stroke-width="1"/>
-              <!-- 折线 -->
-              <polyline points="50,140 100,120 150,100 200,80 250,90 300,60 350,40" fill="none" stroke="#1890ff" stroke-width="2"/>
-              <polyline points="50,160 100,150 150,130 200,120 250,130 300,100 350,90" fill="none" stroke="#52c41a" stroke-width="2"/>
-              <!-- 数据点 -->
-              <circle cx="50" cy="140" r="4" fill="#1890ff"/>
-              <circle cx="100" cy="120" r="4" fill="#1890ff"/>
-              <circle cx="150" cy="100" r="4" fill="#1890ff"/>
-              <circle cx="200" cy="80" r="4" fill="#1890ff"/>
-              <circle cx="250" cy="90" r="4" fill="#1890ff"/>
-              <circle cx="300" cy="60" r="4" fill="#1890ff"/>
-              <circle cx="350" cy="40" r="4" fill="#1890ff"/>
-            </svg>
-            <div class="x-axis-labels">
-              <span>周一</span>
-              <span>周二</span>
-              <span>周三</span>
-              <span>周四</span>
-              <span>周五</span>
-              <span>周六</span>
-              <span>周日</span>
+        <div class="card-body">
+          <div class="trend-grid">
+            <div class="trend-cell" v-for="(day, idx) in weekTrend" :key="idx">
+              <div class="trend-day">{{ day.label }}</div>
+              <div class="trend-bars">
+                <div class="mini-bar" :style="{ height: day.complaint * 2 + 'px' }">
+                  <span class="mini-val">{{ day.complaint }}</span>
+                </div>
+                <div class="mini-bar bar-green" :style="{ height: day.suggestion * 2 + 'px' }">
+                  <span class="mini-val">{{ day.suggestion }}</span>
+                </div>
+              </div>
+              <div class="trend-total">{{ day.complaint + day.suggestion }}</div>
             </div>
           </div>
-          <div class="chart-legend">
-            <div class="legend-item">
-              <span class="legend-color" style="background: #1890ff;"></span>
-              <span class="legend-text">投诉</span>
+          <!-- 快速统计 -->
+          <div class="quick-stats">
+            <div class="quick-stat">
+              <div class="quick-label">本周总提交</div>
+              <div class="quick-value">89<span class="quick-unit">件</span></div>
             </div>
-            <div class="legend-item">
-              <span class="legend-color" style="background: #52c41a;"></span>
-              <span class="legend-text">建议</span>
+            <div class="quick-stat">
+              <div class="quick-label">日均提交</div>
+              <div class="quick-value">12.7<span class="quick-unit">件</span></div>
+            </div>
+            <div class="quick-stat">
+              <div class="quick-label">峰值日</div>
+              <div class="quick-value emphasis">周六</div>
+            </div>
+            <div class="quick-stat">
+              <div class="quick-label">投诉占比</div>
+              <div class="quick-value">62<span class="quick-unit">%</span></div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 处理效率图表 -->
-    <div class="chart-card" style="margin-bottom: 20px;">
-      <div class="chart-header">
-        <h3 class="chart-title">处理效率统计</h3>
+    <!-- 处理效率 -->
+    <div class="data-card">
+      <div class="card-header">
+        <h3 class="card-title">处理效率统计</h3>
+        <span class="card-total">平均满意度 4.23</span>
       </div>
-      <div class="chart-body">
-        <div class="bar-chart">
-          <svg viewBox="0 0 600 200" class="bar-svg">
-            <!-- 柱状图 -->
-            <rect x="30" y="60" width="40" height="120" fill="#1890ff" rx="4"/>
-            <rect x="100" y="80" width="40" height="100" fill="#1890ff" rx="4"/>
-            <rect x="170" y="40" width="40" height="140" fill="#1890ff" rx="4"/>
-            <rect x="240" y="100" width="40" height="80" fill="#1890ff" rx="4"/>
-            <rect x="310" y="70" width="40" height="110" fill="#1890ff" rx="4"/>
-            <rect x="380" y="50" width="40" height="130" fill="#1890ff" rx="4"/>
-            <rect x="450" y="90" width="40" height="90" fill="#1890ff" rx="4"/>
-            <rect x="520" y="30" width="40" height="150" fill="#1890ff" rx="4"/>
-          </svg>
-          <div class="x-axis-labels" style="justify-content: space-around; padding: 0 30px;">
-            <span>服务态度</span>
-            <span>医疗质量</span>
-            <span>就医流程</span>
-            <span>环境卫生</span>
-            <span>收费问题</span>
-            <span>医德医风</span>
-            <span>其他</span>
-            <span>总计</span>
+      <div class="card-body">
+        <div class="efficiency-grid">
+          <div class="eff-card" v-for="(item, idx) in efficiencyData" :key="idx">
+            <div class="eff-head">
+              <span class="eff-name">{{ item.name }}</span>
+              <span class="eff-score" :class="'score-' + item.scoreLevel">{{ item.score }}</span>
+            </div>
+            <div class="eff-row">
+              <div class="eff-cell">
+                <div class="eff-num">{{ item.submit }}</div>
+                <div class="eff-sub">提交</div>
+              </div>
+              <div class="eff-cell eff-pending">
+                <div class="eff-num">{{ item.pending }}</div>
+                <div class="eff-sub">待处理</div>
+              </div>
+              <div class="eff-cell eff-done">
+                <div class="eff-num">{{ item.resolved }}</div>
+                <div class="eff-sub">已处理</div>
+              </div>
+            </div>
+            <div class="eff-rate-wrap">
+              <div class="eff-rate-bar">
+                <div class="eff-rate-fill" :style="{ width: item.rate + '%' }"></div>
+              </div>
+              <span class="eff-rate-text">处理率 {{ item.rate }}%</span>
+            </div>
+            <div class="eff-footer">
+              <span class="eff-time">
+                <svg class="mini-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <circle cx="12" cy="12" r="10" stroke-width="2"/>
+                  <path d="M12 6V12L16 14" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                {{ item.avgTime }}
+              </span>
+              <span class="eff-sat">满意度 {{ item.satisfaction }}</span>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
     <!-- 详细数据表格 -->
-    <div class="table-container">
-      <div class="table-header">
-        <div class="table-cell" style="width: 60px;">序号</div>
-        <div class="table-cell" style="width: 150px;">反馈类型</div>
-        <div class="table-cell" style="width: 120px;">提交次数</div>
-        <div class="table-cell" style="width: 120px;">待处理次数</div>
-        <div class="table-cell" style="width: 120px;">已处理次数</div>
-        <div class="table-cell" style="width: 120px;">评价次数</div>
-        <div class="table-cell" style="width: 150px;">平均处理时长</div>
-        <div class="table-cell" style="width: 120px;">满意度评分</div>
+    <div class="data-card">
+      <div class="card-header">
+        <h3 class="card-title">详细数据明细</h3>
       </div>
-      <div class="table-body">
-        <div class="table-row" v-for="(item, index) in statisticsData" :key="index">
-          <div class="table-cell" style="width: 60px;">{{ index + 1 }}</div>
-          <div class="table-cell" style="width: 150px;">{{ item.type }}</div>
-          <div class="table-cell" style="width: 120px;">{{ item.submitCount }}</div>
-          <div class="table-cell" style="width: 120px;">{{ item.pendingCount }}</div>
-          <div class="table-cell" style="width: 120px;">{{ item.resolvedCount }}</div>
-          <div class="table-cell" style="width: 120px;">{{ item.ratedCount }}</div>
-          <div class="table-cell" style="width: 150px;">{{ item.avgTime }}</div>
-          <div class="table-cell" style="width: 120px;">
-            <span class="rating-value">{{ item.satisfaction }}</span>
+      <div class="table-container">
+        <div class="table-header">
+          <div class="table-cell cell-idx">序号</div>
+          <div class="table-cell cell-type">反馈类型</div>
+          <div class="table-cell">提交次数</div>
+          <div class="table-cell">待处理次数</div>
+          <div class="table-cell">已处理次数</div>
+          <div class="table-cell">评价次数</div>
+          <div class="table-cell">平均处理时长</div>
+          <div class="table-cell">满意度评分</div>
+        </div>
+        <div class="table-body">
+          <div class="table-row" v-for="(item, index) in statisticsData" :key="index">
+            <div class="table-cell cell-idx">{{ index + 1 }}</div>
+            <div class="table-cell cell-type">
+              <span class="type-tag" :class="'tag-' + (index + 1)">{{ item.type }}</span>
+            </div>
+            <div class="table-cell">{{ item.submitCount }}</div>
+            <div class="table-cell">
+              <span class="pending-tag">{{ item.pendingCount }}</span>
+            </div>
+            <div class="table-cell">{{ item.resolvedCount }}</div>
+            <div class="table-cell">{{ item.ratedCount }}</div>
+            <div class="table-cell">{{ item.avgTime }}</div>
+            <div class="table-cell">
+              <span class="rating-value">{{ item.satisfaction }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -246,6 +247,40 @@
 import { ref } from 'vue'
 
 const activeTime = ref('month')
+
+// 反馈类型分布
+const typeDistribution = ref([
+  { name: '服务态度', count: 64, percent: 25 },
+  { name: '医疗质量', count: 51, percent: 20 },
+  { name: '就医流程', count: 38, percent: 15 },
+  { name: '环境卫生', count: 26, percent: 10 },
+  { name: '收费问题', count: 32, percent: 12 },
+  { name: '医德医风', count: 18, percent: 8 },
+  { name: '其他', count: 27, percent: 10 }
+])
+
+// 一周趋势
+const weekTrend = ref([
+  { label: '周一', complaint: 8, suggestion: 4 },
+  { label: '周二', complaint: 10, suggestion: 5 },
+  { label: '周三', complaint: 12, suggestion: 7 },
+  { label: '周四', complaint: 14, suggestion: 8 },
+  { label: '周五', complaint: 13, suggestion: 7 },
+  { label: '周六', complaint: 18, suggestion: 10 },
+  { label: '周日', complaint: 20, suggestion: 11 }
+])
+
+// 处理效率数据
+const efficiencyData = ref([
+  { name: '服务态度', score: 4.2, scoreLevel: 'good', submit: 64, pending: 12, resolved: 48, rate: 81, avgTime: '2.5小时', satisfaction: 4.2 },
+  { name: '医疗质量', score: 4.5, scoreLevel: 'excellent', submit: 51, pending: 8, resolved: 40, rate: 84, avgTime: '3.2小时', satisfaction: 4.5 },
+  { name: '就医流程', score: 4.0, scoreLevel: 'good', submit: 38, pending: 10, resolved: 26, rate: 72, avgTime: '1.8小时', satisfaction: 4.0 },
+  { name: '环境卫生', score: 4.3, scoreLevel: 'good', submit: 26, pending: 5, resolved: 20, rate: 77, avgTime: '1.5小时', satisfaction: 4.3 },
+  { name: '收费问题', score: 4.1, scoreLevel: 'good', submit: 32, pending: 6, resolved: 24, rate: 75, avgTime: '2.0小时', satisfaction: 4.1 },
+  { name: '医德医风', score: 4.6, scoreLevel: 'excellent', submit: 18, pending: 4, resolved: 12, rate: 67, avgTime: '4.0小时', satisfaction: 4.6 },
+  { name: '其他', score: 3.9, scoreLevel: 'normal', submit: 27, pending: 3, resolved: 22, rate: 81, avgTime: '2.8小时', satisfaction: 3.9 },
+  { name: '总计', score: 4.23, scoreLevel: 'good', submit: 256, pending: 48, resolved: 192, rate: 77, avgTime: '2.5小时', satisfaction: 4.2 }
+])
 
 const statisticsData = ref([
   { type: '服务态度', submitCount: 64, pendingCount: 12, resolvedCount: 48, ratedCount: 38, avgTime: '2.5小时', satisfaction: 4.2 },
@@ -292,52 +327,57 @@ const statisticsData = ref([
 }
 
 .page-header {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .page-title {
   font-size: 20px;
   font-weight: 600;
-  color: #333;
+  color: #1f2937;
   margin: 0;
+  letter-spacing: 0.2px;
 }
 
-.time-filter {
+/* 筛选卡片 */
+.filter-card {
   display: flex;
   justify-content: space-between;
   align-items: center;
   background: #fff;
-  padding: 16px 20px;
-  border-radius: 4px;
-  margin-bottom: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 14px 20px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  border: 1px solid #eef0f4;
 }
 
 .quick-btns {
   display: flex;
-  gap: 8px;
+  gap: 6px;
 }
 
 .quick-btn {
   padding: 6px 16px;
-  border: 1px solid #d9d9d9;
-  border-radius: 4px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
   background: #fff;
-  font-size: 14px;
-  color: #666;
+  font-size: 13px;
+  color: #4b5563;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.2s ease;
+  font-weight: 500;
 }
 
 .quick-btn:hover {
   color: #1890ff;
   border-color: #1890ff;
+  background: #f0f9ff;
 }
 
 .quick-btn.active {
-  background: #1890ff;
+  background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
   color: #fff;
-  border-color: #1890ff;
+  border-color: transparent;
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.25);
 }
 
 .date-range {
@@ -346,13 +386,26 @@ const statisticsData = ref([
   gap: 8px;
 }
 
+.date-sep {
+  color: #9ca3af;
+  font-size: 13px;
+}
+
 .form-input {
   height: 32px;
   padding: 0 12px;
-  border: 1px solid #d9d9d9;
-  border-radius: 4px;
-  font-size: 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 13px;
   outline: none;
+  color: #4b5563;
+  background: #fafbfc;
+  transition: border 0.2s;
+}
+
+.form-input:focus {
+  border-color: #1890ff;
+  background: #fff;
 }
 
 .btn {
@@ -362,168 +415,521 @@ const statisticsData = ref([
   height: 32px;
   padding: 0 16px;
   border: none;
-  border-radius: 4px;
-  font-size: 14px;
+  border-radius: 6px;
+  font-size: 13px;
   cursor: pointer;
-  transition: all 0.3s;
-}
-
-.btn-primary {
-  background: #1890ff;
-  color: #fff;
-}
-
-.btn-primary:hover {
-  background: #40a9ff;
-}
-
-.stat-cards {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.stat-card {
-  background: #fff;
-  border-radius: 4px;
-  padding: 20px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.stat-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.stat-icon svg {
-  width: 24px;
-  height: 24px;
-}
-
-.stat-info {
-  flex: 1;
-}
-
-.stat-value {
-  font-size: 28px;
-  font-weight: 600;
-  color: #333;
-}
-
-.stat-label {
-  font-size: 14px;
-  color: #666;
-  margin-top: 4px;
-}
-
-.charts-row {
-  display: grid;
-  grid-template-columns: 1fr 1.5fr;
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.chart-card {
-  background: #fff;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.chart-header {
-  padding: 16px 20px;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.chart-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #333;
-  margin: 0;
-}
-
-.chart-body {
-  padding: 20px;
-  display: flex;
-  gap: 20px;
-}
-
-.pie-chart {
-  flex: 1;
-}
-
-.pie-svg {
-  width: 100%;
-  height: auto;
-}
-
-.line-chart,
-.bar-chart {
-  flex: 1;
-}
-
-.line-svg,
-.bar-svg {
-  width: 100%;
-  height: auto;
-}
-
-.x-axis-labels {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 8px;
-  font-size: 12px;
-  color: #666;
-}
-
-.chart-legend {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  min-width: 120px;
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-}
-
-.legend-color {
-  width: 12px;
-  height: 12px;
-  border-radius: 2px;
-}
-
-.legend-text {
-  color: #666;
-  flex: 1;
-}
-
-.legend-value {
-  color: #333;
+  transition: all 0.2s;
   font-weight: 500;
 }
 
-.table-container {
+.btn-primary {
+  background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.2);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+}
+
+/* 核心指标概览 */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.summary-card {
   background: #fff;
-  border-radius: 4px;
+  border-radius: 10px;
+  padding: 18px 20px;
+  position: relative;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #eef0f4;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.summary-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+}
+
+.summary-primary::before {
+  background: linear-gradient(180deg, #1890ff 0%, #096dd9 100%);
+}
+
+.summary-warn::before {
+  background: linear-gradient(180deg, #ff7a45 0%, #fa541c 100%);
+}
+
+.summary-success::before {
+  background: linear-gradient(180deg, #52c41a 0%, #389e0d 100%);
+}
+
+.summary-orange::before {
+  background: linear-gradient(180deg, #fa8c16 0%, #d46b08 100%);
+}
+
+.summary-label {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.summary-value {
+  font-size: 30px;
+  font-weight: 700;
+  color: #1f2937;
+  line-height: 1.1;
+  margin-bottom: 6px;
+  letter-spacing: -0.5px;
+}
+
+.summary-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.summary-trend.up {
+  color: #389e0d;
+  background: #f6ffed;
+}
+
+.summary-trend.down {
+  color: #cf1322;
+  background: #fff1f0;
+}
+
+.trend-icon {
+  width: 12px;
+  height: 12px;
+}
+
+.summary-sub {
+  margin-top: 4px;
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+/* 内容行 */
+.content-row {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+/* 通用卡片 */
+.data-card {
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid #eef0f4;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+
+.card-header {
+  padding: 14px 20px;
+  border-bottom: 1px solid #f3f4f6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.card-total {
+  font-size: 12px;
+  color: #6b7280;
+  background: #f3f4f6;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.card-body {
+  padding: 18px 20px;
+}
+
+.legend-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.legend-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  margin-right: 4px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.dot-blue {
+  background: #1890ff;
+}
+
+.dot-green {
+  background: #52c41a;
+}
+
+/* 类型列表 */
+.type-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.type-item + .type-item {
+  padding-top: 14px;
+  border-top: 1px dashed #f0f2f5;
+}
+
+.type-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.type-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.type-name.type-1 { color: #1890ff; }
+.type-name.type-2 { color: #52c41a; }
+.type-name.type-3 { color: #fa8c16; }
+.type-name.type-4 { color: #ff4d4f; }
+.type-name.type-5 { color: #722ed1; }
+.type-name.type-6 { color: #13c2c2; }
+.type-name.type-7 { color: #8c8c8c; }
+
+.type-count {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.type-progress-wrap {
+  height: 6px;
+  background: #f3f4f6;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.type-progress-bar {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.6s ease;
+}
+
+.bar-1 { background: linear-gradient(90deg, #1890ff 0%, #40a9ff 100%); }
+.bar-2 { background: linear-gradient(90deg, #52c41a 0%, #73d13d 100%); }
+.bar-3 { background: linear-gradient(90deg, #fa8c16 0%, #ffc069 100%); }
+.bar-4 { background: linear-gradient(90deg, #ff4d4f 0%, #ff7875 100%); }
+.bar-5 { background: linear-gradient(90deg, #722ed1 0%, #9254de 100%); }
+.bar-6 { background: linear-gradient(90deg, #13c2c2 0%, #36cfc9 100%); }
+.bar-7 { background: linear-gradient(90deg, #8c8c8c 0%, #adadad 100%); }
+
+.type-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+.type-percent {
+  font-weight: 600;
+  color: #6b7280;
+}
+
+/* 趋势网格 */
+.trend-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.trend-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 6px;
+  border-radius: 8px;
+  background: #fafbfc;
+  transition: background 0.2s;
+}
+
+.trend-cell:hover {
+  background: #f0f9ff;
+}
+
+.trend-day {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.trend-bars {
+  display: flex;
+  gap: 4px;
+  align-items: flex-end;
+  justify-content: center;
+  height: 70px;
+}
+
+.mini-bar {
+  width: 10px;
+  background: linear-gradient(180deg, #1890ff 0%, #40a9ff 100%);
+  border-radius: 3px 3px 0 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 12px;
+  position: relative;
+}
+
+.mini-bar.bar-green {
+  background: linear-gradient(180deg, #52c41a 0%, #73d13d 100%);
+}
+
+.mini-val {
+  font-size: 9px;
+  color: #fff;
+  font-weight: 700;
+  padding-top: 2px;
+}
+
+.trend-total {
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+/* 快速统计 */
+.quick-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  padding-top: 16px;
+  border-top: 1px dashed #e5e7eb;
+}
+
+.quick-stat {
+  text-align: center;
+  padding: 10px 6px;
+  background: #fafbfc;
+  border-radius: 6px;
+}
+
+.quick-label {
+  font-size: 11px;
+  color: #9ca3af;
+  margin-bottom: 4px;
+}
+
+.quick-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.quick-value.emphasis {
+  color: #fa8c16;
+  font-size: 14px;
+}
+
+.quick-unit {
+  font-size: 10px;
+  font-weight: 500;
+  color: #9ca3af;
+  margin-left: 2px;
+}
+
+/* 处理效率网格 */
+.efficiency-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.eff-card {
+  background: #fafbfc;
+  border-radius: 8px;
+  padding: 14px;
+  border: 1px solid #f0f2f5;
+  transition: all 0.2s;
+}
+
+.eff-card:hover {
+  background: #fff;
+  border-color: #d9e4f5;
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.08);
+}
+
+.eff-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.eff-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.eff-score {
+  font-size: 13px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.eff-score.score-excellent {
+  color: #389e0d;
+  background: #f6ffed;
+}
+
+.eff-score.score-good {
+  color: #fa8c16;
+  background: #fff7e6;
+}
+
+.eff-score.score-normal {
+  color: #4b5563;
+  background: #f3f4f6;
+}
+
+.eff-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.eff-cell {
+  text-align: center;
+  padding: 6px 2px;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.eff-num {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.eff-cell.eff-pending .eff-num {
+  color: #fa541c;
+}
+
+.eff-cell.eff-done .eff-num {
+  color: #389e0d;
+}
+
+.eff-sub {
+  font-size: 10px;
+  color: #9ca3af;
+  margin-top: 2px;
+}
+
+.eff-rate-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.eff-rate-bar {
+  flex: 1;
+  height: 4px;
+  background: #f0f2f5;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.eff-rate-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #1890ff 0%, #52c41a 100%);
+  border-radius: 2px;
+  transition: width 0.6s;
+}
+
+.eff-rate-text {
+  font-size: 11px;
+  color: #4b5563;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.eff-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #6b7280;
+  padding-top: 8px;
+  border-top: 1px dashed #e5e7eb;
+}
+
+.eff-time {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.mini-icon {
+  width: 11px;
+  height: 11px;
+}
+
+.eff-sat {
+  font-weight: 500;
+}
+
+/* 表格 */
+.table-container {
+  overflow: hidden;
 }
 
 .table-header {
   display: flex;
-  background: #fafafa;
-  border-bottom: 1px solid #e8e8e8;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .table-body {
@@ -533,29 +939,108 @@ const statisticsData = ref([
 
 .table-row {
   display: flex;
-  border-bottom: 1px solid #f0f0f0;
-  transition: background 0.3s;
+  border-bottom: 1px solid #f3f4f6;
+  transition: background 0.2s;
 }
 
 .table-row:hover {
-  background: #f5f7fa;
+  background: #f9fafb;
+}
+
+.table-row:last-child {
+  border-bottom: none;
 }
 
 .table-cell {
   padding: 12px 16px;
-  font-size: 14px;
-  color: #333;
+  font-size: 13px;
+  color: #374151;
   display: flex;
   align-items: center;
+  flex: 1;
+  min-width: 100px;
 }
 
 .table-header .table-cell {
   font-weight: 600;
-  color: #666;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.cell-idx {
+  flex: 0 0 60px;
+  min-width: 60px;
+  max-width: 60px;
+}
+
+.cell-type {
+  flex: 0 0 150px;
+  min-width: 150px;
+  max-width: 150px;
+}
+
+.type-tag {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.tag-1 { background: #e6f7ff; color: #1890ff; }
+.tag-2 { background: #f6ffed; color: #52c41a; }
+.tag-3 { background: #fff7e6; color: #fa8c16; }
+.tag-4 { background: #fff1f0; color: #ff4d4f; }
+.tag-5 { background: #f9f0ff; color: #722ed1; }
+.tag-6 { background: #e6fffb; color: #13c2c2; }
+.tag-7 { background: #f5f5f5; color: #8c8c8c; }
+
+.pending-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  background: #fff7e6;
+  color: #fa8c16;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 12px;
 }
 
 .rating-value {
   color: #fa8c16;
-  font-weight: 500;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* 响应式 */
+@media (max-width: 1200px) {
+  .summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .efficiency-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .content-row {
+    grid-template-columns: 1fr;
+  }
+  .quick-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+  .efficiency-grid {
+    grid-template-columns: 1fr;
+  }
+  .filter-card {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
 }
 </style>
