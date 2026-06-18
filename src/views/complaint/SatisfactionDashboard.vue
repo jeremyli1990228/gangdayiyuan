@@ -134,31 +134,76 @@
       <div class="kpi-card">
         <div class="kpi-label">总答卷数</div>
         <div class="kpi-value">{{ totalResponses }}</div>
-        <div class="kpi-trend up">↑ 较上期 +12.3%</div>
+        <div class="kpi-compare">
+          <span class="compare-item up">
+            <span class="compare-label">同比</span>
+            <span class="compare-value">+8.2%</span>
+          </span>
+          <span class="compare-item up">
+            <span class="compare-label">环比</span>
+            <span class="compare-value">+12.3%</span>
+          </span>
+        </div>
       </div>
 
       <div class="kpi-card">
         <div class="kpi-label">门诊满意度</div>
         <div class="kpi-value blue">{{ outpatientScore }}</div>
-        <div class="kpi-trend up">↑ +2.1% vs 上期</div>
+        <div class="kpi-compare">
+          <span class="compare-item up">
+            <span class="compare-label">同比</span>
+            <span class="compare-value">+1.8%</span>
+          </span>
+          <span class="compare-item up">
+            <span class="compare-label">环比</span>
+            <span class="compare-value">+2.1%</span>
+          </span>
+        </div>
       </div>
 
       <div class="kpi-card">
         <div class="kpi-label">住院满意度</div>
         <div class="kpi-value green">{{ inpatientScore }}</div>
-        <div class="kpi-trend up">↑ +1.5% vs 上期</div>
+        <div class="kpi-compare">
+          <span class="compare-item up">
+            <span class="compare-label">同比</span>
+            <span class="compare-value">+1.2%</span>
+          </span>
+          <span class="compare-item up">
+            <span class="compare-label">环比</span>
+            <span class="compare-value">+1.5%</span>
+          </span>
+        </div>
       </div>
 
       <div class="kpi-card">
         <div class="kpi-label">反馈有效率</div>
         <div class="kpi-value orange">{{ feedbackValidRate }}%</div>
-        <div class="kpi-trend down">↓ 较上期 -0.8%</div>
+        <div class="kpi-compare">
+          <span class="compare-item down">
+            <span class="compare-label">同比</span>
+            <span class="compare-value">-0.5%</span>
+          </span>
+          <span class="compare-item down">
+            <span class="compare-label">环比</span>
+            <span class="compare-value">-0.8%</span>
+          </span>
+        </div>
       </div>
 
       <div class="kpi-card">
         <div class="kpi-label">文字反馈数</div>
         <div class="kpi-value purple">{{ textFeedbackCount }}</div>
-        <div class="kpi-trend up">↑ 较上期 +35</div>
+        <div class="kpi-compare">
+          <span class="compare-item up">
+            <span class="compare-label">同比</span>
+            <span class="compare-value">+28</span>
+          </span>
+          <span class="compare-item up">
+            <span class="compare-label">环比</span>
+            <span class="compare-value">+35</span>
+          </span>
+        </div>
       </div>
     </div>
 
@@ -1150,13 +1195,30 @@ const exportReport = (fmt) => {
 .kpi-value.orange { color: #fa8c16; }
 .kpi-value.purple { color: #722ed1; }
 
-.kpi-trend {
-  font-size: 11px;
+.kpi-compare {
+  display: flex;
+  gap: 10px;
   margin-top: 4px;
-  font-weight: 500;
 }
-.kpi-trend.up { color: #389e0d; }
-.kpi-trend.down { color: #cf1322; }
+
+.compare-item {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.compare-label {
+  font-size: 9px;
+  color: #9ca3af;
+}
+
+.compare-value {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.compare-item.up .compare-value { color: #389e0d; }
+.compare-item.down .compare-value { color: #cf1322; }
 
 /* 主卡 */
 .kpi-main {
