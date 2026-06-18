@@ -163,7 +163,7 @@
     </div>
 
     <!-- 图表区：饼图 + 折线图 + 柱状图 -->
-    <div class="chart-row">
+    <div class="chart-row chart-row-three-cols">
       <!-- 饼图：各维度占比 / 满意度分布 -->
       <div class="chart-card">
         <div class="card-head">
@@ -1277,8 +1277,8 @@ const exportReport = (fmt) => {
   align-items: stretch;
 }
 
-.chart-row:first-of-type {
-  grid-template-columns: 1fr 1.8fr 1fr;
+.chart-row-three-cols {
+  grid-template-columns: 1fr 1.8fr 1fr !important;
 }
 
 .chart-row:nth-of-type(2) {
