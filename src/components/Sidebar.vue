@@ -189,10 +189,7 @@ const menuData = [
       { name: '结案时长统计', path: '/statistics/case-duration' },
       { name: '满意度样本数统计', path: '/statistics/satisfaction-sample' },
       { name: '满意度分项指标', path: '/statistics/satisfaction-indicators' },
-      { name: '满意度调查看板', path: '/statistics/satisfaction-dashboard' },
-      { name: '数据可视化看板', path: '/statistics/dashboard' },
-      { name: '报表分析', path: '/statistics/report-analysis' },
-      { name: '导出中心', path: '/statistics/export-center' }
+      { name: '满意度调查看板', path: '/statistics/satisfaction-dashboard' }
     ]
   },
   {

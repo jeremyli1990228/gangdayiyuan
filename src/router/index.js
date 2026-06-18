@@ -396,24 +396,6 @@ const routes = [
     name: 'processCasesMultiModule',
     component: () => import('../views/process-cases/MultiModuleAdd.vue')
   },
-  // 数据可视化看板
-  {
-    path: '/statistics/dashboard',
-    name: 'statisticsDashboard',
-    component: () => import('../views/statistics/Dashboard.vue')
-  },
-  // 报表分析
-  {
-    path: '/statistics/report-analysis',
-    name: 'statisticsReportAnalysis',
-    component: () => import('../views/statistics/ReportAnalysis.vue')
-  },
-  // 导出中心
-  {
-    path: '/statistics/export-center',
-    name: 'statisticsExportCenter',
-    component: () => import('../views/statistics/ExportCenter.vue')
-  },
   // 满意度调查看板
   {
     path: '/statistics/satisfaction-dashboard',
