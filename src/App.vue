@@ -12,47 +12,22 @@
       </div>
       <div v-if="sidebarCollapsed && !isMobile" class="sidebar-overlay" @click="sidebarCollapsed = false"></div>
       
-      <!-- 全局检索模态框 -->
-      <SearchModal ref="searchModal" />
-      
-      <!-- 预警提醒模态框 -->
-      <WarningModal ref="warningModal" />
     </template>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import Sidebar from './components/Sidebar.vue'
 import Header from './components/Header.vue'
-import SearchModal from './components/SearchModal.vue'
-import WarningModal from './components/WarningModal.vue'
 
 const route = useRoute()
 const sidebarCollapsed = ref(false)
-const searchModal = ref(null)
-const warningModal = ref(null)
 
 // 判断是否是H5页面
 const isH5Page = computed(() => {
   return route.path.startsWith('/h5/')
-})
-
-onMounted(() => {
-  // 监听全局搜索事件
-  window.addEventListener('open-global-search', () => {
-    if (searchModal.value) {
-      searchModal.value.openModal()
-    }
-  })
-  
-  // 监听预警提醒事件
-  window.addEventListener('open-warning-modal', () => {
-    if (warningModal.value) {
-      warningModal.value.openModal()
-    }
-  })
 })
 </script>
 
