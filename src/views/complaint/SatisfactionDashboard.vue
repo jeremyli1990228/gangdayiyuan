@@ -221,45 +221,57 @@
         <div class="card-head">
           <h3 class="card-title-sm">满意度月度趋势</h3>
           <div class="legend-inline">
-            <span class="legend-line line-blue"></span>本期
-            <span class="legend-line line-gray"></span>去年同期
-            <span class="legend-dot dot-orange"></span>目标线
+            <span><span class="legend-line line-blue"></span>本期</span>
+            <span><span class="legend-line line-gray"></span>去年同期</span>
+            <span><span class="legend-dot dot-orange"></span>目标线</span>
           </div>
         </div>
         <div class="line-chart-area">
-          <svg viewBox="0 0 560 260" preserveAspectRatio="none" class="line-svg">
+          <svg viewBox="0 0 600 240" preserveAspectRatio="none" class="line-svg">
             <defs>
               <linearGradient id="lineGradBlue" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#1890ff" stop-opacity="0.35"/>
+                <stop offset="0%" stop-color="#1890ff" stop-opacity="0.25"/>
                 <stop offset="100%" stop-color="#1890ff" stop-opacity="0"/>
               </linearGradient>
+              <filter id="glow">
+                <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                <feMerge>
+                  <feMergeNode in="coloredBlur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
             </defs>
+            <!-- Y轴 -->
+            <line x1="55" y1="20" x2="55" y2="200" stroke="#e5e7eb" stroke-width="1"/>
             <!-- 网格线 -->
-            <g stroke="#f0f2f5" stroke-width="1">
-              <line v-for="i in 5" :key="'g-' + i" :x1="50" :x2="540" :y1="20 + (i-1) * 44" :y2="20 + (i-1) * 44" stroke-dasharray="3,3"/>
+            <g stroke="#f3f4f6" stroke-width="1">
+              <line v-for="i in 5" :key="'g-' + i" :x1="55" :x2="585" :y1="20 + (i-1) * 45" :y2="20 + (i-1) * 45" stroke-dasharray="3,3"/>
             </g>
             <!-- Y轴标签 -->
-            <g font-size="10" fill="#9ca3af">
-              <text v-for="(val, i) in ['5.0','4.5','4.0','3.5','3.0']" :key="'y-' + i" x="44" :y="28 + i*44" text-anchor="end">{{ val }}</text>
+            <g font-size="11" fill="#6b7280" font-weight="500">
+              <text v-for="(val, i) in ['5.0','4.5','4.0','3.5','3.0']" :key="'y-' + i" x="48" :y="26 + i*45" text-anchor="end">{{ val }}</text>
             </g>
             <!-- 目标线 -->
-            <line x1="50" y1="42" x2="540" y2="42" stroke="#fa8c16" stroke-width="1.5" stroke-dasharray="6,4"/>
-            <text x="542" y="46" font-size="10" fill="#fa8c16">目标 4.50</text>
+            <line x1="55" y1="45" x2="585" y2="45" stroke="#fa8c16" stroke-width="1.5" stroke-dasharray="8,4"/>
+            <rect x="580" y="40" width="16" height="14" rx="2" fill="#fff" stroke="#fa8c16" stroke-width="1"/>
+            <text x="588" y="49" font-size="10" fill="#fa8c16" text-anchor="middle">目标</text>
 
             <!-- 面积（本期） -->
             <path :d="currentAreaPath" fill="url(#lineGradBlue)"/>
             <!-- 折线 - 本期 -->
-            <path :d="currentLinePath" fill="none" stroke="#1890ff" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+            <path :d="currentLinePath" fill="none" stroke="#1890ff" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" filter="url(#glow)"/>
             <!-- 折线 - 去年同期 -->
-            <path :d="lastYearPath" fill="none" stroke="#bfbfbf" stroke-width="1.8" stroke-dasharray="5,4" stroke-linejoin="round" stroke-linecap="round"/>
+            <path :d="lastYearPath" fill="none" stroke="#9ca3af" stroke-width="2" stroke-dasharray="6,4" stroke-linejoin="round" stroke-linecap="round"/>
             <!-- 数据点 -->
             <g v-for="(p, i) in currentPoints" :key="'cp-' + i">
-              <circle :cx="p.x" :cy="p.y" r="5" fill="#fff" stroke="#1890ff" stroke-width="2"/>
-              <text :x="p.x" :y="p.y - 10" text-anchor="middle" font-size="11" font-weight="600" fill="#1890ff">{{ p.val }}</text>
+              <circle :cx="p.x" :cy="p.y" r="6" fill="#fff" stroke="#1890ff" stroke-width="2.5"/>
+              <circle :cx="p.x" :cy="p.y" r="3" fill="#1890ff"/>
+              <text :x="p.x" :y="p.y - 12" text-anchor="middle" font-size="10" font-weight="600" fill="#1890ff">{{ p.val }}</text>
             </g>
             <!-- X轴 -->
-            <g font-size="11" fill="#6b7280">
-              <text v-for="(lbl, i) in monthLabels" :key="'x-' + i" :x="60 + i*48" y="250" text-anchor="middle">{{ lbl }}</text>
+            <line x1="55" y1="200" x2="585" y2="200" stroke="#e5e7eb" stroke-width="1"/>
+            <g font-size="11" fill="#4b5563" font-weight="500">
+              <text v-for="(lbl, i) in monthLabels" :key="'x-' + i" :x="70 + i*46" y="218" text-anchor="middle">{{ lbl }}</text>
             </g>
           </svg>
         </div>
@@ -272,7 +284,7 @@
           <span class="card-tag">柱状图</span>
         </div>
         <div class="bar-chart-area">
-          <svg viewBox="0 0 320 260" preserveAspectRatio="none" class="bar-svg">
+          <svg viewBox="0 0 340 220" preserveAspectRatio="none" class="bar-svg">
             <defs>
               <linearGradient id="barGradBlue" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stop-color="#40a9ff"/>
@@ -283,16 +295,31 @@
                 <stop offset="100%" stop-color="#52c41a"/>
               </linearGradient>
             </defs>
-            <g v-for="(d, i) in dimensionData" :key="'barg-' + i" :transform="'translate(' + (25 + i * 48) + ', 0)'">
-              <rect x="0" :y="d.currentY" width="18" :height="d.currentH" rx="3" fill="url(#barGradBlue)"/>
-              <rect x="22" :y="d.lastY" width="18" :height="d.lastH" rx="3" fill="url(#barGradGreen)" opacity="0.5"/>
-              <text x="9" :y="d.currentY - 6" text-anchor="middle" font-size="10" font-weight="600" fill="#1890ff">{{ d.current }}</text>
-              <text x="20" y="240" text-anchor="middle" font-size="10" fill="#6b7280" :transform="'translate(11,0)'">{{ d.name }}</text>
+            <!-- Y轴参考线 -->
+            <g stroke="#f3f4f6" stroke-width="1">
+              <line v-for="i in 4" :key="'bg-' + i" :x1="20" :x2="330" :y1="20 + i*45" :y2="20 + i*45" stroke-dasharray="2,2"/>
+            </g>
+            <!-- Y轴标签 -->
+            <g font-size="10" fill="#6b7280">
+              <text v-for="(val, i) in ['5.0','4.0','3.0']" :key="'by-' + i" x="16" :y="26 + i*45" text-anchor="end">{{ val }}</text>
+            </g>
+            <!-- 柱子组 -->
+            <g v-for="(d, i) in dimensionData" :key="'barg-' + i" :transform="'translate(' + (25 + i * 52) + ', 0)'">
+              <!-- 本期柱子 -->
+              <rect x="0" :y="d.currentY - 10" width="16" :height="d.currentH" rx="4" fill="url(#barGradBlue)" />
+              <rect x="0" :y="d.currentY - 10" width="16" height="4" rx="2" fill="#69c0ff"/>
+              <!-- 上期柱子 -->
+              <rect x="20" :y="d.lastY - 10" width="16" :height="d.lastH" rx="4" fill="url(#barGradGreen)" opacity="0.6" />
+              <rect x="20" :y="d.lastY - 10" width="16" height="4" rx="2" fill="#a8e6cf"/>
+              <!-- 数值标签 -->
+              <text x="8" :y="d.currentY - 16" text-anchor="middle" font-size="10" font-weight="600" fill="#1890ff">{{ d.current }}</text>
+              <!-- 维度名称 -->
+              <text x="16" y="205" text-anchor="middle" font-size="10" fill="#4b5563" font-weight="500">{{ d.name }}</text>
             </g>
           </svg>
           <div class="chart-legend-row">
-            <span><span class="legend-dot dot-blue"></span>本期</span>
-            <span><span class="legend-dot dot-green"></span>上期</span>
+            <span><span class="legend-dot dot-blue" style="width:12px;height:12px;border-radius:4px;"></span>本期</span>
+            <span><span class="legend-dot dot-green" style="width:12px;height:12px;border-radius:4px;"></span>上期</span>
           </div>
         </div>
       </div>
@@ -1301,9 +1328,15 @@ const exportReport = (fmt) => {
 .legend-inline {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 16px;
   font-size: 11px;
   color: #6b7280;
+}
+
+.legend-inline span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .legend-dot {
@@ -1335,71 +1368,110 @@ const exportReport = (fmt) => {
 
 /* 饼图 */
 .pie-chart-area {
-  display: grid;
-  grid-template-columns: 220px 1fr;
-  gap: 12px;
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  gap: 12px;
 }
 
 .pie-svg {
   width: 100%;
-  height: 220px;
+  max-width: 280px;
+  height: 200px;
 }
 
 .pie-center-num {
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 700;
   fill: #1890ff;
 }
 .pie-center-label {
-  font-size: 10px;
+  font-size: 11px;
   fill: #9ca3af;
 }
 
 .pie-legend-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px 12px;
+  width: 100%;
+  max-width: 280px;
 }
 
 .legend-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 12px;
+  gap: 6px;
+  font-size: 11px;
+}
+
+.legend-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .legend-name {
   color: #374151;
   flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .legend-num {
   font-weight: 600;
   color: #1f2937;
+  font-size: 11px;
 }
 
 .legend-pct {
   color: #9ca3af;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 500;
 }
 
 /* 折线图 */
-.line-chart-area { width: 100%; }
-.line-svg { width: 100%; height: 260px; }
+.line-chart-area { 
+  width: 100%; 
+  background: linear-gradient(180deg, rgba(24, 144, 255, 0.02) 0%, rgba(24, 144, 255, 0) 100%);
+  border-radius: 8px;
+  padding: 8px;
+}
+.line-svg { 
+  width: 100%; 
+  height: 240px; 
+}
 
 /* 柱状图 */
-.bar-chart-area { width: 100%; }
-.bar-svg { width: 100%; height: 260px; }
+.bar-chart-area { 
+  width: 100%; 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.bar-svg { 
+  width: 100%; 
+  height: 220px; 
+}
 
 .chart-legend-row {
   display: flex;
   justify-content: center;
-  gap: 20px;
-  font-size: 11px;
+  gap: 24px;
+  font-size: 12px;
   color: #6b7280;
-  margin-top: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed #f0f0f0;
+  width: 100%;
+}
+
+.chart-legend-row span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 /* 科室排名 */
