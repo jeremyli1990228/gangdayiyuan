@@ -33,6 +33,14 @@
           </svg>
           导入员工
         </button>
+        <button class="btn btn-success" @click="openSyncModal">
+          <svg class="btn-icon btn-icon-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M23 4v6h-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M1 20v-6h6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          更新同步
+        </button>
       </div>
     </div>
     
@@ -138,12 +146,139 @@
         </div>
       </div>
     </div>
+
+    <div v-if="showSyncModal" class="modal-mask" @click.self="closeSyncModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span class="modal-title">通讯录更新同步</span>
+          <span class="modal-close" @click="closeSyncModal">×</span>
+        </div>
+        <div class="modal-body">
+          <div class="sync-intro">
+            <svg class="sync-intro-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M23 4v6h-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M1 20v-6h6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <div>
+              <div class="sync-intro-title">与第三方系统同步最新通讯录</div>
+              <div class="sync-intro-desc">点击下方"开始同步"按钮，系统将从第三方人事/组织架构系统拉取最新员工信息，比对并更新本系统通讯录，确保人员信息及时、准确。</div>
+            </div>
+          </div>
+
+          <div v-if="syncStatus === 'idle'" class="sync-info">
+            <div class="sync-info-row">
+              <span class="sync-info-label">上次同步时间</span>
+              <span class="sync-info-value">2026-06-18 09:15:32</span>
+            </div>
+            <div class="sync-info-row">
+              <span class="sync-info-label">同步方式</span>
+              <span class="sync-info-value">手动触发（全量比对）</span>
+            </div>
+            <div class="sync-info-row">
+              <span class="sync-info-label">待同步范围</span>
+              <span class="sync-info-value">全部门 / 全体员工</span>
+            </div>
+          </div>
+
+          <div v-if="syncStatus === 'syncing'" class="sync-progress">
+            <div class="sync-progress-bar">
+              <div class="sync-progress-fill" :style="{ width: syncProgress + '%' }"></div>
+            </div>
+            <div class="sync-progress-text">正在同步中… 已完成 {{ syncProgress }}%</div>
+            <div class="sync-step-text">{{ syncStepText }}</div>
+          </div>
+
+          <div v-if="syncStatus === 'done'" class="sync-result">
+            <div class="sync-result-success">
+              <svg class="sync-result-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke-width="2"/>
+                <polyline points="9 12 11 14 15 10" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span>同步完成！</span>
+            </div>
+            <div class="sync-result-grid">
+              <div class="sync-result-item">
+                <div class="sync-result-num">+12</div>
+                <div class="sync-result-label">新增员工</div>
+              </div>
+              <div class="sync-result-item">
+                <div class="sync-result-num">28</div>
+                <div class="sync-result-label">信息已更新</div>
+              </div>
+              <div class="sync-result-item">
+                <div class="sync-result-num">-3</div>
+                <div class="sync-result-label">已离职/停用</div>
+              </div>
+              <div class="sync-result-item">
+                <div class="sync-result-num">1,286</div>
+                <div class="sync-result-label">员工总数</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button v-if="syncStatus === 'idle'" class="btn btn-default" @click="closeSyncModal">取消</button>
+          <button v-if="syncStatus === 'idle'" class="btn btn-success" @click="startSync">开始同步</button>
+          <button v-if="syncStatus === 'syncing'" class="btn btn-default" disabled>同步中…</button>
+          <button v-if="syncStatus === 'done'" class="btn btn-default" @click="closeSyncModal">关闭</button>
+          <button v-if="syncStatus === 'done'" class="btn btn-primary" @click="refreshList">刷新列表</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
+import { ref } from 'vue'
+
 const goBack = () => {
   window.history.back()
+}
+
+const showSyncModal = ref(false)
+const syncStatus = ref('idle')
+const syncProgress = ref(0)
+const syncStepText = ref('')
+
+const openSyncModal = () => {
+  showSyncModal.value = true
+  syncStatus.value = 'idle'
+  syncProgress.value = 0
+}
+
+const closeSyncModal = () => {
+  showSyncModal.value = false
+}
+
+const refreshList = () => {
+  closeSyncModal()
+  window.location.reload()
+}
+
+const startSync = () => {
+  syncStatus.value = 'syncing'
+  syncProgress.value = 0
+  const steps = [
+    '正在连接第三方系统接口…',
+    '拉取最新员工信息…',
+    '逐人比对信息差异…',
+    '更新新增/变动的员工…',
+    '标记离职及停用员工…',
+    '同步完成，数据已写入本地'
+  ]
+  const timer = setInterval(() => {
+    syncProgress.value += 10
+    const stepIndex = Math.min(
+      Math.floor(syncProgress.value / (100 / steps.length)),
+      steps.length - 1
+    )
+    syncStepText.value = steps[stepIndex]
+    if (syncProgress.value >= 100) {
+      clearInterval(timer)
+      syncStatus.value = 'done'
+    }
+  }, 300)
 }
 </script>
 
@@ -235,6 +370,36 @@ const goBack = () => {
 .btn-primary {
   background-color: #1890ff;
   color: #fff;
+}
+
+.btn-success {
+  background-color: #52c41a;
+  color: #fff;
+}
+
+.btn-success:hover {
+  background-color: #73d13d;
+}
+
+.btn-default {
+  background-color: #fff;
+  color: #333;
+  border: 1px solid #d9d9d9;
+}
+
+.btn-default:hover:not(:disabled) {
+  border-color: #1890ff;
+  color: #1890ff;
+}
+
+.btn-default:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.btn-icon-spin {
+  width: 14px;
+  height: 14px;
 }
 
 .search-form {
@@ -429,5 +594,207 @@ const goBack = () => {
   border-radius: 4px;
   text-align: center;
   font-size: 14px;
+}
+
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  width: 520px;
+  max-width: 90%;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.modal-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.modal-close {
+  font-size: 24px;
+  color: #999;
+  cursor: pointer;
+  line-height: 1;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-close:hover {
+  color: #333;
+}
+
+.modal-body {
+  padding: 20px 24px;
+}
+
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 12px 24px;
+  border-top: 1px solid #f0f0f0;
+  background-color: #fafafa;
+}
+
+.sync-intro {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  background-color: #e6f7ff;
+  border: 1px solid #bae7ff;
+  border-radius: 6px;
+  margin-bottom: 16px;
+}
+
+.sync-intro-icon {
+  width: 20px;
+  height: 20px;
+  color: #1890ff;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.sync-intro-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1890ff;
+  margin-bottom: 4px;
+}
+
+.sync-intro-desc {
+  font-size: 13px;
+  color: #555;
+  line-height: 1.6;
+}
+
+.sync-info {
+  background-color: #fafafa;
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
+  padding: 14px 16px;
+}
+
+.sync-info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+}
+
+.sync-info-label {
+  font-size: 13px;
+  color: #888;
+}
+
+.sync-info-value {
+  font-size: 13px;
+  color: #333;
+  font-weight: 500;
+}
+
+.sync-progress {
+  padding: 8px 0;
+}
+
+.sync-progress-bar {
+  width: 100%;
+  height: 8px;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.sync-progress-fill {
+  height: 100%;
+  background-color: #1890ff;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.sync-progress-text {
+  font-size: 14px;
+  color: #1890ff;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.sync-step-text {
+  font-size: 12px;
+  color: #888;
+}
+
+.sync-result {
+  padding: 8px 0;
+}
+
+.sync-result-success {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #52c41a;
+  margin-bottom: 16px;
+}
+
+.sync-result-icon {
+  width: 22px;
+  height: 22px;
+  color: #52c41a;
+}
+
+.sync-result-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.sync-result-item {
+  background-color: #fafafa;
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
+  padding: 12px 8px;
+  text-align: center;
+}
+
+.sync-result-num {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1890ff;
+  margin-bottom: 4px;
+}
+
+.sync-result-label {
+  font-size: 12px;
+  color: #888;
 }
 </style>
