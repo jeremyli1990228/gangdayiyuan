@@ -2055,13 +2055,10 @@ const exportReport = (fmt) => {
 @media (max-width: 1400px) {
   .kpi-grid { grid-template-columns: 2fr 1fr 1fr; }
   .doctor-grid { grid-template-columns: repeat(4, 1fr); }
-  .chart-row:first-of-type { grid-template-columns: 1fr 1fr; }
-  .chart-row:first-of-type > .chart-card:first-child { grid-column: 1 / -1; }
 }
 
 @media (max-width: 1100px) {
   .kpi-grid { grid-template-columns: 2fr 1fr 1fr; }
-  .chart-row:first-of-type,
   .chart-row:nth-of-type(2),
   .chart-row:nth-of-type(4) {
     grid-template-columns: 1fr;
