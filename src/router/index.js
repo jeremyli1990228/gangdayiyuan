@@ -402,6 +402,12 @@ const routes = [
     name: 'statisticsSatisfactionDashboard',
     component: () => import('../views/complaint/SatisfactionDashboard.vue')
   },
+  // 投诉统计看板
+  {
+    path: '/statistics/complaint-dashboard',
+    name: 'statisticsComplaintDashboard',
+    component: () => import('../views/complaint/ComplaintStatisticsDashboard.vue')
+  },
   // 案件闭环管理
   {
     path: '/process-cases/case-tracking',
