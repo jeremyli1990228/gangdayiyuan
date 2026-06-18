@@ -1114,11 +1114,15 @@ const exportReport = (fmt) => {
 .kpi-card {
   background: #fff;
   border-radius: 10px;
-  padding: 16px 18px;
+  padding: 12px 14px;
   position: relative;
   overflow: hidden;
   transition: transform 0.2s, box-shadow 0.2s;
   border: 1px solid #eef0f4;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 88px;
 }
 
 .kpi-card:hover {
@@ -1129,16 +1133,16 @@ const exportReport = (fmt) => {
 .kpi-label {
   font-size: 12px;
   color: #6b7280;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   font-weight: 500;
 }
 
 .kpi-value {
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 700;
   color: #1f2937;
   letter-spacing: -0.5px;
-  line-height: 1.2;
+  line-height: 1.1;
 }
 
 .kpi-value.blue { color: #1890ff; }
@@ -1148,7 +1152,7 @@ const exportReport = (fmt) => {
 
 .kpi-trend {
   font-size: 11px;
-  margin-top: 6px;
+  margin-top: 4px;
   font-weight: 500;
 }
 .kpi-trend.up { color: #389e0d; }
