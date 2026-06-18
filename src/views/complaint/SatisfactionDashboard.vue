@@ -227,7 +227,7 @@
           </div>
         </div>
         <div class="line-chart-area">
-          <svg viewBox="0 0 600 240" preserveAspectRatio="none" class="line-svg">
+          <svg viewBox="0 0 600 190" preserveAspectRatio="none" class="line-svg">
             <defs>
               <linearGradient id="lineGradBlue" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stop-color="#1890ff" stop-opacity="0.25"/>
@@ -242,36 +242,34 @@
               </filter>
             </defs>
             <!-- Y轴 -->
-            <line x1="55" y1="20" x2="55" y2="200" stroke="#e5e7eb" stroke-width="1"/>
+            <line x1="50" y1="15" x2="50" y2="165" stroke="#e5e7eb" stroke-width="1"/>
             <!-- 网格线 -->
             <g stroke="#f3f4f6" stroke-width="1">
-              <line v-for="i in 5" :key="'g-' + i" :x1="55" :x2="585" :y1="20 + (i-1) * 45" :y2="20 + (i-1) * 45" stroke-dasharray="3,3"/>
+              <line v-for="i in 5" :key="'g-' + i" :x1="50" :x2="580" :y1="15 + (i-1) * 38" :y2="15 + (i-1) * 38" stroke-dasharray="3,3"/>
             </g>
             <!-- Y轴标签 -->
-            <g font-size="11" fill="#6b7280" font-weight="500">
-              <text v-for="(val, i) in ['5.0','4.5','4.0','3.5','3.0']" :key="'y-' + i" x="48" :y="26 + i*45" text-anchor="end">{{ val }}</text>
+            <g font-size="10" fill="#6b7280" font-weight="500">
+              <text v-for="(val, i) in ['5.0','4.5','4.0','3.5','3.0']" :key="'y-' + i" x="44" :y="22 + i*38" text-anchor="end">{{ val }}</text>
             </g>
             <!-- 目标线 -->
-            <line x1="55" y1="45" x2="585" y2="45" stroke="#fa8c16" stroke-width="1.5" stroke-dasharray="8,4"/>
-            <rect x="580" y="40" width="16" height="14" rx="2" fill="#fff" stroke="#fa8c16" stroke-width="1"/>
-            <text x="588" y="49" font-size="10" fill="#fa8c16" text-anchor="middle">目标</text>
+            <line x1="50" y1="53" x2="580" y2="53" stroke="#fa8c16" stroke-width="1.5" stroke-dasharray="8,4"/>
+            <text x="582" y="57" font-size="9" fill="#fa8c16">目标</text>
 
             <!-- 面积（本期） -->
             <path :d="currentAreaPath" fill="url(#lineGradBlue)"/>
             <!-- 折线 - 本期 -->
-            <path :d="currentLinePath" fill="none" stroke="#1890ff" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" filter="url(#glow)"/>
+            <path :d="currentLinePath" fill="none" stroke="#1890ff" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" filter="url(#glow)"/>
             <!-- 折线 - 去年同期 -->
-            <path :d="lastYearPath" fill="none" stroke="#9ca3af" stroke-width="2" stroke-dasharray="6,4" stroke-linejoin="round" stroke-linecap="round"/>
+            <path :d="lastYearPath" fill="none" stroke="#9ca3af" stroke-width="1.8" stroke-dasharray="6,4" stroke-linejoin="round" stroke-linecap="round"/>
             <!-- 数据点 -->
             <g v-for="(p, i) in currentPoints" :key="'cp-' + i">
-              <circle :cx="p.x" :cy="p.y" r="6" fill="#fff" stroke="#1890ff" stroke-width="2.5"/>
-              <circle :cx="p.x" :cy="p.y" r="3" fill="#1890ff"/>
-              <text :x="p.x" :y="p.y - 12" text-anchor="middle" font-size="10" font-weight="600" fill="#1890ff">{{ p.val }}</text>
+              <circle :cx="p.x" :cy="p.y" r="5" fill="#fff" stroke="#1890ff" stroke-width="2"/>
+              <circle :cx="p.x" :cy="p.y" r="2.5" fill="#1890ff"/>
             </g>
             <!-- X轴 -->
-            <line x1="55" y1="200" x2="585" y2="200" stroke="#e5e7eb" stroke-width="1"/>
-            <g font-size="11" fill="#4b5563" font-weight="500">
-              <text v-for="(lbl, i) in monthLabels" :key="'x-' + i" :x="70 + i*46" y="218" text-anchor="middle">{{ lbl }}</text>
+            <line x1="50" y1="165" x2="580" y2="165" stroke="#e5e7eb" stroke-width="1"/>
+            <g font-size="10" fill="#4b5563" font-weight="500">
+              <text v-for="(lbl, i) in monthLabels" :key="'x-' + i" :x="65 + i*45" y="178" text-anchor="middle">{{ lbl }}</text>
             </g>
           </svg>
         </div>
@@ -694,8 +692,8 @@ const currentPoints = computed(() => {
   const vals = [4.21, 4.28, 4.15, 4.32, 4.38, 4.41, 4.30, 4.35, 4.42, 4.45, 4.48, 4.42]
   const yMin = 3.0, yMax = 5.0
   return vals.map((v, i) => ({
-    x: 60 + i * 48,
-    y: 20 + (1 - (v - yMin) / (yMax - yMin)) * 176,
+    x: 60 + i * 45,
+    y: 15 + (1 - (v - yMin) / (yMax - yMin)) * 150,
     val: v
   }))
 })
@@ -708,15 +706,15 @@ const currentAreaPath = computed(() => {
   const pts = currentPoints.value
   if (!pts.length) return ''
   const line = pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ')
-  return `${line} L ${pts[pts.length-1].x} 196 L ${pts[0].x} 196 Z`
+  return `${line} L ${pts[pts.length-1].x} 165 L ${pts[0].x} 165 Z`
 })
 
 const lastYearPath = computed(() => {
   const vals = [4.10, 4.15, 4.05, 4.22, 4.28, 4.32, 4.22, 4.25, 4.30, 4.35, 4.38, 4.28]
   const yMin = 3.0, yMax = 5.0
   const pts = vals.map((v, i) => ({
-    x: 60 + i * 48,
-    y: 20 + (1 - (v - yMin) / (yMax - yMin)) * 176
+    x: 60 + i * 45,
+    y: 15 + (1 - (v - yMin) / (yMax - yMin)) * 150
   }))
   return pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ')
 })
@@ -1274,12 +1272,13 @@ const exportReport = (fmt) => {
 /* 图表行 */
 .chart-row {
   display: grid;
-  gap: 12px;
+  gap: 14px;
   margin-bottom: 14px;
+  align-items: stretch;
 }
 
 .chart-row:first-of-type {
-  grid-template-columns: 1fr 1.6fr 1fr;
+  grid-template-columns: 1fr 1.8fr 1fr;
 }
 
 .chart-row:nth-of-type(2) {
@@ -1369,15 +1368,15 @@ const exportReport = (fmt) => {
 /* 饼图 */
 .pie-chart-area {
   display: flex;
-  flex-direction: column;
-  align-items: center;
   gap: 12px;
+  align-items: center;
+  height: 200px;
 }
 
 .pie-svg {
-  width: 100%;
-  max-width: 280px;
-  height: 200px;
+  flex-shrink: 0;
+  width: 160px;
+  height: 160px;
 }
 
 .pie-center-num {
@@ -1391,23 +1390,23 @@ const exportReport = (fmt) => {
 }
 
 .pie-legend-list {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px 12px;
-  width: 100%;
-  max-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  overflow: hidden;
 }
 
 .legend-row {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 11px;
+  gap: 8px;
+  font-size: 12px;
 }
 
 .legend-dot {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   flex-shrink: 0;
 }
@@ -1418,17 +1417,18 @@ const exportReport = (fmt) => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: 11px;
 }
 
 .legend-num {
   font-weight: 600;
   color: #1f2937;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .legend-pct {
   color: #9ca3af;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
 }
 
@@ -1438,10 +1438,11 @@ const exportReport = (fmt) => {
   background: linear-gradient(180deg, rgba(24, 144, 255, 0.02) 0%, rgba(24, 144, 255, 0) 100%);
   border-radius: 8px;
   padding: 8px;
+  height: 200px;
 }
 .line-svg { 
   width: 100%; 
-  height: 240px; 
+  height: 100%; 
 }
 
 /* 柱状图 */
@@ -1450,10 +1451,11 @@ const exportReport = (fmt) => {
   display: flex;
   flex-direction: column;
   align-items: center;
+  height: 200px;
 }
 .bar-svg { 
   width: 100%; 
-  height: 220px; 
+  flex: 1; 
 }
 
 .chart-legend-row {
