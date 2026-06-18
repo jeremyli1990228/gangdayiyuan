@@ -414,6 +414,12 @@ const routes = [
     name: 'statisticsExportCenter',
     component: () => import('../views/statistics/ExportCenter.vue')
   },
+  // 满意度调查看板
+  {
+    path: '/statistics/satisfaction-dashboard',
+    name: 'statisticsSatisfactionDashboard',
+    component: () => import('../views/complaint/SatisfactionDashboard.vue')
+  },
   // 案件闭环管理
   {
     path: '/process-cases/case-tracking',
