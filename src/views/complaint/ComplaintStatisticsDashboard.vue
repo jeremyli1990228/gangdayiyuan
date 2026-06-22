@@ -415,34 +415,38 @@
         <h3 class="card-title">详细数据明细</h3>
       </div>
       <div class="table-container">
-        <div class="table-header">
-          <div class="table-cell" style="flex:0 0 50px">序号</div>
-          <div class="table-cell" style="flex:0 0 80px">月份</div>
-          <div class="table-cell" style="flex:0 0 80px">投诉量</div>
-          <div class="table-cell" style="flex:0 0 80px">已处理</div>
-          <div class="table-cell" style="flex:0 0 80px">待处理</div>
-          <div class="table-cell" style="flex:0 0 80px">表扬量</div>
-          <div class="table-cell" style="flex:0 0 100px">投诉/表扬率</div>
-          <div class="table-cell" style="flex:0 0 100px">赔付金额(元)</div>
-          <div class="table-cell" style="flex:0 0 80px">门急诊</div>
-          <div class="table-cell" style="flex:0 0 80px">住院</div>
-          <div class="table-cell" style="flex:1">主要投诉原因</div>
-        </div>
-        <div class="table-body">
-          <div class="table-row" v-for="(row,idx) in detailTable" :key="idx">
-            <div class="table-cell" style="flex:0 0 50px">{{ idx+1 }}</div>
-            <div class="table-cell" style="flex:0 0 80px">{{ row.month }}</div>
-            <div class="table-cell" style="flex:0 0 80px text-warn">{{ row.complaints }}</div>
-            <div class="table-cell" style="flex:0 0 80px text-success">{{ row.resolved }}</div>
-            <div class="table-cell" style="flex:0 0 80px text-orange">{{ row.pending }}</div>
-            <div class="table-cell" style="flex:0 0 80px text-green">{{ row.praise }}</div>
-            <div class="table-cell" style="flex:0 0 100px">{{ row.ratio }}</div>
-            <div class="table-cell" style="flex:0 0 100px text-red">¥{{ row.compensation }}</div>
-            <div class="table-cell" style="flex:0 0 80px">{{ row.outpatient }}</div>
-            <div class="table-cell" style="flex:0 0 80px">{{ row.inpatient }}</div>
-            <div class="table-cell" style="flex:1">{{ row.topReason }}</div>
-          </div>
-        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>序号</th>
+              <th>月份</th>
+              <th>投诉量</th>
+              <th>已处理</th>
+              <th>待处理</th>
+              <th>表扬量</th>
+              <th>投诉/表扬率</th>
+              <th>赔付金额(元)</th>
+              <th>门急诊</th>
+              <th>住院</th>
+              <th>主要投诉原因</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(row,idx) in detailTable" :key="idx">
+              <td>{{ idx+1 }}</td>
+              <td>{{ row.month }}</td>
+              <td class="text-warn">{{ row.complaints }}</td>
+              <td class="text-success">{{ row.resolved }}</td>
+              <td class="text-orange">{{ row.pending }}</td>
+              <td class="text-green">{{ row.praise }}</td>
+              <td>{{ row.ratio }}</td>
+              <td class="text-red">¥{{ row.compensation }}</td>
+              <td>{{ row.outpatient }}</td>
+              <td>{{ row.inpatient }}</td>
+              <td>{{ row.topReason }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -949,14 +953,49 @@ const exportReport = () => {
 .card-title { font-size: 14px; font-weight: 600; color: #1f2937; margin: 0; }
 
 .table-container { overflow-x: auto; }
-.table-header { display: flex; background: #f9fafb; padding: 10px 16px; border-bottom: 1px solid #e5e7eb; }
-.table-body { padding: 0; }
-.table-row { display: flex; padding: 10px 16px; border-bottom: 1px solid #f3f4f6; transition: background 0.2s; }
-.table-row:hover { background: #f9fafb; }
-.table-row:last-child { border-bottom: none; }
-.table-cell { font-size: 13px; color: #374151; display: flex; align-items: center; min-width: 0; }
-
-.table-header .table-cell { font-size: 12px; font-weight: 600; color: #6b7280; }
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th,
+.data-table td {
+  padding: 10px 12px;
+  text-align: left;
+  font-size: 13px;
+  color: #374151;
+  border-bottom: 1px solid #f3f4f6;
+  white-space: nowrap;
+}
+.data-table th {
+  background: #f9fafb;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+}
+.data-table th:first-child,
+.data-table td:first-child { width: 50px; }
+.data-table th:nth-child(2),
+.data-table td:nth-child(2) { width: 80px; }
+.data-table th:nth-child(3),
+.data-table td:nth-child(3) { width: 70px; }
+.data-table th:nth-child(4),
+.data-table td:nth-child(4) { width: 70px; }
+.data-table th:nth-child(5),
+.data-table td:nth-child(5) { width: 70px; }
+.data-table th:nth-child(6),
+.data-table td:nth-child(6) { width: 70px; }
+.data-table th:nth-child(7),
+.data-table td:nth-child(7) { width: 100px; }
+.data-table th:nth-child(8),
+.data-table td:nth-child(8) { width: 110px; }
+.data-table th:nth-child(9),
+.data-table td:nth-child(9) { width: 70px; }
+.data-table th:nth-child(10),
+.data-table td:nth-child(10) { width: 70px; }
+.data-table th:last-child,
+.data-table td:last-child { 
+  width: auto; 
+  min-width: 120px;
+  white-space: normal;
+}
+.data-table tbody tr:hover { background: #f9fafb; }
 
 @media (max-width: 1400px) {
   .kpi-grid { grid-template-columns: repeat(3, 1fr); }
