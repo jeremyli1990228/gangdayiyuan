@@ -107,7 +107,6 @@
         </div>
         <div class="table-cell" style="width: 60px;">序号</div>
         <div class="table-cell" style="width: 100px;">提交人</div>
-        <div class="table-cell" style="width: 120px;">微信昵称</div>
         <div class="table-cell" style="width: 80px;">分类</div>
         <div class="table-cell" style="width: 100px;">反馈类型</div>
         <div class="table-cell" style="width: 150px;">提交时间</div>
@@ -124,7 +123,6 @@
           </div>
           <div class="table-cell" style="width: 60px;">{{ index + 1 }}</div>
           <div class="table-cell" style="width: 100px;">{{ item.submitterName }}</div>
-          <div class="table-cell" style="width: 120px;">{{ item.wechatNickname }}</div>
           <div class="table-cell" style="width: 80px;">{{ item.category }}</div>
           <div class="table-cell" style="width: 100px;">{{ item.feedbackType }}</div>
           <div class="table-cell" style="width: 150px;">{{ item.submitTime }}</div>
@@ -176,10 +174,6 @@
               <div class="detail-item">
                 <span class="detail-label">提交人：</span>
                 <span class="detail-value">{{ currentFeedback.submitterName }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">微信昵称：</span>
-                <span class="detail-value">{{ currentFeedback.wechatNickname }}</span>
               </div>
               <div class="detail-item">
                 <span class="detail-label">联系方式：</span>
