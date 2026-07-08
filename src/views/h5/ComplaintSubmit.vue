@@ -75,9 +75,24 @@
           <div class="upload-tip">最多上传9张图片</div>
         </div>
 
-        <div class="form-item">
+        <div class="form-item required">
           <label class="form-label">联系方式</label>
-          <input type="tel" class="form-input" v-model="formData.phone" placeholder="请输入手机号码">
+          <input type="tel" class="form-input" v-model="formData.phone" placeholder="请输入手机号码" maxlength="11">
+        </div>
+
+        <div class="form-item required">
+          <label class="form-label">短信验证码</label>
+          <div class="verify-code-row">
+            <input type="text" class="form-input verify-input" v-model="formData.verifyCode" placeholder="请输入验证码" maxlength="6">
+            <button
+              class="verify-btn"
+              :disabled="countdown > 0 || !isValidPhone"
+              @click="sendVerifyCode"
+            >
+              {{ countdown > 0 ? `${countdown}s后重发` : '获取验证码' }}
+            </button>
+          </div>
+          <div class="verify-tip" v-if="verifyMessage">{{ verifyMessage }}</div>
         </div>
       </div>
     </div>
@@ -147,6 +162,12 @@ const caseNo = ref('')
 const autoSaveTimer = ref(null)
 const lastSaveTime = ref('')
 
+// 短信验证码相关
+const countdown = ref(0)
+const verifyMessage = ref('')
+const sentCode = ref('')
+const countdownTimer = ref(null)
+
 // 从URL参数获取患者信息
 const patientInfo = ref({
   name: route.query.patientName || '',
@@ -160,7 +181,8 @@ const formData = ref({
   type: '',
   description: '',
   images: [],
-  phone: ''
+  phone: '',
+  verifyCode: ''
 })
 
 const tempType = ref({
@@ -268,6 +290,39 @@ const level2Options = computed(() => {
   return selected?.children || []
 })
 
+// 手机号格式校验
+const isValidPhone = computed(() => {
+  const phone = formData.value.phone
+  return /^1[3-9]\d{9}$/.test(phone)
+})
+
+// 发送短信验证码
+const sendVerifyCode = () => {
+  if (!isValidPhone.value) {
+    verifyMessage.value = '请输入正确的手机号码'
+    return
+  }
+
+  // 模拟生成6位验证码
+  sentCode.value = Math.floor(100000 + Math.random() * 900000).toString()
+
+  // 模拟发送成功提示（实际项目中这里调用短信API）
+  verifyMessage.value = `验证码已发送至 ${formData.value.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')}，请查收`
+
+  // 模拟在控制台输出验证码（便于测试）
+  console.log('[模拟短信验证码]', sentCode.value)
+
+  // 启动倒计时
+  countdown.value = 60
+  countdownTimer.value = setInterval(() => {
+    countdown.value--
+    if (countdown.value <= 0) {
+      clearInterval(countdownTimer.value)
+      countdownTimer.value = null
+    }
+  }, 1000)
+}
+
 const selectLevel1 = (value) => {
   tempType.value.level1 = value
   tempType.value.level2 = ''
@@ -298,11 +353,36 @@ const removeImage = (index) => {
 }
 
 const submitForm = () => {
+  // 基础表单校验
   if (!formData.value.type || !formData.value.description) {
     alert('请填写完整信息')
     return
   }
-  
+
+  // 手机号必填校验
+  if (!formData.value.phone) {
+    alert('请输入联系方式')
+    return
+  }
+
+  // 手机号格式校验
+  if (!isValidPhone.value) {
+    alert('请输入正确的手机号码')
+    return
+  }
+
+  // 验证码必填校验
+  if (!formData.value.verifyCode) {
+    alert('请输入短信验证码')
+    return
+  }
+
+  // 验证码正确性校验
+  if (formData.value.verifyCode !== sentCode.value) {
+    alert('验证码错误，请重新输入')
+    return
+  }
+
   // 构建完整的提交数据，包含患者信息关联
   const submitData = {
     patientInfo: patientInfo.value,
@@ -310,12 +390,18 @@ const submitForm = () => {
     submitTime: new Date().toISOString(),
     source: 'mobile_h5'
   }
-  
+
   console.log('提交数据:', submitData)
-  
+
   // 清除本地存储的草稿
   clearLocalStorage()
-  
+
+  // 清除验证码定时器
+  if (countdownTimer.value) {
+    clearInterval(countdownTimer.value)
+    countdownTimer.value = null
+  }
+
   caseNo.value = 'TS' + Date.now()
   showSuccess.value = true
 }
@@ -584,6 +670,42 @@ const goBack = () => {
   border-radius: 4px;
   font-size: 14px;
   outline: none;
+}
+
+.verify-code-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.verify-input {
+  flex: 1;
+}
+
+.verify-btn {
+  width: 110px;
+  height: 40px;
+  padding: 0 8px;
+  background: #1890ff;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.3s;
+}
+
+.verify-btn:disabled {
+  background: #d9d9d9;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.verify-tip {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #52c41a;
 }
 
 .h5-footer {
