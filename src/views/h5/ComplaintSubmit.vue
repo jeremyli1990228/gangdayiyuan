@@ -92,7 +92,7 @@
               {{ countdown > 0 ? `${countdown}s后重发` : '获取验证码' }}
             </button>
           </div>
-          <div class="verify-tip" v-if="verifyMessage">{{ verifyMessage }}</div>
+          <div :class="['verify-tip', verifyMessageType]">{{ verifyMessage }}</div>
         </div>
       </div>
     </div>
@@ -165,8 +165,10 @@ const lastSaveTime = ref('')
 // 短信验证码相关
 const countdown = ref(0)
 const verifyMessage = ref('')
+const verifyMessageType = ref('success')
 const sentCode = ref('')
 const countdownTimer = ref(null)
+const hasSentToday = ref(false)
 
 // 从URL参数获取患者信息
 const patientInfo = ref({
@@ -300,14 +302,26 @@ const isValidPhone = computed(() => {
 const sendVerifyCode = () => {
   if (!isValidPhone.value) {
     verifyMessage.value = '请输入正确的手机号码'
+    verifyMessageType.value = 'error'
     return
   }
+
+  // 检查是否已发送过（一天内只能发送一次）
+  if (hasSentToday.value) {
+    verifyMessage.value = '验证次数已达上限，同一号码一天内只能验证一次'
+    verifyMessageType.value = 'error'
+    return
+  }
+
+  // 标记已发送
+  hasSentToday.value = true
 
   // 模拟生成6位验证码
   sentCode.value = Math.floor(100000 + Math.random() * 900000).toString()
 
   // 模拟发送成功提示（实际项目中这里调用短信API）
   verifyMessage.value = `验证码已发送至 ${formData.value.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')}，请查收`
+  verifyMessageType.value = 'success'
 
   // 模拟在控制台输出验证码（便于测试）
   console.log('[模拟短信验证码]', sentCode.value)
@@ -706,6 +720,10 @@ const goBack = () => {
   margin-top: 8px;
   font-size: 12px;
   color: #52c41a;
+}
+
+.verify-tip.error {
+  color: #ff4d4f;
 }
 
 .h5-footer {
