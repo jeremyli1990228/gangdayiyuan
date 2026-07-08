@@ -170,6 +170,10 @@ const sentCode = ref('')
 const countdownTimer = ref(null)
 const hasSentToday = ref(false)
 
+// 重复提交检测
+const hasSubmitted = ref(false)
+const lastSubmitContent = ref('')
+
 // 从URL参数获取患者信息
 const patientInfo = ref({
   name: route.query.patientName || '',
@@ -403,6 +407,13 @@ const submitForm = () => {
     return
   }
 
+  // 检查重复提交（同一提交人，相同内容）
+  const currentContent = `${formData.value.phone}-${formData.value.type}-${formData.value.description}`
+  if (hasSubmitted.value && lastSubmitContent.value === currentContent) {
+    alert('您已经提交过反馈信息，请勿重复提交')
+    return
+  }
+
   // 构建完整的提交数据，包含患者信息关联
   const submitData = {
     patientInfo: patientInfo.value,
@@ -412,6 +423,10 @@ const submitForm = () => {
   }
 
   console.log('提交数据:', submitData)
+
+  // 记录提交状态和内容，防止重复提交
+  hasSubmitted.value = true
+  lastSubmitContent.value = currentContent
 
   // 清除本地存储的草稿
   clearLocalStorage()
