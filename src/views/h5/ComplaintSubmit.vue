@@ -385,6 +385,12 @@ const submitForm = () => {
     return
   }
 
+  // 检查是否已获取验证码（一天内只能提交一次）
+  if (!hasSentToday.value) {
+    alert('请先获取短信验证码进行身份验证')
+    return
+  }
+
   // 验证码必填校验
   if (!formData.value.verifyCode) {
     alert('请输入短信验证码')
