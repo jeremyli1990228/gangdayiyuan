@@ -1,6 +1,5 @@
 <template>
   <div class="page-container">
-    <!-- 面包屑导航 -->
     <div class="breadcrumb">
       <span class="breadcrumb-item">
         <svg class="breadcrumb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -13,7 +12,6 @@
       <span class="breadcrumb-item active">网站反馈管理</span>
     </div>
 
-    <!-- 页面标题 -->
     <div class="page-header">
       <h1 class="page-title">网站反馈管理</h1>
       <div class="channel-tag web">
@@ -24,29 +22,29 @@
       </div>
     </div>
 
-    <!-- 筛选栏 -->
     <div class="filter-bar">
       <div class="filter-row">
         <div class="filter-item">
           <label class="filter-label">提交人姓名</label>
-          <input type="text" class="form-input" placeholder="请输入姓名">
+          <input type="text" class="form-input" placeholder="请输入姓名" v-model="filterForm.submitterName">
         </div>
         <div class="filter-item">
           <label class="filter-label">邮箱</label>
-          <input type="text" class="form-input" placeholder="请输入邮箱">
+          <input type="text" class="form-input" placeholder="请输入邮箱" v-model="filterForm.email">
         </div>
         <div class="filter-item">
           <label class="filter-label">分类</label>
-          <select class="form-select">
+          <select class="form-select" v-model="filterForm.category">
             <option value="">全部</option>
             <option value="complaint">投诉</option>
-            <option value="suggestion">建议</option>
+            <option value="suggestion">意见</option>
             <option value="consult">咨询</option>
+            <option value="thanks">感谢</option>
           </select>
         </div>
         <div class="filter-item">
           <label class="filter-label">反馈类型</label>
-          <select class="form-select">
+          <select class="form-select" v-model="filterForm.feedbackType">
             <option value="">全部</option>
             <option value="1">服务态度</option>
             <option value="2">医疗质量</option>
@@ -54,8 +52,18 @@
           </select>
         </div>
         <div class="filter-item">
+          <label class="filter-label">反馈人与就诊人关系</label>
+          <select class="form-select" v-model="filterForm.relation">
+            <option value="">全部</option>
+            <option value="self">本人</option>
+            <option value="family">家属</option>
+            <option value="friend">朋友</option>
+            <option value="other">其他</option>
+          </select>
+        </div>
+        <div class="filter-item">
           <label class="filter-label">状态</label>
-          <select class="form-select">
+          <select class="form-select" v-model="filterForm.status">
             <option value="">全部</option>
             <option value="0">待处理</option>
             <option value="1">处理中</option>
@@ -66,27 +74,86 @@
       </div>
       <div class="filter-row" style="margin-top: 12px;">
         <div class="filter-item">
-          <label class="filter-label">提交时间</label>
-          <input type="date" class="form-input" style="width: 140px;">
-          <span style="margin: 0 8px; color: #999;">至</span>
-          <input type="date" class="form-input" style="width: 140px;">
+          <label class="filter-label">所在省</label>
+          <select class="form-select" v-model="filterForm.province" @change="onProvinceChange">
+            <option value="">全部</option>
+            <option v-for="p in regionData" :key="p.name" :value="p.name">{{ p.name }}</option>
+          </select>
         </div>
-        <button class="btn btn-primary">
+        <div class="filter-item">
+          <label class="filter-label">所在市</label>
+          <select class="form-select" v-model="filterForm.city" :disabled="!filterForm.province" @change="onCityChange">
+            <option value="">全部</option>
+            <option v-for="c in cityOptions" :key="c.name" :value="c.name">{{ c.name }}</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <label class="filter-label">所在街道(乡镇)</label>
+          <select class="form-select" v-model="filterForm.district" :disabled="!filterForm.city">
+            <option value="">全部</option>
+            <option v-for="d in districtOptions" :key="d" :value="d">{{ d }}</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <label class="filter-label">被反馈人员科室</label>
+          <input type="text" class="form-input" placeholder="请输入科室" v-model="filterForm.staffDept">
+        </div>
+        <div class="filter-item">
+          <label class="filter-label">被反馈人员姓名</label>
+          <input type="text" class="form-input" placeholder="请输入姓名" v-model="filterForm.staffName">
+        </div>
+      </div>
+      <div class="filter-row" style="margin-top: 12px;">
+        <div class="filter-item">
+          <label class="filter-label">被反馈人员类别</label>
+          <select class="form-select" v-model="filterForm.staffCategory">
+            <option value="">全部</option>
+            <option value="doctor">医生</option>
+            <option value="nurse">护士</option>
+            <option value="technician">医技</option>
+            <option value="logistics">后勤</option>
+            <option value="other">其他</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <label class="filter-label">联系方式</label>
+          <input type="text" class="form-input" placeholder="请输入手机号" v-model="filterForm.phone">
+        </div>
+        <div class="filter-item">
+          <label class="filter-label">性别</label>
+          <select class="form-select" v-model="filterForm.gender">
+            <option value="">全部</option>
+            <option value="male">男</option>
+            <option value="female">女</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <label class="filter-label">年龄</label>
+          <input type="number" class="form-input age-input" placeholder="最小年龄" v-model="filterForm.minAge" min="0" max="150">
+          <span style="margin: 0 4px; color: #999;">至</span>
+          <input type="number" class="form-input age-input" placeholder="最大年龄" v-model="filterForm.maxAge" min="0" max="150">
+        </div>
+        <div class="filter-item">
+          <label class="filter-label">提交时间</label>
+          <input type="date" class="form-input date-input" v-model="filterForm.startDate">
+          <span style="margin: 0 4px; color: #999;">至</span>
+          <input type="date" class="form-input date-input" v-model="filterForm.endDate">
+        </div>
+        <button class="btn btn-primary" @click="handleSearch">
           <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <circle cx="11" cy="11" r="8" stroke-width="2"/>
             <path d="M21 21L16.65 16.65" stroke-width="2" stroke-linecap="round"/>
           </svg>
           搜索
         </button>
-        <button class="btn btn-secondary">重置</button>
+        <button class="btn btn-secondary" @click="handleReset">重置</button>
       </div>
     </div>
 
-    <!-- 操作按钮 -->
     <div class="action-bar">
       <button class="btn btn-primary">
         <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 21.0391 3 19.5304 3 19V15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           <path d="M17 8L12 3L7 8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           <path d="M12 3V15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
@@ -94,7 +161,7 @@
       </button>
       <button class="btn btn-secondary">
         <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 21.0391 3 19.5304 3 19V15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           <path d="M7 10L12 15L17 10" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           <path d="M12 15V3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
@@ -102,51 +169,68 @@
       </button>
     </div>
 
-    <!-- 数据表格 -->
-    <div class="table-container">
+    <div class="table-container table-horizontal-scroll">
       <div class="table-header">
-        <div class="table-cell" style="width: 60px;">
+        <div class="table-cell" style="width: 60px; flex-shrink: 0;">
           <input type="checkbox" class="checkbox">
         </div>
-        <div class="table-cell" style="width: 60px;">序号</div>
-        <div class="table-cell" style="width: 100px;">提交人</div>
-        <div class="table-cell" style="width: 180px;">电子邮箱</div>
-        <div class="table-cell" style="width: 80px;">分类</div>
-        <div class="table-cell" style="width: 100px;">反馈类型</div>
-        <div class="table-cell" style="width: 150px;">提交时间</div>
-        <div class="table-cell" style="flex: 1;">问题描述</div>
-        <div class="table-cell" style="width: 80px;">状态</div>
-        <div class="table-cell" style="width: 150px;">结束时间</div>
-        <div class="table-cell" style="width: 100px;">评价</div>
-        <div class="table-cell" style="width: 180px;">操作</div>
+        <div class="table-cell" style="width: 60px; flex-shrink: 0;">序号</div>
+        <div class="table-cell" style="width: 100px; flex-shrink: 0;">提交人</div>
+        <div class="table-cell" style="width: 180px; flex-shrink: 0;">电子邮箱</div>
+        <div class="table-cell" style="width: 80px; flex-shrink: 0;">分类</div>
+        <div class="table-cell" style="width: 100px; flex-shrink: 0;">反馈类型</div>
+        <div class="table-cell" style="width: 120px; flex-shrink: 0;">反馈人与就诊人关系</div>
+        <div class="table-cell" style="width: 100px; flex-shrink: 0;">所在省</div>
+        <div class="table-cell" style="width: 100px; flex-shrink: 0;">所在市</div>
+        <div class="table-cell" style="width: 120px; flex-shrink: 0;">所在街道(乡镇)</div>
+        <div class="table-cell" style="width: 120px; flex-shrink: 0;">被反馈人员科室</div>
+        <div class="table-cell" style="width: 100px; flex-shrink: 0;">被反馈人员姓名</div>
+        <div class="table-cell" style="width: 100px; flex-shrink: 0;">被反馈人员类别</div>
+        <div class="table-cell" style="width: 80px; flex-shrink: 0;">性别</div>
+        <div class="table-cell" style="width: 80px; flex-shrink: 0;">年龄</div>
+        <div class="table-cell" style="width: 150px; flex-shrink: 0;">提交时间</div>
+        <div class="table-cell" style="flex: 1; min-width: 200px;">问题描述</div>
+        <div class="table-cell" style="width: 80px; flex-shrink: 0;">状态</div>
+        <div class="table-cell" style="width: 150px; flex-shrink: 0;">结束时间</div>
+        <div class="table-cell" style="width: 100px; flex-shrink: 0;">评价</div>
+        <div class="table-cell" style="width: 180px; flex-shrink: 0;">操作</div>
       </div>
       <div class="table-body">
         <div class="table-row" v-for="(item, index) in feedbackList" :key="item.id">
-          <div class="table-cell" style="width: 60px;">
+          <div class="table-cell" style="width: 60px; flex-shrink: 0;">
             <input type="checkbox" class="checkbox">
           </div>
-          <div class="table-cell" style="width: 60px;">{{ index + 1 }}</div>
-          <div class="table-cell" style="width: 100px;">{{ item.submitterName }}</div>
-          <div class="table-cell" style="width: 180px;">{{ item.email }}</div>
-          <div class="table-cell" style="width: 80px;">{{ item.category }}</div>
-          <div class="table-cell" style="width: 100px;">{{ item.feedbackType }}</div>
-          <div class="table-cell" style="width: 150px;">{{ item.submitTime }}</div>
-          <div class="table-cell" style="flex: 1;">
+          <div class="table-cell" style="width: 60px; flex-shrink: 0;">{{ index + 1 }}</div>
+          <div class="table-cell" style="width: 100px; flex-shrink: 0;">{{ item.submitterName }}</div>
+          <div class="table-cell" style="width: 180px; flex-shrink: 0;">{{ item.email }}</div>
+          <div class="table-cell" style="width: 80px; flex-shrink: 0;">{{ getCategoryText(item.category) }}</div>
+          <div class="table-cell" style="width: 100px; flex-shrink: 0;">{{ item.feedbackType }}</div>
+          <div class="table-cell" style="width: 120px; flex-shrink: 0;">{{ getRelationText(item.relation) }}</div>
+          <div class="table-cell" style="width: 100px; flex-shrink: 0;">{{ item.province || '-' }}</div>
+          <div class="table-cell" style="width: 100px; flex-shrink: 0;">{{ item.city || '-' }}</div>
+          <div class="table-cell" style="width: 120px; flex-shrink: 0;">{{ item.district || '-' }}</div>
+          <div class="table-cell" style="width: 120px; flex-shrink: 0;">{{ item.staffDept || '-' }}</div>
+          <div class="table-cell" style="width: 100px; flex-shrink: 0;">{{ item.staffName || '-' }}</div>
+          <div class="table-cell" style="width: 100px; flex-shrink: 0;">{{ getStaffCategoryText(item.staffCategory) }}</div>
+          <div class="table-cell" style="width: 80px; flex-shrink: 0;">{{ getGenderText(item.gender) }}</div>
+          <div class="table-cell" style="width: 80px; flex-shrink: 0;">{{ item.age || '-' }}</div>
+          <div class="table-cell" style="width: 150px; flex-shrink: 0;">{{ item.submitTime }}</div>
+          <div class="table-cell" style="flex: 1; min-width: 200px;">
             <span class="content-preview" @click="showDetail(item)">{{ item.description }}</span>
           </div>
-          <div class="table-cell" style="width: 80px;">
+          <div class="table-cell" style="width: 80px; flex-shrink: 0;">
             <span :class="['status-tag', getStatusClass(item.status)]">
               {{ getStatusText(item.status) }}
             </span>
           </div>
-          <div class="table-cell" style="width: 150px;">{{ item.endTime || '-' }}</div>
-          <div class="table-cell" style="width: 100px;">
+          <div class="table-cell" style="width: 150px; flex-shrink: 0;">{{ item.endTime || '-' }}</div>
+          <div class="table-cell" style="width: 100px; flex-shrink: 0;">
             <div class="rating" v-if="item.rating">
               <span class="rating-stars">{{ '★'.repeat(item.rating) }}</span>
             </div>
             <span v-else>-</span>
           </div>
-          <div class="table-cell" style="width: 180px;">
+          <div class="table-cell" style="width: 180px; flex-shrink: 0;">
             <a href="#" class="action-link" @click.prevent="showDetail(item)">详情</a>
             <a href="#" class="action-link" @click.prevent="handleFeedback(item)" v-if="item.status < 2">处理</a>
             <a href="#" class="action-link" @click.prevent="replyFeedback(item)" v-if="item.status === 2">回复</a>
@@ -155,7 +239,6 @@
       </div>
     </div>
 
-    <!-- 分页 -->
     <div class="pagination">
       <div class="pagination-info">共 {{ total }} 条记录</div>
       <div class="pagination-controls">
@@ -165,9 +248,8 @@
       </div>
     </div>
 
-    <!-- 详情抽屉 -->
     <div class="drawer-overlay" v-if="showDetailDrawer" @click="showDetailDrawer = false">
-      <div class="drawer" @click.stop>
+      <div class="drawer drawer-wide" @click.stop>
         <div class="drawer-header">
           <h3 class="drawer-title">反馈详情</h3>
           <button class="drawer-close" @click="showDetailDrawer = false">×</button>
@@ -175,7 +257,7 @@
         <div class="drawer-body">
           <div class="detail-section">
             <div class="detail-title">基本信息</div>
-            <div class="detail-grid">
+            <div class="detail-grid detail-grid-3">
               <div class="detail-item">
                 <span class="detail-label">提交人：</span>
                 <span class="detail-value">{{ currentFeedback.submitterName }}</span>
@@ -194,11 +276,35 @@
               </div>
               <div class="detail-item">
                 <span class="detail-label">分类：</span>
-                <span class="detail-value">{{ currentFeedback.category }}</span>
+                <span class="detail-value">{{ getCategoryText(currentFeedback.category) }}</span>
               </div>
               <div class="detail-item">
                 <span class="detail-label">反馈类型：</span>
                 <span class="detail-value">{{ currentFeedback.feedbackType }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">反馈人与就诊人关系：</span>
+                <span class="detail-value">{{ getRelationText(currentFeedback.relation) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">所在省：</span>
+                <span class="detail-value">{{ currentFeedback.province || '-' }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">所在市：</span>
+                <span class="detail-value">{{ currentFeedback.city || '-' }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">所在街道(乡镇)：</span>
+                <span class="detail-value">{{ currentFeedback.district || '-' }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">性别：</span>
+                <span class="detail-value">{{ getGenderText(currentFeedback.gender) }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">年龄：</span>
+                <span class="detail-value">{{ currentFeedback.age || '-' }}</span>
               </div>
               <div class="detail-item">
                 <span class="detail-label">提交时间：</span>
@@ -209,6 +315,23 @@
                 <span :class="['status-tag', getStatusClass(currentFeedback.status)]">
                   {{ getStatusText(currentFeedback.status) }}
                 </span>
+              </div>
+            </div>
+          </div>
+          <div class="detail-section">
+            <div class="detail-title">被反馈人员信息</div>
+            <div class="detail-grid detail-grid-3">
+              <div class="detail-item">
+                <span class="detail-label">被反馈人员科室：</span>
+                <span class="detail-value">{{ currentFeedback.staffDept || '-' }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">被反馈人员姓名：</span>
+                <span class="detail-value">{{ currentFeedback.staffName || '-' }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">被反馈人员类别：</span>
+                <span class="detail-value">{{ getStaffCategoryText(currentFeedback.staffCategory) }}</span>
               </div>
             </div>
           </div>
@@ -239,7 +362,6 @@
       </div>
     </div>
 
-    <!-- 处理抽屉 -->
     <div class="drawer-overlay" v-if="showHandleDrawer" @click="showHandleDrawer = false">
       <div class="drawer" @click.stop>
         <div class="drawer-header">
@@ -266,7 +388,7 @@
               <input type="file" id="file-upload-web" style="display: none;">
               <label for="file-upload-web" class="upload-btn">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 21.0391 3 19.5304 3 19V15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                   <path d="M17 8L12 3L7 8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                   <path d="M12 3V15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
@@ -298,7 +420,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { regionData, getCitiesByProvince, getDistrictsByCity } from '../../utils/regionData'
 
 const showDetailDrawer = ref(false)
 const showHandleDrawer = ref(false)
@@ -314,12 +437,78 @@ const handleForm = ref({
   notifySms: false
 })
 
+const filterForm = ref({
+  submitterName: '',
+  email: '',
+  category: '',
+  feedbackType: '',
+  relation: '',
+  province: '',
+  city: '',
+  district: '',
+  staffDept: '',
+  staffName: '',
+  staffCategory: '',
+  phone: '',
+  gender: '',
+  minAge: '',
+  maxAge: '',
+  startDate: '',
+  endDate: '',
+  status: ''
+})
+
+const cityOptions = computed(() => {
+  return getCitiesByProvince(filterForm.value.province)
+})
+
+const districtOptions = computed(() => {
+  return getDistrictsByCity(filterForm.value.province, filterForm.value.city)
+})
+
+const onProvinceChange = () => {
+  filterForm.value.city = ''
+  filterForm.value.district = ''
+}
+
+const onCityChange = () => {
+  filterForm.value.district = ''
+}
+
+const handleSearch = () => {
+  console.log('搜索条件:', filterForm.value)
+}
+
+const handleReset = () => {
+  filterForm.value = {
+    submitterName: '',
+    email: '',
+    category: '',
+    feedbackType: '',
+    relation: '',
+    province: '',
+    city: '',
+    district: '',
+    staffDept: '',
+    staffName: '',
+    staffCategory: '',
+    phone: '',
+    gender: '',
+    minAge: '',
+    maxAge: '',
+    startDate: '',
+    endDate: '',
+    status: ''
+  }
+}
+
 const feedbackList = ref([
-  { id: 1, submitterName: '赵先生', email: 'zhaoxs@example.com', phone: '13900139001', sourcePage: '医院官网-联系我们', category: '咨询', feedbackType: '其他', submitTime: '2026-06-07 11:20:00', description: '想了解医院的体检套餐有哪些，价格分别是多少？', status: 0, endTime: null, rating: null, handleResult: '', images: [] },
-  { id: 2, submitterName: '孙女士', email: 'sunls@example.com', phone: '13900139002', sourcePage: '医院官网-投诉建议', category: '建议', feedbackType: '就医流程', submitTime: '2026-06-06 16:30:00', description: '建议在网站首页增加在线咨询功能，方便患者随时咨询。', status: 1, endTime: null, rating: null, handleResult: '', images: [] },
-  { id: 3, submitterName: '周先生', email: 'zhouxs@example.com', phone: '13900139003', sourcePage: '医院官网-服务指南', category: '投诉', feedbackType: '服务态度', submitTime: '2026-06-05 09:45:00', description: '昨天去医院咨询，前台工作人员态度非常不好，希望能加强服务培训。', status: 2, endTime: '2026-06-05 14:00:00', rating: null, handleResult: '已通知相关部门加强服务培训，对该员工进行了批评教育。', images: [] },
-  { id: 4, submitterName: '吴女士', email: 'wuws@example.com', phone: '13900139004', sourcePage: '医院官网-意见反馈', category: '建议', feedbackType: '医疗质量', submitTime: '2026-06-04 14:00:00', description: '建议增加更多专家号源，方便患者预约。', status: 3, endTime: '2026-06-05 10:00:00', rating: 4, ratingContent: '回复很及时，期待改进', handleResult: '已将建议提交给相关部门，正在研究增加号源的可行性。', images: [] },
-  { id: 5, submitterName: '郑先生', email: 'zhengxs@example.com', phone: '13900139005', sourcePage: '医院官网-首页', category: '投诉', feedbackType: '环境卫生', submitTime: '2026-06-03 10:30:00', description: '上次去医院看到停车场垃圾很多，希望加强清洁管理。', status: 3, endTime: '2026-06-04 11:00:00', rating: 5, ratingContent: '处理迅速，非常满意', handleResult: '已通知后勤部门加强停车场清洁管理。', images: ['https://via.placeholder.com/100'] }
+  { id: 1, submitterName: '赵先生', email: 'zhaoxs@example.com', phone: '13900139001', sourcePage: '医院官网-联系我们', category: 'consult', feedbackType: '其他', relation: 'self', province: '广东省', city: '广州市', district: '天河区', staffDept: '', staffName: '', staffCategory: '', gender: 'male', age: 45, submitTime: '2026-06-07 11:20:00', description: '想了解医院的体检套餐有哪些，价格分别是多少？', status: 0, endTime: null, rating: null, handleResult: '', images: [] },
+  { id: 2, submitterName: '孙女士', email: 'sunls@example.com', phone: '13900139002', sourcePage: '医院官网-投诉建议', category: 'suggestion', feedbackType: '就医流程', relation: 'family', province: '广东省', city: '深圳市', district: '南山区', staffDept: '门诊', staffName: '王护士', staffCategory: 'nurse', gender: 'female', age: 32, submitTime: '2026-06-06 16:30:00', description: '建议在网站首页增加在线咨询功能，方便患者随时咨询。', status: 1, endTime: null, rating: null, handleResult: '', images: [] },
+  { id: 3, submitterName: '周先生', email: 'zhouxs@example.com', phone: '13900139003', sourcePage: '医院官网-服务指南', category: 'complaint', feedbackType: '服务态度', relation: 'self', province: '北京市', city: '北京市', district: '朝阳区', staffDept: '前台', staffName: '李护士', staffCategory: 'nurse', gender: 'male', age: 50, submitTime: '2026-06-05 09:45:00', description: '昨天去医院咨询，前台工作人员态度非常不好，希望能加强服务培训。', status: 2, endTime: '2026-06-05 14:00:00', rating: null, handleResult: '已通知相关部门加强服务培训，对该员工进行了批评教育。', images: [] },
+  { id: 4, submitterName: '吴女士', email: 'wuws@example.com', phone: '13900139004', sourcePage: '医院官网-意见反馈', category: 'suggestion', feedbackType: '医疗质量', relation: 'friend', province: '上海市', city: '上海市', district: '浦东新区', staffDept: '内科', staffName: '张医生', staffCategory: 'doctor', gender: 'female', age: 38, submitTime: '2026-06-04 14:00:00', description: '建议增加更多专家号源，方便患者预约。', status: 3, endTime: '2026-06-05 10:00:00', rating: 4, ratingContent: '回复很及时，期待改进', handleResult: '已将建议提交给相关部门，正在研究增加号源的可行性。', images: [] },
+  { id: 5, submitterName: '郑先生', email: 'zhengxs@example.com', phone: '13900139005', sourcePage: '医院官网-首页', category: 'complaint', feedbackType: '环境卫生', relation: 'self', province: '浙江省', city: '杭州市', district: '西湖区', staffDept: '后勤', staffName: '', staffCategory: 'logistics', gender: 'male', age: 42, submitTime: '2026-06-03 10:30:00', description: '上次去医院看到停车场垃圾很多，希望加强清洁管理。', status: 3, endTime: '2026-06-04 11:00:00', rating: 5, ratingContent: '处理迅速，非常满意', handleResult: '已通知后勤部门加强停车场清洁管理。', images: ['https://via.placeholder.com/100'] },
+  { id: 6, submitterName: '陈女士', email: 'chenns@example.com', phone: '13900139006', sourcePage: '医院官网-科室介绍', category: 'thanks', feedbackType: '服务态度', relation: 'self', province: '广东省', city: '深圳市', district: '福田区', staffDept: '外科', staffName: '刘主任', staffCategory: 'doctor', gender: 'female', age: 55, submitTime: '2026-06-02 09:15:00', description: '感谢刘主任的精心治疗，手术非常成功，恢复得很好。', status: 3, endTime: '2026-06-03 10:00:00', rating: 5, ratingContent: '非常感谢，医术高明', handleResult: '已转达感谢，继续保持优质医疗服务。', images: [] }
 ])
 
 const getStatusClass = (status) => {
@@ -330,6 +519,45 @@ const getStatusClass = (status) => {
 const getStatusText = (status) => {
   const texts = ['待处理', '处理中', '已处理', '已评价']
   return texts[status] || '待处理'
+}
+
+const getCategoryText = (category) => {
+  const map = {
+    complaint: '投诉',
+    suggestion: '意见',
+    consult: '咨询',
+    thanks: '感谢'
+  }
+  return map[category] || '-'
+}
+
+const getRelationText = (relation) => {
+  const map = {
+    self: '本人',
+    family: '家属',
+    friend: '朋友',
+    other: '其他'
+  }
+  return map[relation] || '-'
+}
+
+const getStaffCategoryText = (category) => {
+  const map = {
+    doctor: '医生',
+    nurse: '护士',
+    technician: '医技',
+    logistics: '后勤',
+    other: '其他'
+  }
+  return map[category] || '-'
+}
+
+const getGenderText = (gender) => {
+  const map = {
+    male: '男',
+    female: '女'
+  }
+  return map[gender] || '-'
 }
 
 const showDetail = (item) => {
@@ -486,6 +714,14 @@ const submitHandle = () => {
   width: 150px;
 }
 
+.form-input.age-input {
+  width: 80px;
+}
+
+.form-input.date-input {
+  width: 130px;
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -537,10 +773,15 @@ const submitHandle = () => {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
+.table-horizontal-scroll {
+  overflow-x: auto;
+}
+
 .table-header {
   display: flex;
   background: #fafafa;
   border-bottom: 1px solid #e8e8e8;
+  min-width: max-content;
 }
 
 .table-body {
@@ -552,6 +793,7 @@ const submitHandle = () => {
   display: flex;
   border-bottom: 1px solid #f0f0f0;
   transition: background 0.3s;
+  min-width: max-content;
 }
 
 .table-row:hover {
@@ -703,6 +945,10 @@ const submitHandle = () => {
   box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
 }
 
+.drawer-wide {
+  width: 750px;
+}
+
 .drawer-header {
   display: flex;
   justify-content: space-between;
@@ -758,6 +1004,10 @@ const submitHandle = () => {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
+}
+
+.detail-grid-3 {
+  grid-template-columns: repeat(3, 1fr);
 }
 
 .detail-item {
