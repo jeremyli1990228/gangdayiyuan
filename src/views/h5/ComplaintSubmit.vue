@@ -148,20 +148,19 @@
           <label class="form-label">性别</label>
           <div class="radio-group">
             <label class="radio-item">
-              <input type="radio" v-model="formData.gender" value="male" :disabled="!userInfoLoaded">
+              <input type="radio" v-model="formData.gender" value="male">
               <span class="radio-text">男</span>
             </label>
             <label class="radio-item">
-              <input type="radio" v-model="formData.gender" value="female" :disabled="!userInfoLoaded">
+              <input type="radio" v-model="formData.gender" value="female">
               <span class="radio-text">女</span>
             </label>
           </div>
-          <div class="verify-tip" v-if="!userInfoLoaded && hasSentToday" style="color: #faad14;">验证通过后将自动带入性别信息</div>
         </div>
 
         <div class="form-item required">
           <label class="form-label">年龄</label>
-          <input type="number" class="form-input" v-model="formData.age" placeholder="验证通过后自动带入" :readonly="userInfoLoaded" min="0" max="150">
+          <input type="number" class="form-input" v-model="formData.age" placeholder="请输入年龄" min="0" max="150">
         </div>
       </div>
     </div>
@@ -238,9 +237,6 @@ const verifyMessageType = ref('success')
 const sentCode = ref('')
 const countdownTimer = ref(null)
 const hasSentToday = ref(false)
-
-// 用户信息（性别、年龄）从第三方系统获取
-const userInfoLoaded = ref(false)
 
 // 重复提交检测
 const hasSubmitted = ref(false)
@@ -872,37 +868,6 @@ const sendVerifyCode = () => {
       countdownTimer.value = null
     }
   }, 1000)
-
-  // 调第三方系统接口获取用户性别和年龄
-  fetchUserInfoByPhone(formData.value.phone)
-}
-
-// 调第三方系统接口获取用户性别和年龄
-const fetchUserInfoByPhone = async (phone) => {
-  try {
-    // 实际项目中替换为真实API调用：
-    // const response = await fetch(`/api/user/info?phone=${phone}`)
-    // const data = await response.json()
-
-    // 模拟调第三方系统接口返回数据
-    await new Promise(resolve => setTimeout(resolve, 1000))
-
-    // 模拟根据手机号查询到的用户信息
-    // 实际项目中接口返回格式：{ gender: 'male'|'female', age: number }
-    const mockGender = Math.random() > 0.5 ? 'male' : 'female'
-    const mockAge = Math.floor(Math.random() * 60) + 18
-
-    // 自动带入性别和年龄
-    formData.value.gender = mockGender
-    formData.value.age = mockAge
-    userInfoLoaded.value = true
-
-    console.log('[第三方接口返回]', { gender: mockGender, age: mockAge })
-  } catch (error) {
-    console.error('获取用户信息失败:', error)
-    verifyMessage.value = '获取用户信息失败，请重试'
-    verifyMessageType.value = 'error'
-  }
 }
 
 const selectLevel1 = (value) => {
