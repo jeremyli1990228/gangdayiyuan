@@ -10,13 +10,13 @@
     "deploy": "npm run build && gh-pages -d dist"
   },
   "dependencies": {
+    "element-plus": "^2.14.3",
     "vue": "^3.4.21",
-    "element-plus": "^2.6.3",
-    "vue-router": "^4.3.0"
+    "vue-router": "^4.6.4"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",
-    "vite": "^5.2.8",
-    "gh-pages": "^6.1.1"
+    "gh-pages": "^6.1.1",
+    "vite": "^5.2.8"
   }
 }
