@@ -36,7 +36,8 @@
             <option value="complaint">投诉</option>
             <option value="suggestion">意见</option>
             <option value="consult">咨询</option>
-            <option value="thanks">感谢</option>
+            <option value="thanks">表扬</option>
+            <option value="other">其他</option>
           </select>
         </div>
         <div class="filter-item">
@@ -514,7 +515,8 @@ const getCategoryText = (category) => {
     complaint: '投诉',
     suggestion: '意见',
     consult: '咨询',
-    thanks: '感谢'
+    thanks: '表扬',
+    other: '其他'
   }
   return map[category] || '-'
 }

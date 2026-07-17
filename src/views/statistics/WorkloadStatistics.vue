@@ -52,7 +52,7 @@
           <div class="table-cell" style="width: 120px;">员工工号</div>
           <div class="table-cell" style="width: 120px;">员工姓名</div>
           <div class="table-cell" style="width: 120px;">投诉案件数</div>
-          <div class="table-cell" style="width: 120px;">感谢案件数</div>
+          <div class="table-cell" style="width: 120px;">表扬案件数</div>
           <div class="table-cell" style="width: 120px;">建议案件数</div>
           <div class="table-cell" style="width: 120px;">其他案件数</div>
         </div>

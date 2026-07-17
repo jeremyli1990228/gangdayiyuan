@@ -343,7 +343,8 @@ const categories = ref([
   { label: '投诉', value: 'complaint' },
   { label: '意见', value: 'suggestion' },
   { label: '咨询', value: 'consult' },
-  { label: '感谢', value: 'thanks' }
+  { label: '表扬', value: 'thanks' },
+  { label: '其他', value: 'other' }
 ])
 
 const relationOptions = ref([

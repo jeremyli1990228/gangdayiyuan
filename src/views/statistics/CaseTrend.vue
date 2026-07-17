@@ -76,7 +76,7 @@
           </div>
           <div class="legend-item">
             <span class="legend-dot" style="background-color: #1890ff;"></span>
-            <span>感谢案件数</span>
+            <span>表扬案件数</span>
           </div>
           <div class="legend-item">
             <span class="legend-dot" style="background-color: #d4d4d4;"></span>
