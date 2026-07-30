@@ -274,9 +274,68 @@
 
       <div id="section-7" class="form-section">
         <div class="section-title">07.跟进记录</div>
-        <div class="form-row">
-          <div class="form-item">
-            <button class="btn-add-section">+ 添加</button>
+        <div class="section-desc">根据案件类型分别记录跟进情况，每类支持添加多条记录</div>
+        <div class="followup-modules">
+          <div
+            v-for="module in followupModules"
+            :key="module.key"
+            class="followup-module"
+            :class="'module-' + module.key"
+            :style="{ '--module-color': module.color, '--module-bg': module.bg, '--module-border': module.border }"
+          >
+            <div class="module-header">
+              <div class="module-title">
+                <span class="module-dot"></span>
+                <span class="module-name">{{ module.label }}跟进</span>
+                <span class="module-count">{{ followupRecords[module.key].length }} 条</span>
+              </div>
+              <button class="btn-add-record" @click="addFollowupRecord(module.key)">
+                <span class="add-icon">+</span>
+                <span>添加</span>
+              </button>
+            </div>
+            <div class="module-body" v-if="followupRecords[module.key].length > 0">
+              <div
+                v-for="(record, index) in followupRecords[module.key]"
+                :key="record.id"
+                class="record-item"
+              >
+                <div class="record-form-row">
+                  <div class="form-item required">
+                    <label>跟进类型</label>
+                    <select class="form-select" v-model="record.type">
+                      <option value="">请选择</option>
+                      <option v-for="opt in module.typeOptions" :key="opt" :value="opt">{{ opt }}</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="record-form-row">
+                  <div class="form-item required">
+                    <label>跟进日期</label>
+                    <input type="text" placeholder="请选择日期: yyyy-MM-dd" class="form-input date-input" v-model="record.date">
+                  </div>
+                </div>
+                <div class="record-form-row">
+                  <div class="form-item required">
+                    <label>跟进描述</label>
+                    <textarea
+                      placeholder="请点击输入"
+                      class="form-textarea"
+                      rows="3"
+                      maxlength="2000"
+                      v-model="record.description"
+                    ></textarea>
+                    <div class="textarea-footer">
+                      <span class="word-count">{{ (record.description || '').length }}/2000</span>
+                      <button class="btn-delete" @click="removeFollowupRecord(module.key, index)">删除</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="module-empty" v-else>
+              <span>暂无跟进记录，点击右上角"添加"按钮新增</span>
+            </div>
           </div>
         </div>
       </div>
@@ -401,6 +460,71 @@ const activeSection = ref('section-1')
 const autoSaveTimer = ref(null)
 const lastSaveTime = ref('')
 const formData = ref({})
+
+// 跟进记录 4 个模块定义
+const followupModules = ref([
+  {
+    key: 'complaint',
+    label: '投诉',
+    color: '#1890ff',
+    bg: '#e6f7ff',
+    border: '#91d5ff',
+    typeOptions: ['电话沟通', '现场协调', '面谈约谈', '书面回复', '其他']
+  },
+  {
+    key: 'petition',
+    label: '信访',
+    color: '#722ed1',
+    bg: '#f9f0ff',
+    border: '#d3adf7',
+    typeOptions: ['接待来访', '电话回复', '书面答复', '实地走访', '其他']
+  },
+  {
+    key: 'claim',
+    label: '理赔',
+    color: '#fa8c16',
+    bg: '#fff7e6',
+    border: '#ffd591',
+    typeOptions: ['案件审核', '协商谈判', '协议签订', '款项支付', '其他']
+  },
+  {
+    key: 'investigation',
+    label: '行政调查',
+    color: '#52c41a',
+    bg: '#f6ffed',
+    border: '#b7eb8f',
+    typeOptions: ['现场调查', '资料调取', '询问笔录', '专家评审', '其他']
+  }
+])
+
+// 各模块跟进记录数据
+const followupRecords = ref({
+  complaint: [],
+  petition: [],
+  claim: [],
+  investigation: []
+})
+
+let recordIdCounter = 0
+const createEmptyRecord = () => {
+  recordIdCounter += 1
+  return {
+    id: `rec_${Date.now()}_${recordIdCounter}`,
+    type: '',
+    date: '',
+    description: ''
+  }
+}
+
+// 添加跟进记录
+const addFollowupRecord = (key) => {
+  followupRecords.value[key].push(createEmptyRecord())
+}
+
+// 删除跟进记录
+const removeFollowupRecord = (key, index) => {
+  followupRecords.value[key].splice(index, 1)
+}
 
 const scrollToSection = (sectionId) => {
   const element = document.getElementById(sectionId)
@@ -966,5 +1090,156 @@ onUnmounted(() => {
 .nav-item.active {
   background-color: #e6f7ff;
   color: #1890ff;
+}
+
+/* ==================== 跟进记录 4 模块样式 ==================== */
+.followup-modules {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.followup-module {
+  border: 1px solid var(--module-border, #d9d9d9);
+  border-left: 4px solid var(--module-color, #1890ff);
+  border-radius: 6px;
+  background-color: #fff;
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+}
+
+.followup-module:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.module-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: var(--module-bg, #fafafa);
+  border-bottom: 1px solid var(--module-border, #f0f0f0);
+}
+
+.module-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--module-color, #333);
+}
+
+.module-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--module-color, #1890ff);
+  box-shadow: 0 0 0 3px var(--module-bg, #fafafa), 0 0 0 4px var(--module-color, #1890ff);
+}
+
+.module-name {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.module-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 20px;
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--module-color, #1890ff);
+  background-color: #fff;
+  border: 1px solid var(--module-border, #d9d9d9);
+  border-radius: 10px;
+}
+
+.btn-add-record {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 30px;
+  padding: 0 12px;
+  background-color: var(--module-color, #1890ff);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-add-record:hover {
+  opacity: 0.85;
+  transform: translateY(-1px);
+}
+
+.add-icon {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.module-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.record-item {
+  position: relative;
+  padding: 16px;
+  background-color: var(--module-bg, #fafafa);
+  border: 1px dashed var(--module-border, #d9d9d9);
+  border-radius: 4px;
+}
+
+.record-item::before {
+  content: '';
+  position: absolute;
+  top: 16px;
+  left: -1px;
+  width: 3px;
+  height: 20px;
+  background-color: var(--module-color, #1890ff);
+  border-radius: 0 2px 2px 0;
+}
+
+.record-form-row {
+  margin-bottom: 12px;
+}
+
+.record-form-row:last-child {
+  margin-bottom: 0;
+}
+
+.btn-delete {
+  background: none;
+  border: none;
+  color: #ff4d4f;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.2s;
+}
+
+.btn-delete:hover {
+  color: #cf1322;
+  text-decoration: underline;
+}
+
+.module-empty {
+  padding: 24px 16px;
+  text-align: center;
+  font-size: 13px;
+  color: #999;
+  background-color: #fafafa;
 }
 </style>
