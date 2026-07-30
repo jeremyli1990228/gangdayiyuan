@@ -286,7 +286,7 @@
             <div class="module-header">
               <div class="module-title">
                 <span class="module-dot"></span>
-                <span class="module-name">{{ module.label }}跟进</span>
+                <span class="module-name">{{ module.label }}</span>
                 <span class="module-count">{{ followupRecords[module.key].length }} 条</span>
               </div>
               <button class="btn-add-record" @click="addFollowupRecord(module.key)">

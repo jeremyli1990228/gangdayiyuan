@@ -140,7 +140,7 @@
           </div>
           <div class="table-cell" style="width: 60px;">{{ index + 1 }}</div>
           <div class="table-cell" style="width: 160px;">
-            <span class="case-no" :class="item.caseNoClass">{{ item.caseNo }}</span>
+            <router-link :to="`/process-cases/detail/${item.caseNo}`" class="case-no-link" :class="item.caseNoClass">{{ item.caseNo }}</router-link>
           </div>
           <div class="table-cell" style="width: 100px;">{{ item.patientName }}</div>
           <div class="table-cell" style="width: 100px;">{{ item.feedbackPerson }}</div>
@@ -574,10 +574,23 @@ const total = ref(5)
   color: #666;
 }
 
+.case-no-link {
+  color: #666;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.case-no-link:hover {
+  text-decoration: underline;
+  color: #1890ff;
+}
+
+.case-no-link.blue,
 .case-no.blue {
   color: #1890ff;
 }
 
+.case-no-link.red,
 .case-no.red {
   color: #f5222d;
 }

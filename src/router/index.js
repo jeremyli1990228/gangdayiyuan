@@ -67,6 +67,11 @@ const routes = [
     component: () => import('../views/process-cases/All.vue')
   },
   {
+    path: '/process-cases/detail/:id?',
+    name: 'processCasesDetail',
+    component: () => import('../views/process-cases/CaseDetail.vue')
+  },
+  {
     path: '/process-cases/drafts',
     name: 'processCasesDrafts',
     component: () => import('../views/process-cases/Drafts.vue')
