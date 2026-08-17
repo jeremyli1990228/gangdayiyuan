@@ -232,6 +232,11 @@ const routes = [
     component: () => import('../views/settings/ApprovalSettings.vue')
   },
   {
+    path: '/settings/feedback-config',
+    name: 'settingsFeedbackConfig',
+    component: () => import('../views/settings/FeedbackConfig.vue')
+  },
+  {
     path: '/system-auth/user-manage',
     name: 'systemAuthUserManage',
     component: () => import('../views/system-auth/UserManage.vue')
@@ -359,18 +364,6 @@ const routes = [
     name: 'memo',
     component: () => import('../views/memo/Index.vue')
   },
-  // 科室架构管理
-  {
-    path: '/settings/department-manage',
-    name: 'settingsDepartmentManage',
-    component: () => import('../views/settings/DepartmentManage.vue')
-  },
-  // 投诉原因管理
-  {
-    path: '/settings/complaint-reason',
-    name: 'settingsComplaintReason',
-    component: () => import('../views/settings/ComplaintReason.vue')
-  },
   // 功能权限管理
   {
     path: '/system-auth/function-permission',
@@ -383,23 +376,29 @@ const routes = [
     name: 'systemAuthPermissionConfig',
     component: () => import('../views/system-auth/PermissionConfig.vue')
   },
-  // 结案反馈
+  // 涉及环节管理
   {
-    path: '/process-cases/feedback',
-    name: 'processCasesFeedback',
-    component: () => import('../views/process-cases/Feedback.vue')
+    path: '/process-cases/link-management',
+    name: 'processCasesLinkManagement',
+    component: () => import('../views/process-cases/LinkManagement.vue')
+  },
+  // 原因管理
+  {
+    path: '/process-cases/reason-management',
+    name: 'processCasesReasonManagement',
+    component: () => import('../views/process-cases/ReasonManagement.vue')
+  },
+  // 案件字段配置
+  {
+    path: '/process-cases/field-management',
+    name: 'processCasesFieldManagement',
+    component: () => import('../views/process-cases/FieldManagement.vue')
   },
   // 通讯录更新配置
   {
     path: '/contacts/sync-config',
     name: 'contactsSyncConfig',
     component: () => import('../views/contacts/ContactSync.vue')
-  },
-  // 多模块录入
-  {
-    path: '/process-cases/multi-module',
-    name: 'processCasesMultiModule',
-    component: () => import('../views/process-cases/MultiModuleAdd.vue')
   },
   // 满意度调查看板
   {
@@ -413,12 +412,6 @@ const routes = [
     name: 'statisticsComplaintDashboard',
     component: () => import('../views/complaint/ComplaintStatisticsDashboard.vue')
   },
-  // 案件闭环管理
-  {
-    path: '/process-cases/case-tracking',
-    name: 'processCasesCaseTracking',
-    component: () => import('../views/process-cases/CaseTracking.vue')
-  },
   // 知识库
   {
     path: '/knowledge',
@@ -431,12 +424,6 @@ const routes = [
     name: 'notifications',
     component: () => import('../views/notifications/Index.vue')
   },
-  // 高级设置
-  {
-    path: '/settings/advanced',
-    name: 'settingsAdvanced',
-    component: () => import('../views/settings/Advanced.vue')
-  }
 ]
 
 const router = createRouter({

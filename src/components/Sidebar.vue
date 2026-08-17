@@ -130,9 +130,9 @@ const menuData = [
       { name: '新增案件', path: '/process-cases/add' },
       { name: '所有案件', path: '/process-cases/all' },
       { name: '草稿箱', path: '/process-cases/drafts' },
-      { name: '结案反馈', path: '/process-cases/feedback' },
-      { name: '多模块录入', path: '/process-cases/multi-module' },
-      { name: '案件闭环管理', path: '/process-cases/case-tracking' }
+      { name: '涉及环节管理', path: '/process-cases/link-management' },
+      { name: '原因管理', path: '/process-cases/reason-management' },
+      { name: '案件字段配置', path: '/process-cases/field-management' }
     ]
   },
   {
@@ -242,9 +242,7 @@ const menuData = [
       { name: '公共词库', path: '/settings/public-thesaurus' },
       { name: '个人词库', path: '/settings/personal-thesaurus' },
       { name: '审批设置', path: '/settings/approval-settings' },
-      { name: '科室架构', path: '/settings/department-manage' },
-      { name: '投诉原因', path: '/settings/complaint-reason' },
-      { name: '系统设置', path: '/settings/advanced' }
+      { name: '反馈配置', path: '/settings/feedback-config' }
     ]
   },
   {

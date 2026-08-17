@@ -8,14 +8,14 @@
         </svg>
       </span>
       <span class="breadcrumb-separator">/</span>
-      <span class="breadcrumb-item">投诉管理</span>
+      <span class="breadcrumb-item">设置</span>
       <span class="breadcrumb-separator">/</span>
-      <span class="breadcrumb-item active">反馈设置</span>
+      <span class="breadcrumb-item active">反馈配置</span>
     </div>
 
     <!-- 页面标题 -->
     <div class="page-header">
-      <h1 class="page-title">反馈设置</h1>
+      <h1 class="page-title">反馈配置</h1>
     </div>
 
     <!-- 基础设置 -->
@@ -30,15 +30,6 @@
             <div class="settings-input-group">
               <input type="number" class="form-input" v-model="settings.complaintDeadline" min="1">
               <span class="input-tip">超过此时效未处理将自动标记为超期</span>
-            </div>
-          </div>
-        </div>
-        <div class="settings-row">
-          <div class="settings-item">
-            <label class="settings-label">评价时限（天）</label>
-            <div class="settings-input-group">
-              <input type="number" class="form-input" v-model="settings.ratingDeadline" min="1">
-              <span class="input-tip">处理完成后，患者可评价的有效期限</span>
             </div>
           </div>
         </div>
@@ -97,19 +88,6 @@
       <div class="card-body">
         <div class="settings-row">
           <div class="settings-item">
-            <label class="settings-label">短信通知</label>
-            <div class="settings-input-group">
-              <div class="switch-wrapper">
-                <span :class="['switch', settings.smsNotify ? 'active' : '']" @click="settings.smsNotify = !settings.smsNotify">
-                  <span class="switch-dot"></span>
-                </span>
-                <span class="switch-text">{{ settings.smsNotify ? '开启' : '关闭' }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="settings-row">
-          <div class="settings-item">
             <label class="settings-label">邮件通知</label>
             <div class="settings-input-group">
               <div class="switch-wrapper">
@@ -119,53 +97,6 @@
                 <span class="switch-text">{{ settings.emailNotify ? '开启' : '关闭' }}</span>
               </div>
             </div>
-          </div>
-        </div>
-        <div class="settings-row">
-          <div class="settings-item">
-            <label class="settings-label">公众号通知</label>
-            <div class="settings-input-group">
-              <div class="switch-wrapper">
-                <span :class="['switch', settings.wechatNotify ? 'active' : '']" @click="settings.wechatNotify = !settings.wechatNotify">
-                  <span class="switch-dot"></span>
-                </span>
-                <span class="switch-text">{{ settings.wechatNotify ? '开启' : '关闭' }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 通知模板配置 -->
-    <div class="settings-card">
-      <div class="card-header">
-        <h3 class="card-title">通知模板配置</h3>
-      </div>
-      <div class="card-body">
-        <div class="template-tabs">
-          <button :class="['tab-btn', activeTab === 'submit' ? 'active' : '']" @click="activeTab = 'submit'">提交通知</button>
-          <button :class="['tab-btn', activeTab === 'process' ? 'active' : '']" @click="activeTab = 'process'">处理通知</button>
-          <button :class="['tab-btn', activeTab === 'complete' ? 'active' : '']" @click="activeTab = 'complete'">完成通知</button>
-          <button :class="['tab-btn', activeTab === 'remind' ? 'active' : '']" @click="activeTab = 'remind'">催促通知</button>
-        </div>
-        <div class="template-content">
-          <div class="form-item">
-            <label class="form-label">短信模板</label>
-            <textarea class="form-textarea" v-model="templates[activeTab].sms" placeholder="请输入短信模板内容" rows="4"></textarea>
-            <div class="template-vars">
-              <span class="var-tag" @click="insertVar('sms', '{patientName}')">{patientName} 患者姓名</span>
-              <span class="var-tag" @click="insertVar('sms', '{caseNo}')">{caseNo} 案件编号</span>
-              <span class="var-tag" @click="insertVar('sms', '{status}')">{status} 处理状态</span>
-            </div>
-          </div>
-          <div class="form-item">
-            <label class="form-label">邮件主题</label>
-            <input type="text" class="form-input" v-model="templates[activeTab].emailSubject" placeholder="请输入邮件主题">
-          </div>
-          <div class="form-item">
-            <label class="form-label">邮件内容</label>
-            <textarea class="form-textarea" v-model="templates[activeTab].emailContent" placeholder="请输入邮件内容" rows="6"></textarea>
           </div>
         </div>
       </div>
@@ -188,46 +119,14 @@
 <script setup>
 import { ref } from 'vue'
 
-const activeTab = ref('submit')
-
 const settings = ref({
   complaintDeadline: 7,
-  ratingDeadline: 30,
   autoRemind: true,
   remindInterval: 2,
   autoWarning: false,
   warningTime: 5,
-  smsNotify: true,
-  emailNotify: true,
-  wechatNotify: true
+  emailNotify: true
 })
-
-const templates = ref({
-  submit: {
-    sms: '【港大医院】尊敬的{patientName}，您的投诉建议已提交成功，案件编号：{caseNo}，我们将尽快处理。',
-    emailSubject: '投诉建议提交成功通知',
-    emailContent: '尊敬的{patientName}：\n\n您的投诉建议已提交成功，案件编号：{caseNo}。\n\n我们将尽快处理并反馈结果。\n\n香港大学深圳医院'
-  },
-  process: {
-    sms: '【港大医院】尊敬的{patientName}，您的案件{caseNo}正在处理中，请耐心等待。',
-    emailSubject: '投诉建议处理通知',
-    emailContent: '尊敬的{patientName}：\n\n您的案件{caseNo}正在处理中。\n\n处理人：{handler}\n\n请耐心等待处理结果。\n\n香港大学深圳医院'
-  },
-  complete: {
-    sms: '【港大医院】尊敬的{patientName}，您的案件{caseNo}已处理完成，请点击链接进行评价。',
-    emailSubject: '投诉建议处理完成通知',
-    emailContent: '尊敬的{patientName}：\n\n您的案件{caseNo}已处理完成。\n\n处理结果：{result}\n\n请点击以下链接进行评价：\n{ratingLink}\n\n香港大学深圳医院'
-  },
-  remind: {
-    sms: '【港大医院】尊敬的{patientName}，您的案件{caseNo}即将超期，请尽快处理。',
-    emailSubject: '投诉建议催促通知',
-    emailContent: '尊敬的{patientName}：\n\n您的案件{caseNo}即将超期，请尽快处理。\n\n剩余时间：{remainingTime}\n\n香港大学深圳医院'
-  }
-})
-
-const insertVar = (type, variable) => {
-  templates.value[activeTab.value][type === 'sms' ? 'sms' : 'emailContent'] += variable
-}
 
 const saveSettings = () => {
   alert('设置保存成功！')
@@ -385,90 +284,6 @@ const saveSettings = () => {
 .switch-text {
   font-size: 14px;
   color: #666;
-}
-
-.template-tabs {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 20px;
-}
-
-.tab-btn {
-  padding: 8px 16px;
-  border: 1px solid #d9d9d9;
-  border-radius: 4px;
-  background: #fff;
-  font-size: 14px;
-  color: #666;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.tab-btn:hover {
-  color: #1890ff;
-  border-color: #1890ff;
-}
-
-.tab-btn.active {
-  background: #1890ff;
-  color: #fff;
-  border-color: #1890ff;
-}
-
-.template-content {
-  background: #fafafa;
-  padding: 20px;
-  border-radius: 4px;
-}
-
-.form-item {
-  margin-bottom: 20px;
-}
-
-.form-item:last-child {
-  margin-bottom: 0;
-}
-
-.form-label {
-  display: block;
-  font-size: 14px;
-  color: #333;
-  margin-bottom: 8px;
-}
-
-.form-textarea {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #d9d9d9;
-  border-radius: 4px;
-  font-size: 14px;
-  outline: none;
-  resize: vertical;
-  min-height: 100px;
-}
-
-.form-textarea:focus {
-  border-color: #1890ff;
-}
-
-.template-vars {
-  display: flex;
-  gap: 8px;
-  margin-top: 8px;
-  flex-wrap: wrap;
-}
-
-.var-tag {
-  padding: 4px 8px;
-  background: #e6f7ff;
-  color: #1890ff;
-  border-radius: 2px;
-  font-size: 12px;
-  cursor: pointer;
-}
-
-.var-tag:hover {
-  background: #bae7ff;
 }
 
 .action-bar {

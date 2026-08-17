@@ -9,6 +9,40 @@
     </div>
     <h1 class="page-title">所有案件</h1>
     
+    <!-- 预警提示框 -->
+    <div class="warning-alert" v-if="showWarningAlert && warningList.length > 0">
+      <div class="warning-alert-header">
+        <div class="warning-title">
+          <svg class="warning-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>案件到期预警</span>
+          <span class="warning-count">共 {{ warningList.length }} 条待处理案件即将到期</span>
+        </div>
+        <button class="warning-close" @click="showWarningAlert = false">×</button>
+      </div>
+      <div class="warning-alert-body">
+        <div class="warning-list">
+          <div class="warning-item" v-for="item in warningList" :key="item.caseNumber">
+            <div class="warning-case-info">
+              <span class="warning-case-no">{{ item.caseNumber }}</span>
+              <span class="warning-case-submitter">{{ item.patientName }}</span>
+              <span class="warning-case-type">{{ item.caseType }}</span>
+            </div>
+            <div class="warning-case-time">
+              <span :class="['warning-time-tag', item.isOverdue ? 'overdue' : '']">
+                {{ item.isOverdue ? '即将超期' : item.remainingText }}
+              </span>
+              <span class="warning-deadline">截止：{{ item.deadlineTime }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="warning-alert-footer">
+        <button class="btn btn-warning-dismiss" @click="showWarningAlert = false">取消</button>
+      </div>
+    </div>
+
     <div class="search-form">
       <div class="form-row">
         <div class="form-item">
@@ -148,7 +182,69 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+
+const showWarningAlert = ref(true)
+const warningConfig = ref({
+  complaintDeadline: 7,
+  autoWarning: true,
+  warningTime: 30
+})
+let warningTimer = null
+
+const warningList = computed(() => {
+  const now = new Date()
+  const result = []
+  for (const item of tableData.value) {
+    if (item.statusClass === 'closed') continue
+    const acceptDate = new Date(item.acceptTime.replace(/-/g, '/'))
+    const deadline = new Date(acceptDate.getTime() + warningConfig.value.complaintDeadline * 24 * 60 * 60 * 1000)
+    const warningThreshold = new Date(deadline.getTime() - warningConfig.value.warningTime * 60 * 1000)
+    if (now >= warningThreshold) {
+      const diffMs = deadline.getTime() - now.getTime()
+      const isOverdue = diffMs <= 0
+      const remainingMinutes = Math.abs(Math.floor(diffMs / (1000 * 60)))
+      let remainingText = ''
+      if (isOverdue) {
+        const overdueDays = Math.floor(remainingMinutes / (60 * 24))
+        const overdueHours = Math.floor((remainingMinutes % (60 * 24)) / 60)
+        remainingText = overdueDays > 0 ? `即将超期 ${overdueDays}天${overdueHours}小时` : `即将超期 ${overdueHours}小时`
+      } else {
+        const days = Math.floor(remainingMinutes / (60 * 24))
+        const hours = Math.floor((remainingMinutes % (60 * 24)) / 60)
+        const mins = remainingMinutes % 60
+        if (days > 0) {
+          remainingText = `剩余 ${days}天${hours}小时`
+        } else if (hours > 0) {
+          remainingText = `剩余 ${hours}小时${mins}分钟`
+        } else {
+          remainingText = `剩余 ${mins}分钟`
+        }
+      }
+      result.push({
+        ...item,
+        isOverdue,
+        remainingText,
+        deadlineTime: deadline.toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+      })
+    }
+  }
+  return result.sort((a, b) => {
+    const aTime = new Date(a.acceptTime.replace(/-/g, '/')).getTime() + warningConfig.value.complaintDeadline * 24 * 60 * 60 * 1000
+    const bTime = new Date(b.acceptTime.replace(/-/g, '/')).getTime() + warningConfig.value.complaintDeadline * 24 * 60 * 60 * 1000
+    return aTime - bTime
+  })
+})
+
+onMounted(() => {
+  warningTimer = setInterval(() => {
+    showWarningAlert.value = showWarningAlert.value
+  }, 60000)
+})
+
+onUnmounted(() => {
+  if (warningTimer) clearInterval(warningTimer)
+})
 
 const tableData = ref([
   {
@@ -578,5 +674,165 @@ const totalCount = ref(5)
 
 .page-input:focus {
   border-color: #1890ff;
+}
+
+.warning-alert {
+  background: #fff7e6;
+  border: 1px solid #ffd591;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(255, 140, 0, 0.15);
+}
+
+.warning-alert-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #fff1b8 0%, #fff7e6 100%);
+  border-bottom: 1px solid #ffd591;
+}
+
+.warning-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #d46b08;
+}
+
+.warning-icon {
+  width: 22px;
+  height: 22px;
+  color: #fa8c16;
+}
+
+.warning-count {
+  font-size: 13px;
+  font-weight: normal;
+  color: #ad6800;
+  background: rgba(255, 140, 0, 0.1);
+  padding: 2px 10px;
+  border-radius: 10px;
+}
+
+.warning-close {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+  font-size: 18px;
+  color: #8c8c8c;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.warning-close:hover {
+  background: #ff4d4f;
+  color: #fff;
+}
+
+.warning-alert-body {
+  padding: 16px 20px;
+}
+
+.warning-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.warning-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: #fff;
+  border: 1px solid #ffe7ba;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.warning-item:hover {
+  border-color: #ffbb96;
+  box-shadow: 0 2px 6px rgba(255, 140, 0, 0.1);
+}
+
+.warning-case-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.warning-case-no {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.warning-case-submitter {
+  font-size: 13px;
+  color: #666;
+  padding: 2px 8px;
+  background: #f5f5f5;
+  border-radius: 4px;
+}
+
+.warning-case-type {
+  font-size: 13px;
+  color: #fa8c16;
+  padding: 2px 8px;
+  background: #fff7e6;
+  border-radius: 4px;
+}
+
+.warning-case-time {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.warning-time-tag {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fa8c16;
+  padding: 4px 12px;
+  background: #fff7e6;
+  border-radius: 12px;
+}
+
+.warning-time-tag.overdue {
+  color: #fff;
+  background: #fa8c16;
+}
+
+.warning-deadline {
+  font-size: 12px;
+  color: #999;
+}
+
+.warning-alert-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px 20px;
+  background: #fffbe6;
+  border-top: 1px solid #ffd591;
+}
+
+.btn-warning-dismiss {
+  background: #fff;
+  color: #8c8c8c;
+  border: 1px solid #d9d9d9;
+}
+
+.btn-warning-dismiss:hover {
+  color: #fa8c16;
+  border-color: #fa8c16;
 }
 </style>
