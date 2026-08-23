@@ -8,12 +8,12 @@
       </div>
       <span class="breadcrumb-item">数据统计</span>
       <span class="breadcrumb-separator">›</span>
-      <span class="breadcrumb-item active">投诉统计看板</span>
+      <span class="breadcrumb-item active">案件统计看板</span>
     </div>
 
     <!-- 页面标题 & 导出 -->
     <div class="page-header">
-      <h1 class="page-title">投诉统计看板</h1>
+      <h1 class="page-title">案件统计看板</h1>
       <div class="header-actions">
         <button class="btn btn-outline" @click="exportReport">
           <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -730,7 +730,7 @@ const exportReport = () => {
   const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' })
   const link = document.createElement('a')
   link.href = URL.createObjectURL(blob)
-  link.download = `投诉统计看板_${new Date().toISOString().slice(0,10)}.csv`
+  link.download = `案件统计看板_${new Date().toISOString().slice(0,10)}.csv`
   link.click()
 }
 </script>

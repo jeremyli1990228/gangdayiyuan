@@ -397,11 +397,18 @@
         <div class="drawer-body">
           <div class="form-item required">
             <label class="form-label">处理结果</label>
-            <select class="form-select" v-model="handleForm.result">
+            <select class="form-select" v-model="handleForm.result" @change="onResultChange">
               <option value="">请选择处理结果</option>
               <option value="resolved">已解决</option>
               <option value="processing">处理中</option>
               <option value="rejected">不予受理</option>
+            </select>
+          </div>
+          <div class="form-item" v-if="handleForm.result && availableTemplates.length > 0">
+            <label class="form-label">快捷模板</label>
+            <select class="form-select" v-model="selectedTemplateId" @change="applyTemplate">
+              <option value="">请选择模板（可选）</option>
+              <option v-for="tpl in availableTemplates" :key="tpl.id" :value="tpl.id">{{ tpl.name }}</option>
             </select>
           </div>
           <div class="form-item required">
@@ -448,6 +455,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { regionData, getCitiesByProvince, getDistrictsByCity } from '../../utils/regionData'
+import { useHandleResultTemplates } from '../../composables/useHandleResultTemplates'
 
 const showWarningAlert = ref(true)
 const warningConfig = ref({
@@ -524,6 +532,26 @@ const handleForm = ref({
   notifyWechat: false,
   notifySms: false
 })
+
+const { getEnabledTemplates } = useHandleResultTemplates()
+const selectedTemplateId = ref('')
+
+const availableTemplates = computed(() => {
+  return getEnabledTemplates(handleForm.value.result)
+})
+
+const applyTemplate = () => {
+  if (selectedTemplateId.value) {
+    const tpl = availableTemplates.value.find(t => t.id === selectedTemplateId.value)
+    if (tpl) {
+      handleForm.value.opinion = tpl.content
+    }
+  }
+}
+
+const onResultChange = () => {
+  selectedTemplateId.value = ''
+}
 
 const filterForm = ref({
   submitterName: '',
@@ -659,11 +687,13 @@ const handleFeedback = (item) => {
     notifyWechat: false,
     notifySms: false
   }
+  selectedTemplateId.value = ''
   showHandleDrawer.value = true
 }
 
 const replyFeedback = (item) => {
   currentFeedback.value = { ...item }
+  selectedTemplateId.value = ''
   showHandleDrawer.value = true
 }
 

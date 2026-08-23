@@ -52,6 +52,16 @@ const routes = [
     component: () => import('../views/my-cases/InitiatedApplication.vue')
   },
   {
+    path: '/my-cases/copy-to-me',
+    name: 'myCasesCopyToMe',
+    component: () => import('../views/my-cases/CopyToMe.vue')
+  },
+  {
+    path: '/my-cases/my-created',
+    name: 'myCasesMyCreated',
+    component: () => import('../views/my-cases/MyCreated.vue')
+  },
+  {
     path: '/my-cases/all',
     name: 'myCasesAll',
     component: () => import('../views/my-cases/All.vue')
@@ -364,18 +374,6 @@ const routes = [
     name: 'memo',
     component: () => import('../views/memo/Index.vue')
   },
-  // 功能权限管理
-  {
-    path: '/system-auth/function-permission',
-    name: 'systemAuthFunctionPermission',
-    component: () => import('../views/system-auth/FunctionPermission.vue')
-  },
-  // 权限配置
-  {
-    path: '/system-auth/permission-config',
-    name: 'systemAuthPermissionConfig',
-    component: () => import('../views/system-auth/PermissionConfig.vue')
-  },
   // 涉及环节管理
   {
     path: '/process-cases/link-management',
@@ -394,35 +392,17 @@ const routes = [
     name: 'processCasesFieldManagement',
     component: () => import('../views/process-cases/FieldManagement.vue')
   },
-  // 通讯录更新配置
-  {
-    path: '/contacts/sync-config',
-    name: 'contactsSyncConfig',
-    component: () => import('../views/contacts/ContactSync.vue')
-  },
   // 满意度调查看板
   {
     path: '/statistics/satisfaction-dashboard',
     name: 'statisticsSatisfactionDashboard',
     component: () => import('../views/complaint/SatisfactionDashboard.vue')
   },
-  // 投诉统计看板
+  // 案件统计看板
   {
     path: '/statistics/complaint-dashboard',
     name: 'statisticsComplaintDashboard',
     component: () => import('../views/complaint/ComplaintStatisticsDashboard.vue')
-  },
-  // 知识库
-  {
-    path: '/knowledge',
-    name: 'knowledge',
-    component: () => import('../views/knowledge/Index.vue')
-  },
-  // 消息通知
-  {
-    path: '/notifications',
-    name: 'notifications',
-    component: () => import('../views/notifications/Index.vue')
   },
 ]
 

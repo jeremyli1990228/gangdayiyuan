@@ -171,6 +171,77 @@
       </div>
     </div>
 
+    <!-- 处理结果模板配置 -->
+    <div class="settings-card">
+      <div class="card-header">
+        <h3 class="card-title">处理结果模板配置</h3>
+      </div>
+      <div class="card-body">
+        <div class="template-tabs">
+          <button :class="['tab-btn', handleResultTab === 'resolved' ? 'active' : '']" @click="handleResultTab = 'resolved'">已解决</button>
+          <button :class="['tab-btn', handleResultTab === 'processing' ? 'active' : '']" @click="handleResultTab = 'processing'">处理中</button>
+          <button :class="['tab-btn', handleResultTab === 'rejected' ? 'active' : '']" @click="handleResultTab = 'rejected'">不予受理</button>
+        </div>
+        <div class="handle-template-list">
+          <div class="handle-template-row" v-for="tpl in handleResultTemplates[handleResultTab]" :key="tpl.id">
+            <div class="handle-template-info">
+              <div class="handle-template-name">
+                {{ tpl.name }}
+                <span class="default-tag" v-if="tpl.isDefault">默认</span>
+              </div>
+              <div class="handle-template-content">{{ tpl.content }}</div>
+            </div>
+            <div class="handle-template-actions">
+              <div class="switch-wrapper">
+                <span :class="['switch', tpl.enabled ? 'active' : '']" @click="tpl.enabled = !tpl.enabled">
+                  <span class="switch-dot"></span>
+                </span>
+              </div>
+              <button class="text-btn" @click="openEditTemplate(tpl)">编辑</button>
+              <button class="text-btn danger" @click="deleteHandleTemplate(tpl.id)">删除</button>
+            </div>
+          </div>
+          <div class="empty-tip" v-if="handleResultTemplates[handleResultTab].length === 0">
+            暂无模板，请点击下方按钮添加
+          </div>
+        </div>
+        <button class="btn btn-outline" @click="openAddTemplate">+ 新增模板</button>
+      </div>
+    </div>
+
+    <!-- 模板编辑弹窗 -->
+    <div class="modal-overlay" v-if="showTemplateModal" @click="showTemplateModal = false">
+      <div class="modal" @click.stop>
+        <div class="modal-header">
+          <h3 class="modal-title">{{ editingTemplate.id ? '编辑模板' : '新增模板' }}</h3>
+          <button class="modal-close" @click="showTemplateModal = false">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-item">
+            <label class="form-label">模板名称</label>
+            <input type="text" class="form-input" v-model="editingTemplate.name" placeholder="请输入模板名称" style="width: 100%;">
+          </div>
+          <div class="form-item">
+            <label class="form-label">模板内容</label>
+            <textarea class="form-textarea" v-model="editingTemplate.content" placeholder="请输入模板内容（纯文本）" rows="6"></textarea>
+          </div>
+          <div class="form-item">
+            <label class="form-label">设为默认</label>
+            <div class="switch-wrapper">
+              <span :class="['switch', editingTemplate.isDefault ? 'active' : '']" @click="editingTemplate.isDefault = !editingTemplate.isDefault">
+                <span class="switch-dot"></span>
+              </span>
+              <span class="switch-text">{{ editingTemplate.isDefault ? '是' : '否' }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" @click="showTemplateModal = false">取消</button>
+          <button class="btn btn-primary" @click="saveHandleTemplate">保存</button>
+        </div>
+      </div>
+    </div>
+
     <!-- 保存按钮 -->
     <div class="action-bar">
       <button class="btn btn-primary" @click="saveSettings">
@@ -187,6 +258,7 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useHandleResultTemplates } from '../../composables/useHandleResultTemplates'
 
 const activeTab = ref('submit')
 
@@ -231,6 +303,51 @@ const insertVar = (type, variable) => {
 
 const saveSettings = () => {
   alert('设置保存成功！')
+}
+
+// 处理结果模板配置
+const { templates: handleResultTemplates, addTemplate, updateTemplate, deleteTemplate } = useHandleResultTemplates()
+
+const handleResultTab = ref('resolved')
+const showTemplateModal = ref(false)
+const editingTemplate = ref({ name: '', content: '', isDefault: false })
+
+const openAddTemplate = () => {
+  editingTemplate.value = { name: '', content: '', isDefault: false }
+  showTemplateModal.value = true
+}
+
+const openEditTemplate = (tpl) => {
+  editingTemplate.value = { ...tpl }
+  showTemplateModal.value = true
+}
+
+const saveHandleTemplate = () => {
+  if (!editingTemplate.value.name || !editingTemplate.value.content) {
+    alert('请填写模板名称和内容')
+    return
+  }
+  if (editingTemplate.value.id) {
+    updateTemplate(handleResultTab.value, editingTemplate.value.id, {
+      name: editingTemplate.value.name,
+      content: editingTemplate.value.content,
+      isDefault: editingTemplate.value.isDefault
+    })
+  } else {
+    addTemplate(handleResultTab.value, {
+      name: editingTemplate.value.name,
+      content: editingTemplate.value.content,
+      isDefault: editingTemplate.value.isDefault,
+      enabled: true
+    })
+  }
+  showTemplateModal.value = false
+}
+
+const deleteHandleTemplate = (id) => {
+  if (confirm('确定删除该模板？')) {
+    deleteTemplate(handleResultTab.value, id)
+  }
 }
 </script>
 
@@ -501,5 +618,181 @@ const saveSettings = () => {
 .btn-icon {
   width: 16px;
   height: 16px;
+}
+
+/* 处理结果模板配置 */
+.handle-template-list {
+  margin-bottom: 16px;
+}
+
+.handle-template-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border: 1px solid #f0f0f0;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  background: #fafafa;
+}
+
+.handle-template-info {
+  flex: 1;
+  min-width: 0;
+  margin-right: 16px;
+}
+
+.handle-template-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.default-tag {
+  display: inline-block;
+  padding: 1px 6px;
+  background: #e6f7ff;
+  color: #1890ff;
+  border-radius: 2px;
+  font-size: 12px;
+  font-weight: normal;
+}
+
+.handle-template-content {
+  font-size: 13px;
+  color: #666;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.handle-template-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.text-btn {
+  background: none;
+  border: none;
+  color: #1890ff;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.text-btn:hover {
+  color: #40a9ff;
+}
+
+.text-btn.danger {
+  color: #ff4d4f;
+}
+
+.text-btn.danger:hover {
+  color: #ff7875;
+}
+
+.empty-tip {
+  text-align: center;
+  color: #999;
+  font-size: 14px;
+  padding: 24px 0;
+}
+
+.btn-secondary {
+  background: #fff;
+  color: #333;
+  border: 1px solid #d9d9d9;
+}
+
+.btn-secondary:hover {
+  color: #1890ff;
+  border-color: #1890ff;
+}
+
+.btn-outline {
+  background: #fff;
+  color: #1890ff;
+  border: 1px dashed #1890ff;
+}
+
+.btn-outline:hover {
+  background: #e6f7ff;
+}
+
+/* 模板编辑弹窗 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 8px;
+  width: 500px;
+  max-width: 90vw;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.modal-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #999;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  color: #333;
+}
+
+.modal-body {
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 20px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.modal-body .form-input {
+  width: 100%;
 }
 </style>

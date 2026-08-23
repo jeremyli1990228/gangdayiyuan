@@ -102,6 +102,8 @@ const menuData = [
       { name: '移交我的', path: '/my-cases/transferred-in' },
       { name: '我发起的转办', path: '/my-cases/initiated-transfer' },
       { name: '我发起的申请', path: '/my-cases/initiated-application' },
+      { name: '抄送我的', path: '/my-cases/copy-to-me' },
+      { name: '我创建的', path: '/my-cases/my-created' },
       { name: '所有案件', path: '/my-cases/all' }
     ]
   },
@@ -167,15 +169,6 @@ const menuData = [
     ]
   },
   {
-    key: 'knowledge',
-    title: '知识库',
-    iconViewBox: '0 0 24 24',
-    iconPath: 'M12 6.25278V19.2528M12 6.25278C10.8321 5.47686 9.24649 5 7.5 5C5.75351 5 4.16789 5.47686 3 6.25278V19.2528C4.16789 18.4769 5.75351 18 7.5 18C9.24649 18 10.8321 18.4769 12 19.2528M12 6.25278C13.1679 5.47686 14.7535 5 16.5 5C18.2465 5 19.8321 5.47686 21 6.25278V19.2528C19.8321 18.4769 18.2465 18 16.5 18C14.7535 18 13.1679 18.4769 12 19.2528',
-    items: [
-      { name: '知识库首页', path: '/knowledge' }
-    ]
-  },
-  {
     key: 'statistics',
     title: '数据统计',
     iconViewBox: '0 0 24 24',
@@ -190,7 +183,7 @@ const menuData = [
       { name: '满意度样本数统计', path: '/statistics/satisfaction-sample' },
       { name: '满意度分项指标', path: '/statistics/satisfaction-indicators' },
       { name: '满意度调查看板', path: '/statistics/satisfaction-dashboard' },
-      { name: '投诉统计看板', path: '/statistics/complaint-dashboard' }
+      { name: '案件统计看板', path: '/statistics/complaint-dashboard' }
     ]
   },
   {
@@ -216,8 +209,7 @@ const menuData = [
       { name: '员工组', path: '/contacts/employee-group' },
       { name: '组织关系', path: '/contacts/organization' },
       { name: '反馈人名单', path: '/contacts/feedback-list' },
-      { name: '患者名单', path: '/contacts/patient-list' },
-      { name: '更新配置', path: '/contacts/sync-config' }
+      { name: '患者名单', path: '/contacts/patient-list' }
     ]
   },
   {
@@ -229,8 +221,7 @@ const menuData = [
       { name: '站内信', path: '/messages/inbox' },
       { name: '邮件记录', path: '/messages/email-records' },
       { name: '短信记录', path: '/messages/sms-records' },
-      { name: '系统日志', path: '/messages/system-log' },
-      { name: '消息中心', path: '/notifications' }
+      { name: '系统日志', path: '/messages/system-log' }
     ]
   },
   {
@@ -264,9 +255,7 @@ const menuData = [
     items: [
       { name: '用户管理', path: '/system-auth/user-manage' },
       { name: '角色管理', path: '/system-auth/role-manage' },
-      { name: '菜单管理', path: '/system-auth/menu-manage' },
-      { name: '功能权限', path: '/system-auth/function-permission' },
-      { name: '权限配置', path: '/system-auth/permission-config' }
+      { name: '菜单管理', path: '/system-auth/menu-manage' }
     ]
   },
   {
@@ -311,10 +300,6 @@ watch(() => route.path, (newPath) => {
     if (!openMenus.value.includes('learning')) {
       openMenus.value.push('learning')
     }
-  } else if (newPath.startsWith('/knowledge')) {
-    if (!openMenus.value.includes('knowledge')) {
-      openMenus.value.push('knowledge')
-    }
   } else if (newPath.startsWith('/statistics')) {
     if (!openMenus.value.includes('statistics')) {
       openMenus.value.push('statistics')
@@ -328,10 +313,6 @@ watch(() => route.path, (newPath) => {
       openMenus.value.push('contacts')
     }
   } else if (newPath.startsWith('/messages')) {
-    if (!openMenus.value.includes('messages')) {
-      openMenus.value.push('messages')
-    }
-  } else if (newPath.startsWith('/notifications')) {
     if (!openMenus.value.includes('messages')) {
       openMenus.value.push('messages')
     }

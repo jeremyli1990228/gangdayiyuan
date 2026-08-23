@@ -176,11 +176,18 @@
           </div>
           <div class="form-item required">
             <label class="form-label">处理结果</label>
-            <select class="form-select" v-model="handleForm.result">
+            <select class="form-select" v-model="handleForm.result" @change="onResultChange">
               <option value="">请选择</option>
               <option value="resolved">已解决</option>
               <option value="processing">处理中</option>
               <option value="rejected">不予受理</option>
+            </select>
+          </div>
+          <div class="form-item" v-if="handleForm.result && availableTemplates.length > 0">
+            <label class="form-label">快捷模板</label>
+            <select class="form-select" v-model="selectedTemplateId" @change="applyTemplate">
+              <option value="">请选择模板（可选）</option>
+              <option v-for="tpl in availableTemplates" :key="tpl.id" :value="tpl.id">{{ tpl.name }}</option>
             </select>
           </div>
           <div class="form-item required">
@@ -257,6 +264,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useHandleResultTemplates } from '../../composables/useHandleResultTemplates'
 
 const activeTab = ref('pending')
 const showHandleDrawer = ref(false)
@@ -271,6 +279,26 @@ const handleForm = ref({
   notifySms: true,
   notifyEmail: false
 })
+
+const { getEnabledTemplates } = useHandleResultTemplates()
+const selectedTemplateId = ref('')
+
+const availableTemplates = computed(() => {
+  return getEnabledTemplates(handleForm.value.result)
+})
+
+const applyTemplate = () => {
+  if (selectedTemplateId.value) {
+    const tpl = availableTemplates.value.find(t => t.id === selectedTemplateId.value)
+    if (tpl) {
+      handleForm.value.opinion = tpl.content
+    }
+  }
+}
+
+const onResultChange = () => {
+  selectedTemplateId.value = ''
+}
 
 const pendingList = ref([
   { id: 1, submitterName: '张三', phone: '13800138001', category: '投诉', feedbackType: '服务态度', submitTime: '2026-06-01 09:30:00', description: '门诊挂号处工作人员态度冷漠，排队等候时间过长，希望改进服务流程。', remainingHours: 48 },
@@ -294,6 +322,7 @@ const handleFeedback = (item) => {
     notifySms: true,
     notifyEmail: false
   }
+  selectedTemplateId.value = ''
   showHandleDrawer.value = true
 }
 
