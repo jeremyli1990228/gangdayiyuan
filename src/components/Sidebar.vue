@@ -123,6 +123,27 @@ const menuData = [
     ]
   },
   {
+    key: 'petition',
+    title: '民生诉求',
+    iconViewBox: '0 0 24 24',
+    iconPath: 'M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C13.7864 3 15.4262 3.51567 16.7772 4.47364',
+    items: [
+      { name: '新增案件', path: '/petition/add' },
+      { name: '我跟进的', path: '/petition/following' },
+      { name: '转办知悉', path: '/petition/transfer-notice' },
+      { name: '出具科室意见', path: '/petition/opinions' },
+      { name: '有效性判定', path: '/petition/validity' },
+      { name: '完结归档判定', path: '/petition/archive' },
+      { name: '我移交的', path: '/petition/transferred-out' },
+      { name: '移交我的', path: '/petition/transferred-in' },
+      { name: '我发起的转办', path: '/petition/initiated-transfer' },
+      { name: '我发起的申请', path: '/petition/initiated-application' },
+      { name: '抄送我的', path: '/petition/copy-to-me' },
+      { name: '我创建的', path: '/petition/my-created' },
+      { name: '所有案件', path: '/petition/all' }
+    ]
+  },
+  {
     key: 'process-cases',
     title: '处理案件',
     iconViewBox: '0 0 24 24',
@@ -283,6 +304,10 @@ watch(() => route.path, (newPath) => {
   } else if (newPath.startsWith('/complaint')) {
     if (!openMenus.value.includes('complaint')) {
       openMenus.value.push('complaint')
+    }
+  } else if (newPath.startsWith('/petition')) {
+    if (!openMenus.value.includes('petition')) {
+      openMenus.value.push('petition')
     }
   } else if (newPath.startsWith('/process-cases')) {
     if (!openMenus.value.includes('process-cases')) {

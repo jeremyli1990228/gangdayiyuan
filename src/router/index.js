@@ -332,6 +332,77 @@ const routes = [
     name: 'complaintMyFeedback',
     component: () => import('../views/complaint/MyFeedback.vue')
   },
+  // 民生诉求模块
+  {
+    path: '/petition/add',
+    name: 'petitionAdd',
+    component: () => import('../views/petition/Add.vue')
+  },
+  {
+    path: '/petition/all',
+    name: 'petitionAll',
+    component: () => import('../views/petition/All.vue')
+  },
+  {
+    path: '/petition/detail/:id?',
+    name: 'petitionDetail',
+    component: () => import('../views/petition/Detail.vue')
+  },
+  {
+    path: '/petition/following',
+    name: 'petitionFollowing',
+    component: () => import('../views/petition/Following.vue')
+  },
+  {
+    path: '/petition/transfer-notice',
+    name: 'petitionTransferNotice',
+    component: () => import('../views/petition/TransferNotice.vue')
+  },
+  {
+    path: '/petition/opinions',
+    name: 'petitionOpinions',
+    component: () => import('../views/petition/Opinions.vue')
+  },
+  {
+    path: '/petition/validity',
+    name: 'petitionValidity',
+    component: () => import('../views/petition/Validity.vue')
+  },
+  {
+    path: '/petition/archive',
+    name: 'petitionArchive',
+    component: () => import('../views/petition/Archive.vue')
+  },
+  {
+    path: '/petition/transferred-out',
+    name: 'petitionTransferredOut',
+    component: () => import('../views/petition/TransferredOut.vue')
+  },
+  {
+    path: '/petition/transferred-in',
+    name: 'petitionTransferredIn',
+    component: () => import('../views/petition/TransferredIn.vue')
+  },
+  {
+    path: '/petition/initiated-transfer',
+    name: 'petitionInitiatedTransfer',
+    component: () => import('../views/petition/InitiatedTransfer.vue')
+  },
+  {
+    path: '/petition/initiated-application',
+    name: 'petitionInitiatedApplication',
+    component: () => import('../views/petition/InitiatedApplication.vue')
+  },
+  {
+    path: '/petition/copy-to-me',
+    name: 'petitionCopyToMe',
+    component: () => import('../views/petition/CopyToMe.vue')
+  },
+  {
+    path: '/petition/my-created',
+    name: 'petitionMyCreated',
+    component: () => import('../views/petition/MyCreated.vue')
+  },
   // 移动端H5页面
   {
     path: '/h5/home',
