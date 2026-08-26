@@ -2,7 +2,7 @@
   <div class="page-container">
     <div class="breadcrumb">
       <div class="breadcrumb-arrow">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#999">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#999" xmlns="http://www.w3.org/2000/svg">
           <polyline points="15 18 9 12 15 6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
@@ -41,30 +41,76 @@
           <input type="text" placeholder="请输入" class="form-input">
         </div>
         <div class="form-item">
+          <label>涉及科室</label>
+          <input type="text" placeholder="请输入" class="form-input">
+        </div>
+        <div class="form-item">
           <label>工单状态</label>
           <select class="form-select">
             <option value="">请选择</option>
             <option value="pending">待处理</option>
             <option value="processing">处理中</option>
             <option value="resolved">已解决</option>
+            <option value="closed">已归档</option>
           </select>
         </div>
+      </div>
+      <div class="search-form-row">
         <div class="form-item">
           <label>签收日期</label>
           <div class="date-inputs">
-            <input type="text" placeholder="开始日期" class="form-input date-input">
+            <div class="date-input-wrapper">
+              <svg class="date-icon" viewBox="0 0 24 24" fill="none" stroke="#999">
+                <rect x="3" y="4" width="18" height="18" rx="2" stroke-width="2"/>
+                <line x1="16" y1="2" x2="16" y2="6" stroke-width="2"/>
+                <line x1="8" y1="2" x2="8" y2="6" stroke-width="2"/>
+                <line x1="3" y1="10" x2="21" y2="10" stroke-width="2"/>
+              </svg>
+              <input type="text" placeholder="开始日期" class="form-input date-input">
+            </div>
             <span class="date-separator">至</span>
             <input type="text" placeholder="结束日期" class="form-input date-input">
           </div>
+        </div>
+        <div class="form-item">
+          <label>工单分类</label>
+          <select class="form-select">
+            <option value="">请选择</option>
+            <option value="first">首件</option>
+            <option value="repeat">重复件</option>
+          </select>
+        </div>
+        <div class="form-item">
+          <label>紧急程度</label>
+          <select class="form-select">
+            <option value="">请选择</option>
+            <option value="normal">常态</option>
+            <option value="attention">关注</option>
+            <option value="urgent">加急</option>
+            <option value="public_opinion">舆情提醒</option>
+          </select>
+        </div>
+        <div class="form-item expand-btn">
+          <button class="btn btn-link">
+            展开查询条件
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="#1890ff">
+              <polyline points="6 9 12 15 18 9" stroke-width="2"/>
+            </svg>
+          </button>
         </div>
       </div>
     </div>
     
     <div class="table-container">
       <div class="table-header">
+        <div class="table-cell checkbox-cell" style="width: 50px;">
+          <input type="checkbox" class="checkbox" @change="toggleSelectAll">
+        </div>
         <div class="table-cell" style="width: 60px;">序号</div>
         <div class="table-cell" style="width: 160px;">工单编号</div>
         <div class="table-cell" style="width: 120px;">反馈人</div>
+        <div class="table-cell" style="width: 130px;">反馈人手机号</div>
+        <div class="table-cell" style="width: 120px;">工单来源</div>
         <div class="table-cell" style="width: 120px;">工单分类</div>
         <div class="table-cell" style="width: 100px;">紧急程度</div>
         <div class="table-cell" style="width: 150px;">涉及科室</div>
@@ -74,11 +120,16 @@
       </div>
       <div class="table-body">
         <div class="table-row" v-for="(item, index) in tableData" :key="index">
+          <div class="table-cell checkbox-cell" style="width: 50px;">
+            <input type="checkbox" class="checkbox" v-model="selectedIds" :value="item.id">
+          </div>
           <div class="table-cell" style="width: 60px;">{{ index + 1 }}</div>
           <div class="table-cell" style="width: 160px;">
-            <router-link :to="`/petition/detail/${item.id}`" class="case-no-link">{{ item.caseNo }}</router-link>
+            <router-link :to="`/petition/detail/${item.id}`" class="case-no-link" :class="item.caseNoClass">{{ item.caseNo }}</router-link>
           </div>
           <div class="table-cell" style="width: 120px;">{{ item.feedbackName }}</div>
+          <div class="table-cell" style="width: 130px;">{{ item.feedbackPhone }}</div>
+          <div class="table-cell" style="width: 120px;">{{ item.source }}</div>
           <div class="table-cell" style="width: 120px;">{{ item.category }}</div>
           <div class="table-cell" style="width: 100px;">
             <span class="urgency-tag" :class="item.urgencyClass">{{ item.urgency }}</span>
@@ -94,44 +145,85 @@
     </div>
     
     <div class="pagination">
-      <div class="pagination-info">共 {{ tableData.length }} 条</div>
+      <div class="pagination-info">共 {{ total }} 条</div>
       <div class="pagination-right">
-        <button class="page-btn" disabled>
+        <select class="page-size-select">
+          <option value="10">10条/页</option>
+          <option value="20">20条/页</option>
+          <option value="50">50条/页</option>
+        </select>
+        <button class="page-btn" :disabled="currentPage === 1" @click="currentPage--">
           <svg viewBox="0 0 24 24" fill="none" stroke="#999">
             <polyline points="15 18 9 12 15 6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </button>
-        <button class="page-btn active">1</button>
-        <button class="page-btn" disabled>
+        <button v-for="page in totalPages" :key="page" class="page-btn" :class="{ active: page === currentPage }" @click="currentPage = page">{{ page }}</button>
+        <button class="page-btn" :disabled="currentPage === totalPages" @click="currentPage++">
           <svg viewBox="0 0 24 24" fill="none" stroke="#999">
             <polyline points="9 18 15 12 9 6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </button>
+        <div class="page-jump">
+          前往 <input type="number" class="page-input" v-model.number="currentPage" min="1" :max="totalPages"> 页
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const pageTitle = '转办知悉'
+const selectedIds = ref([])
+const currentPage = ref(1)
+const pageSize = ref(10)
 
 const tableData = ref([
   {
     id: '001',
     caseNo: 'MZSS20260801001',
     feedbackName: '张三',
-    category: '医疗服务',
-    urgency: '紧急',
-    urgencyClass: 'urgent',
+    feedbackPhone: '138****1234',
+    source: '政府平台',
+    category: '首件',
+    urgency: '关注',
+    urgencyClass: 'attention',
     department: '门诊部',
     status: '处理中',
     statusClass: 'processing',
     signDate: '2026-08-01',
-    lastUpdateTime: '2026-08-15 10:30'
+    lastUpdateTime: '2026-08-15 10:30:00',
+    caseNoClass: 'blue'
+  },
+  {
+    id: '002',
+    caseNo: 'MZSS20260802002',
+    feedbackName: '李四',
+    feedbackPhone: '139****5678',
+    source: '热线电话',
+    category: '重复件',
+    urgency: '舆情提醒',
+    urgencyClass: 'critical',
+    department: '财务科',
+    status: '待处理',
+    statusClass: 'pending',
+    signDate: '2026-08-02',
+    lastUpdateTime: '2026-08-10 14:20:00',
+    caseNoClass: 'red'
   }
 ])
+
+const total = ref(tableData.value.length)
+const totalPages = computed(() => Math.ceil(total.value / pageSize.value))
+
+const toggleSelectAll = (e) => {
+  if (e.target.checked) {
+    selectedIds.value = tableData.value.map(item => item.id)
+  } else {
+    selectedIds.value = []
+  }
+}
 </script>
 
 <style scoped>
@@ -217,6 +309,11 @@ const tableData = ref([
   display: flex;
   align-items: center;
   gap: 20px;
+  margin-bottom: 16px;
+}
+
+.search-form-row:last-child {
+  margin-bottom: 0;
 }
 
 .form-item {
@@ -230,16 +327,18 @@ const tableData = ref([
   color: #333;
   white-space: nowrap;
   font-weight: 500;
+  line-height: 32px;
 }
 
 .form-input {
-  width: 180px;
+  width: 200px;
   height: 32px;
   padding: 0 12px;
   border: 1px solid #d9d9d9;
   border-radius: 4px;
   font-size: 14px;
   outline: none;
+  transition: border-color 0.2s;
   box-sizing: border-box;
 }
 
@@ -247,12 +346,26 @@ const tableData = ref([
   border-color: #1890ff;
 }
 
+.date-input-wrapper {
+  position: relative;
+}
+
+.date-icon {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+}
+
 .form-input.date-input {
-  width: 120px;
+  width: 140px;
+  padding-left: 28px;
 }
 
 .form-select {
-  width: 150px;
+  width: 200px;
   height: 32px;
   padding: 0 12px;
   border: 1px solid #d9d9d9;
@@ -261,8 +374,16 @@ const tableData = ref([
   outline: none;
   background-color: #fff;
   cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
   padding-right: 28px;
   box-sizing: border-box;
+}
+
+.form-select:focus {
+  border-color: #1890ff;
 }
 
 .date-inputs {
@@ -273,11 +394,18 @@ const tableData = ref([
 
 .date-separator {
   color: #666;
+  font-size: 14px;
+  line-height: 32px;
+}
+
+.expand-btn {
+  margin-left: auto;
 }
 
 .btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   height: 32px;
   padding: 0 16px;
@@ -285,6 +413,7 @@ const tableData = ref([
   border-radius: 4px;
   font-size: 14px;
   cursor: pointer;
+  transition: all 0.2s;
 }
 
 .btn-icon {
@@ -310,6 +439,18 @@ const tableData = ref([
   background-color: #ffc53d;
 }
 
+.btn-link {
+  background: none;
+  border: none;
+  color: #1890ff;
+  padding: 0;
+  font-size: 14px;
+}
+
+.btn-link:hover {
+  text-decoration: underline;
+}
+
 .table-container {
   background-color: #fff;
   border-radius: 4px;
@@ -328,6 +469,19 @@ const tableData = ref([
   font-weight: 600;
   color: #333;
   text-align: left;
+  flex-shrink: 0;
+}
+
+.checkbox-cell {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
 }
 
 .table-body {
@@ -338,10 +492,15 @@ const tableData = ref([
   display: flex;
   border-bottom: 1px solid #f0f0f0;
   padding: 12px 16px;
+  transition: background-color 0.2s;
 }
 
 .table-row:hover {
   background-color: #fafafa;
+}
+
+.table-row:last-child {
+  border-bottom: none;
 }
 
 .table-row .table-cell {
@@ -353,13 +512,22 @@ const tableData = ref([
 }
 
 .case-no-link {
-  color: #1890ff;
+  color: #666;
   text-decoration: none;
   cursor: pointer;
 }
 
 .case-no-link:hover {
   text-decoration: underline;
+  color: #1890ff;
+}
+
+.case-no-link.blue {
+  color: #1890ff;
+}
+
+.case-no-link.red {
+  color: #f5222d;
 }
 
 .status-tag {
@@ -387,6 +555,12 @@ const tableData = ref([
   border: 1px solid #b7eb8f;
 }
 
+.status-tag.archived {
+  background-color: #f5f5f5;
+  color: #8c8c8c;
+  border: 1px solid #d9d9d9;
+}
+
 .urgency-tag {
   display: inline-block;
   padding: 2px 8px;
@@ -398,6 +572,12 @@ const tableData = ref([
   background-color: #f0f0f0;
   color: #666;
   border: 1px solid #d9d9d9;
+}
+
+.urgency-tag.attention {
+  background-color: #e6f7ff;
+  color: #1890ff;
+  border: 1px solid #91d5ff;
 }
 
 .urgency-tag.urgent {
@@ -432,6 +612,17 @@ const tableData = ref([
   gap: 10px;
 }
 
+.page-size-select {
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  font-size: 14px;
+  outline: none;
+  background-color: #fff;
+  cursor: pointer;
+}
+
 .page-btn {
   min-width: 32px;
   height: 32px;
@@ -439,7 +630,9 @@ const tableData = ref([
   border: 1px solid #d9d9d9;
   border-radius: 4px;
   background-color: #fff;
+  font-size: 14px;
   cursor: pointer;
+  transition: all 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -464,5 +657,28 @@ const tableData = ref([
 .page-btn:disabled {
   cursor: not-allowed;
   color: #d9d9d9;
+}
+
+.page-jump {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #666;
+}
+
+.page-input {
+  width: 60px;
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  font-size: 14px;
+  text-align: center;
+  outline: none;
+}
+
+.page-input:focus {
+  border-color: #1890ff;
 }
 </style>

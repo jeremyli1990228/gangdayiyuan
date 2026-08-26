@@ -65,9 +65,7 @@
         </div>
         <div class="form-item">
           <label>涉及科室</label>
-          <select class="form-select">
-            <option value="">请选择</option>
-          </select>
+          <input type="text" placeholder="请输入" class="form-input">
         </div>
         <div class="form-item">
           <label>工单状态</label>
@@ -98,23 +96,21 @@
           </div>
         </div>
         <div class="form-item">
-          <label>工单来源</label>
+          <label>工单分类</label>
           <select class="form-select">
             <option value="">请选择</option>
-            <option value="government">政府平台</option>
-            <option value="hotline">热线电话</option>
-            <option value="visit">来访</option>
-            <option value="letter">来信</option>
-            <option value="email">邮件</option>
+            <option value="first">首件</option>
+            <option value="repeat">重复件</option>
           </select>
         </div>
         <div class="form-item">
           <label>紧急程度</label>
           <select class="form-select">
             <option value="">请选择</option>
-            <option value="normal">普通</option>
-            <option value="urgent">紧急</option>
-            <option value="critical">特急</option>
+            <option value="normal">常态</option>
+            <option value="attention">关注</option>
+            <option value="urgent">加急</option>
+            <option value="public_opinion">舆情提醒</option>
           </select>
         </div>
         <div class="form-item expand-btn">
@@ -212,8 +208,8 @@ const tableData = ref([
     feedbackName: '张三',
     feedbackPhone: '138****1234',
     source: '政府平台',
-    category: '医疗服务',
-    urgency: '紧急',
+    category: '首件',
+    urgency: '加急',
     urgencyClass: 'urgent',
     department: '门诊部',
     status: '处理中',
@@ -228,8 +224,8 @@ const tableData = ref([
     feedbackName: '李四',
     feedbackPhone: '139****5678',
     source: '热线电话',
-    category: '收费问题',
-    urgency: '普通',
+    category: '重复件',
+    urgency: '常态',
     urgencyClass: 'normal',
     department: '财务科',
     status: '待处理',
@@ -244,8 +240,8 @@ const tableData = ref([
     feedbackName: '王五',
     feedbackPhone: '137****9012',
     source: '来访',
-    category: '医疗质量',
-    urgency: '特急',
+    category: '首件',
+    urgency: '舆情提醒',
     urgencyClass: 'critical',
     department: '内科',
     status: '已解决',
@@ -260,9 +256,9 @@ const tableData = ref([
     feedbackName: '赵六',
     feedbackPhone: '136****3456',
     source: '来信',
-    category: '就医体验',
-    urgency: '普通',
-    urgencyClass: 'normal',
+    category: '重复件',
+    urgency: '关注',
+    urgencyClass: 'attention',
     department: '外科',
     status: '处理中',
     statusClass: 'processing',
@@ -276,8 +272,8 @@ const tableData = ref([
     feedbackName: '钱七',
     feedbackPhone: '135****7890',
     source: '政府平台',
-    category: '医疗服务',
-    urgency: '紧急',
+    category: '首件',
+    urgency: '加急',
     urgencyClass: 'urgent',
     department: '急诊室',
     status: '已归档',
@@ -658,6 +654,12 @@ const toggleSelectAll = (e) => {
   background-color: #f0f0f0;
   color: #666;
   border: 1px solid #d9d9d9;
+}
+
+.urgency-tag.attention {
+  background-color: #e6f7ff;
+  color: #1890ff;
+  border: 1px solid #91d5ff;
 }
 
 .urgency-tag.urgent {
