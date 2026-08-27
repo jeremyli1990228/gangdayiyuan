@@ -513,7 +513,8 @@ watch(() => route.path, (newPath) => {
 }
 
 .submenu-items.open {
-  max-height: 500px;
+  max-height: 900px;
+  overflow-y: auto;
 }
 
 .collapsed .submenu-items {
