@@ -128,7 +128,7 @@ const menuData = [
     iconViewBox: '0 0 24 24',
     iconPath: 'M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C13.7864 3 15.4262 3.51567 16.7772 4.47364',
     items: [
-      { name: '新增案件', path: '/petition/add' },
+      { name: '新增工单', path: '/petition/add' },
       { name: '我跟进的', path: '/petition/following' },
       { name: '转办知悉', path: '/petition/transfer-notice' },
       { name: '出具科室意见', path: '/petition/opinions' },
@@ -140,7 +140,9 @@ const menuData = [
       { name: '我发起的申请', path: '/petition/initiated-application' },
       { name: '抄送我的', path: '/petition/copy-to-me' },
       { name: '我创建的', path: '/petition/my-created' },
-      { name: '所有案件', path: '/petition/all' }
+      { name: '所有案件', path: '/petition/all' },
+      { name: '草稿箱', path: '/petition/drafts' },
+      { name: '工单字段配置', path: '/petition/field-management' }
     ]
   },
   {

@@ -403,6 +403,16 @@ const routes = [
     name: 'petitionMyCreated',
     component: () => import('../views/petition/MyCreated.vue')
   },
+  {
+    path: '/petition/drafts',
+    name: 'petitionDrafts',
+    component: () => import('../views/petition/Drafts.vue')
+  },
+  {
+    path: '/petition/field-management',
+    name: 'petitionFieldManagement',
+    component: () => import('../views/petition/FieldManagement.vue')
+  },
   // 移动端H5页面
   {
     path: '/h5/home',
