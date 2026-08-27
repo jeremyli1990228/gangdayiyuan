@@ -119,13 +119,13 @@
       <div id="section-4" class="form-section">
         <div class="section-title">04.答复与评价</div>
         <div class="form-row">
-          <div class="form-item">
+          <div class="form-item required">
             <label>工单答复时间</label>
             <input type="date" placeholder="请选择答复时间" class="form-input date-input" v-model="formData.replyTime">
           </div>
         </div>
         <div class="form-row">
-          <div class="form-item">
+          <div class="form-item required">
             <label>答复内容</label>
             <textarea placeholder="请输入答复内容" class="form-textarea" rows="4" v-model="formData.replyContent"></textarea>
             <div class="textarea-footer">
@@ -134,7 +134,7 @@
           </div>
         </div>
         <div class="form-row">
-          <div class="form-item required">
+          <div class="form-item required radio-parent">
             <label>是否差评</label>
             <div class="radio-group">
               <label class="radio-item">
@@ -493,6 +493,8 @@ const submitForm = () => {
   if (!formData.value.problemSource) missingFields.push('问题来源')
   if (!formData.value.description) missingFields.push('诉求（问题描述）')
   if (!formData.value.department) missingFields.push('涉及科室')
+  if (!formData.value.replyTime) missingFields.push('工单答复时间')
+  if (!formData.value.replyContent) missingFields.push('答复内容')
   if (!formData.value.isBadReview) missingFields.push('是否差评')
   
   if (missingFields.length > 0) {
@@ -601,6 +603,13 @@ const saveDraft = () => {
   content: '*';
   color: #ff4d4f;
   margin-right: 4px;
+}
+
+/* 清除单选/复选框内部选项 label 前面的星号 */
+.form-item.required .radio-item::before,
+.form-item.required label.radio-item::before {
+  content: none !important;
+  display: none !important;
 }
 
 .form-input {

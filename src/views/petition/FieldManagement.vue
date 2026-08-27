@@ -118,10 +118,7 @@ const defaultSections = [
     title: '患者信息',
     fields: [
       { key: 'patientName', name: '患者姓名', required: false, display: true, requiredField: false },
-      { key: 'patientNo', name: '病人号', required: false, display: true, requiredField: false },
-      { key: 'age', name: '年龄', required: false, display: false, requiredField: false },
-      { key: 'gender', name: '性别', required: false, display: false, requiredField: false },
-      { key: 'contact', name: '联系方式', required: false, display: false, requiredField: false }
+      { key: 'patientNo', name: '病人号', required: false, display: true, requiredField: false }
     ]
   },
   {
@@ -129,10 +126,7 @@ const defaultSections = [
     title: '反馈人信息',
     fields: [
       { key: 'feedbackName', name: '反馈人（信访人）', required: true, display: true, requiredField: true },
-      { key: 'feedbackPhone', name: '反馈人手机号', required: true, display: true, requiredField: true },
-      { key: 'relation', name: '与患者关系', required: false, display: false, requiredField: false },
-      { key: 'age', name: '年龄', required: false, display: false, requiredField: false },
-      { key: 'gender', name: '性别', required: false, display: false, requiredField: false }
+      { key: 'feedbackPhone', name: '反馈人手机号', required: true, display: true, requiredField: true }
     ]
   },
   {
@@ -155,8 +149,8 @@ const defaultSections = [
     key: 'reply',
     title: '答复与评价',
     fields: [
-      { key: 'replyTime', name: '工单答复时间', required: false, display: true, requiredField: false },
-      { key: 'replyContent', name: '答复内容', required: false, display: true, requiredField: false },
+      { key: 'replyTime', name: '工单答复时间', required: true, display: true, requiredField: true },
+      { key: 'replyContent', name: '答复内容', required: true, display: true, requiredField: true },
       { key: 'isBadReview', name: '是否差评', required: true, display: true, requiredField: true },
       { key: 'badReviewContent', name: '差评内容', required: false, display: true, requiredField: false }
     ]
@@ -165,25 +159,21 @@ const defaultSections = [
     key: 'medical',
     title: '病历摘要',
     fields: [
-      { key: 'title', name: '病历标题', required: false, display: true, requiredField: false },
-      { key: 'content', name: '病历摘要内容', required: false, display: true, requiredField: false }
+      { key: 'content', name: '病历摘要', required: false, display: true, requiredField: false }
     ]
   },
   {
     key: 'followup',
     title: '跟进记录',
     fields: [
-      { key: 'complaintRecord', name: '投诉跟进记录', required: false, display: true, requiredField: false },
-      { key: 'petitionRecord', name: '信访跟进记录', required: false, display: true, requiredField: false },
-      { key: 'claimRecord', name: '理赔跟进记录', required: false, display: true, requiredField: false },
-      { key: 'investigationRecord', name: '行政调查跟进记录', required: false, display: true, requiredField: false }
+      { key: 'investigationRecord', name: '跟进记录', required: true, display: true, requiredField: true }
     ]
   },
   {
     key: 'result',
     title: '处理结果',
     fields: [
-      { key: 'processResult', name: '处理结果（多选）', required: false, display: true, requiredField: false }
+      { key: 'processResult', name: '处理结果（多选）', required: true, display: true, requiredField: true }
     ]
   },
   {
@@ -196,15 +186,28 @@ const defaultSections = [
 ]
 
 const loadConfig = () => {
+  const defaults = JSON.parse(JSON.stringify(defaultSections))
   try {
     const saved = localStorage.getItem(STORAGE_KEY)
     if (saved) {
-      return JSON.parse(saved)
+      const parsed = JSON.parse(saved)
+      // 合并：只保留默认配置中存在的 section 和字段，避免历史遗留字段残留
+      return defaults.map(defSec => {
+        const savedSec = parsed.find(s => s.key === defSec.key)
+        if (!savedSec) return defSec
+        return {
+          ...defSec,
+          fields: defSec.fields.map(defField => {
+            const savedField = savedSec.fields.find(f => f.key === defField.key)
+            return savedField ? savedField : defField
+          })
+        }
+      })
     }
   } catch (e) {
     console.error('Failed to load config:', e)
   }
-  return JSON.parse(JSON.stringify(defaultSections))
+  return defaults
 }
 
 const sections = reactive(loadConfig())
