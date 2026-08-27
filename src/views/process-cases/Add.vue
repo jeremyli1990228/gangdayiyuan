@@ -265,9 +265,49 @@
 
       <div id="section-6" class="form-section">
         <div class="section-title">06.病历摘要</div>
+        <div class="medical-records-list">
+          <div
+            v-for="(record, index) in medicalRecords"
+            :key="record.id"
+            class="medical-record-item"
+          >
+            <div class="record-form-row">
+              <div class="form-item">
+                <label>就诊日期</label>
+                <div class="date-input-wrapper">
+                  <span class="date-icon">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="%23999" stroke-width="2">
+                      <rect x="3" y="4" width="18" height="18" rx="2"/>
+                      <line x1="16" y1="2" x2="16" y2="6"/>
+                      <line x1="8" y1="2" x2="8" y2="6"/>
+                      <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                  </span>
+                  <input type="text" placeholder="请选择日期: yyyy-MM-dd" class="form-input" v-model="record.date" @focus="openDatePicker($event, record)">
+                </div>
+              </div>
+            </div>
+            <div class="record-form-row">
+              <div class="form-item">
+                <label>就诊描述</label>
+                <textarea
+                  placeholder="请点击输入"
+                  class="form-textarea"
+                  rows="3"
+                  maxlength="2000"
+                  v-model="record.description"
+                ></textarea>
+                <div class="textarea-footer">
+                  <span class="word-count">{{ (record.description || '').length }}/2000字</span>
+                  <button class="btn-delete" @click="removeMedicalRecord(index)">删除</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="form-row">
-          <div class="form-item">
-            <button class="btn-add-section">+ 添加</button>
+          <div class="form-item add-record-wrapper">
+            <button class="btn-add-inline" @click="addMedicalRecord">+ 添加</button>
           </div>
         </div>
       </div>
@@ -460,6 +500,41 @@ const activeSection = ref('section-1')
 const autoSaveTimer = ref(null)
 const lastSaveTime = ref('')
 const formData = ref({})
+
+// 病历摘要
+const medicalRecords = ref([])
+let medicalRecordIdCounter = 0
+const addMedicalRecord = () => {
+  medicalRecordIdCounter += 1
+  medicalRecords.value.push({
+    id: `med_${Date.now()}_${medicalRecordIdCounter}`,
+    date: '',
+    description: ''
+  })
+}
+const removeMedicalRecord = (index) => {
+  medicalRecords.value.splice(index, 1)
+}
+
+// 日期选择器（简单实现：使用原生 type="date" 触发）
+const openDatePicker = (event, record) => {
+  const input = event.target
+  // 切换为 type=date 以触发原生日期选择器
+  input.type = 'date'
+  input.focus()
+  const onBlur = () => {
+    input.type = 'text'
+    input.removeEventListener('blur', onBlur)
+    // 格式化日期显示
+    if (record.date) {
+      const d = new Date(record.date)
+      if (!isNaN(d.getTime())) {
+        record.date = record.date // 保持 yyyy-MM-dd 格式
+      }
+    }
+  }
+  input.addEventListener('blur', onBlur)
+}
 
 // 跟进记录 4 个模块定义
 const followupModules = ref([
@@ -1241,5 +1316,80 @@ onUnmounted(() => {
   font-size: 13px;
   color: #999;
   background-color: #fafafa;
+}
+
+/* ==================== 病历摘要 样式 ==================== */
+.medical-records-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.medical-record-item {
+  padding: 16px;
+  background-color: #fafafa;
+  border: 1px solid #f0f0f0;
+  border-radius: 4px;
+}
+
+.medical-record-item .record-form-row {
+  margin-bottom: 12px;
+}
+
+.medical-record-item .record-form-row:last-child {
+  margin-bottom: 0;
+}
+
+.medical-record-item label {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.date-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.date-input-wrapper .form-input {
+  padding-left: 32px;
+}
+
+.date-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+
+.btn-add-inline {
+  background: none;
+  border: none;
+  color: #1890ff;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.btn-add-inline:hover {
+  text-decoration: underline;
+}
+
+.add-record-wrapper {
+  justify-content: center;
+  align-items: center;
+}
+
+/* 病历摘要中的 textarea-footer 左对齐字数 */
+.medical-record-item .textarea-footer {
+  justify-content: space-between;
 }
 </style>
