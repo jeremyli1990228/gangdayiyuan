@@ -413,6 +413,11 @@ const routes = [
     name: 'petitionFieldManagement',
     component: () => import('../views/petition/FieldManagement.vue')
   },
+  {
+    path: '/petition/approval-settings',
+    name: 'petitionApprovalSettings',
+    component: () => import('../views/petition/ApprovalSettings.vue')
+  },
   // 移动端H5页面
   {
     path: '/h5/home',

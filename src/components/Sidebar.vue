@@ -142,7 +142,8 @@ const menuData = [
       { name: '我创建的', path: '/petition/my-created' },
       { name: '所有案件', path: '/petition/all' },
       { name: '草稿箱', path: '/petition/drafts' },
-      { name: '工单字段配置', path: '/petition/field-management' }
+      { name: '工单字段配置', path: '/petition/field-management' },
+      { name: '审批设置', path: '/petition/approval-settings' }
     ]
   },
   {
@@ -427,8 +428,27 @@ watch(() => route.path, (newPath) => {
 
 .nav-menu {
   flex: 1;
-  padding: 8px 0;
+  padding: 8px 0 80px 0;
   overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.nav-menu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.nav-menu::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.nav-menu::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.nav-menu::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.3);
 }
 
 .menu-item {
@@ -513,8 +533,8 @@ watch(() => route.path, (newPath) => {
 }
 
 .submenu-items.open {
-  max-height: 900px;
-  overflow-y: auto;
+  max-height: 1400px;
+  overflow-y: visible;
 }
 
 .collapsed .submenu-items {
