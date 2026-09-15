@@ -140,7 +140,7 @@ const menuData = [
       { name: '我发起的申请', path: '/petition/initiated-application' },
       { name: '抄送我的', path: '/petition/copy-to-me' },
       { name: '我创建的', path: '/petition/my-created' },
-      { name: '所有案件', path: '/petition/all' },
+      { name: '所有工单', path: '/petition/all' },
       { name: '草稿箱', path: '/petition/drafts' },
       { name: '工单字段配置', path: '/petition/field-management' },
       { name: '审批设置', path: '/petition/approval-settings' },
