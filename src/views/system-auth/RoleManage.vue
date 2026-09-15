@@ -314,7 +314,7 @@ const permissionTree = ref([
       { key: 'petition-initiated-application', title: '我发起的申请' },
       { key: 'petition-copy-to-me', title: '抄送我的' },
       { key: 'petition-my-created', title: '我创建的' },
-      { key: 'petition-all', title: '所有案件' }
+      { key: 'petition-all', title: '所有工单' }
     ]
   },
   {

@@ -10,7 +10,7 @@
         </button>
         <router-link to="/petition/all" class="breadcrumb-item">民生诉求</router-link>
         <span class="breadcrumb-separator">›</span>
-        <router-link to="/petition/all" class="breadcrumb-item">所有案件</router-link>
+        <router-link to="/petition/all" class="breadcrumb-item">所有工单</router-link>
         <span class="breadcrumb-separator">›</span>
         <span class="breadcrumb-item active">案件详情</span>
       </div>
