@@ -144,7 +144,8 @@ const menuData = [
       { name: '草稿箱', path: '/petition/drafts' },
       { name: '工单字段配置', path: '/petition/field-management' },
       { name: '审批设置', path: '/petition/approval-settings' },
-      { name: '反馈设置', path: '/petition/feedback-settings' }
+      { name: '反馈设置', path: '/petition/feedback-settings' },
+      { name: '数据统计', path: '/petition/statistics' }
     ]
   },
   {

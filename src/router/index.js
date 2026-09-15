@@ -423,6 +423,11 @@ const routes = [
     name: 'petitionFeedbackSettings',
     component: () => import('../views/petition/FeedbackSettings.vue')
   },
+  {
+    path: '/petition/statistics',
+    name: 'petitionStatistics',
+    component: () => import('../views/petition/Statistics.vue')
+  },
   // 移动端H5页面
   {
     path: '/h5/home',
