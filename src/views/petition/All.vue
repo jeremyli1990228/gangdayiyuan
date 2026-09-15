@@ -8,18 +8,18 @@
       </div>
       <router-link to="/" class="breadcrumb-item">民生诉求</router-link>
       <span class="breadcrumb-separator">›</span>
-      <span class="breadcrumb-item active">所有案件</span>
+      <span class="breadcrumb-item active">所有工单</span>
     </div>
-    
+
     <div class="page-header">
-      <h1 class="page-title">所有案件</h1>
+      <h1 class="page-title">所有工单</h1>
       <div class="page-header-actions">
         <button class="btn btn-primary" @click="$router.push('/petition/add')">
           <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <line x1="12" y1="5" x2="12" y2="19" stroke-width="2" stroke-linecap="round"/>
             <line x1="5" y1="12" x2="19" y2="12" stroke-width="2" stroke-linecap="round"/>
           </svg>
-          新增案件
+          新增工单
         </button>
         <button class="btn btn-primary btn-search">
           <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
