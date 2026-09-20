@@ -132,13 +132,63 @@
 
     <!-- 第一行：工单趋势 + 工单分类 + 紧急程度 -->
     <div class="charts-row">
-      <!-- 折线图：工单趋势 -->
+      <!-- 工单趋势 -->
       <div class="chart-card chart-main">
         <div class="chart-header">
-          <span class="chart-title">工单趋势</span>
-          <span class="chart-sub">近12个月工单量走势</span>
+          <div class="chart-title-group">
+            <span class="chart-title">工单趋势</span>
+            <span class="chart-sub">近12个月工单量走势</span>
+          </div>
+          <div class="chart-type-tabs">
+            <button :class="['chart-type-tab', {active: trendChartType==='pie'}]" @click="trendChartType='pie'">饼图</button>
+            <button :class="['chart-type-tab', {active: trendChartType==='bar'}]" @click="trendChartType='bar'">柱状</button>
+            <button :class="['chart-type-tab', {active: trendChartType==='hbar'}]" @click="trendChartType='hbar'">条形</button>
+            <button :class="['chart-type-tab', {active: trendChartType==='line'}]" @click="trendChartType='line'">折线</button>
+          </div>
         </div>
-        <div class="chart-body">
+        <!-- 饼图 -->
+        <div class="chart-body pie-body" v-if="trendChartType==='pie'">
+          <svg class="pie-svg" viewBox="0 0 200 200">
+            <g transform="translate(100,100)">
+              <circle r="40" fill="#fff" stroke="#eef0f4" stroke-width="1"/>
+            </g>
+            <g transform="translate(100,100)" v-for="(s,i) in trendPieSlices" :key="'tps'+i">
+              <path :d="s.path" :fill="s.color" stroke="#fff" stroke-width="1.5"/>
+            </g>
+          </svg>
+          <div class="pie-legend pie-legend-grid">
+            <div class="leg-row" v-for="(d,i) in trendData" :key="'tpl'+i">
+              <span class="leg-dot" :style="{background: linkColors[i%linkColors.length]}"></span>
+              <span class="leg-name">{{ d.month }}</span>
+              <span class="leg-val">{{ d.value }}</span>
+            </div>
+          </div>
+        </div>
+        <!-- 柱状 -->
+        <div class="chart-body" v-else-if="trendChartType==='bar'">
+          <svg class="line-svg" viewBox="0 0 540 200" preserveAspectRatio="none">
+            <line v-for="i in 4" :key="'tbgl'+i" x1="40" x2="525" :y1="20+i*40" :y2="20+i*40" stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
+            <text v-for="(v,i) in trendBarData.yLabels" :key="'tbyl'+i" x="35" :y="25+i*40" text-anchor="end" class="axis-label">{{ v }}</text>
+            <g v-for="(b,i) in trendBarData.bars" :key="'tbg'+i">
+              <rect :x="b.x" :y="b.y" :width="b.w" :height="b.h" rx="2" :fill="b.color"/>
+              <text :x="b.x+b.w/2" :y="b.y-3" text-anchor="middle" class="axis-label" font-size="9">{{ b.value }}</text>
+            </g>
+            <text v-for="(b,i) in trendBarData.bars" :key="'tblbl'+i" :x="b.x+b.w/2" y="195" text-anchor="middle" class="axis-label" font-size="9">{{ b.label }}</text>
+          </svg>
+        </div>
+        <!-- 条形 -->
+        <div class="chart-body" v-else-if="trendChartType==='hbar'">
+          <svg class="line-svg" viewBox="0 0 540 200" preserveAspectRatio="none">
+            <line v-for="i in 4" :key="'thgl'+i" :x1="60" x2="525" :y1="20+i*40" :y2="20+i*40" stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
+            <g v-for="(b,i) in trendHBarData.bars" :key="'thb'+i" :transform="'translate(0,'+b.y+')'">
+              <text x="55" y="9" text-anchor="end" class="axis-label" font-size="9">{{ b.label }}</text>
+              <rect x="60" y="0" :width="b.w" :height="b.h" rx="2" :fill="b.color"/>
+              <text :x="60+b.w+4" y="9" class="axis-label" font-size="9" font-weight="600" fill="#1f2937">{{ b.value }}</text>
+            </g>
+          </svg>
+        </div>
+        <!-- 折线 -->
+        <div class="chart-body" v-else>
           <svg class="line-svg" viewBox="0 0 540 200" preserveAspectRatio="none">
             <defs>
               <linearGradient id="trendGrad" x1="0" y1="0" x2="0" y2="1">
@@ -164,13 +214,22 @@
         </div>
       </div>
 
-      <!-- 饼图：工单分类（首件/重复件） -->
+      <!-- 工单分类（首件/重复件） -->
       <div class="chart-card chart-side">
         <div class="chart-header">
-          <span class="chart-title">工单分类</span>
-          <span class="chart-sub">首件 / 重复件</span>
+          <div class="chart-title-group">
+            <span class="chart-title">工单分类</span>
+            <span class="chart-sub">首件 / 重复件</span>
+          </div>
+          <div class="chart-type-tabs">
+            <button :class="['chart-type-tab', {active: orderClassChartType==='pie'}]" @click="orderClassChartType='pie'">饼图</button>
+            <button :class="['chart-type-tab', {active: orderClassChartType==='bar'}]" @click="orderClassChartType='bar'">柱状</button>
+            <button :class="['chart-type-tab', {active: orderClassChartType==='hbar'}]" @click="orderClassChartType='hbar'">条形</button>
+            <button :class="['chart-type-tab', {active: orderClassChartType==='line'}]" @click="orderClassChartType='line'">折线</button>
+          </div>
         </div>
-        <div class="chart-body pie-body">
+        <!-- 饼图 -->
+        <div class="chart-body pie-body" v-if="orderClassChartType==='pie'">
           <svg class="pie-svg" viewBox="0 0 200 200">
             <g transform="translate(100,100)">
               <circle r="48" fill="#fff" stroke="#eef0f4" stroke-width="1"/>
@@ -190,15 +249,59 @@
             </div>
           </div>
         </div>
+        <!-- 柱状 -->
+        <div class="chart-body" v-else-if="orderClassChartType==='bar'">
+          <svg class="bar-svg-h" viewBox="0 0 460 240" preserveAspectRatio="none">
+            <line v-for="i in 4" :key="'ocbgl'+i" x1="50" x2="450" :y1="20+i*40" :y2="20+i*40" stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
+            <text v-for="(v,i) in orderClassBarData.yLabels" :key="'ocbyl'+i" x="45" :y="25+i*40" text-anchor="end" class="axis-label">{{ v }}</text>
+            <g v-for="(b,i) in orderClassBarData.bars" :key="'ocbg'+i">
+              <rect :x="b.x" :y="b.y" :width="b.w" :height="b.h" rx="3" :fill="b.color"/>
+              <text :x="b.x+b.w/2" :y="b.y-5" text-anchor="middle" class="axis-label" font-size="10" font-weight="600" fill="#1f2937">{{ b.value }}</text>
+            </g>
+            <text v-for="(b,i) in orderClassBarData.bars" :key="'oclbl'+i" :x="b.x+b.w/2" y="230" text-anchor="middle" class="axis-label">{{ b.label }}</text>
+          </svg>
+        </div>
+        <!-- 条形 -->
+        <div class="chart-body" v-else-if="orderClassChartType==='hbar'">
+          <svg class="bar-svg-h" viewBox="0 0 460 240" preserveAspectRatio="none">
+            <line v-for="i in 4" :key="'ochgl'+i" :x1="80" x2="450" :y1="20+i*40" :y2="20+i*40" stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
+            <g v-for="(b,i) in orderClassHBarData.bars" :key="'ochb'+i" :transform="'translate(0,'+b.y+')'">
+              <text x="75" y="11" text-anchor="end" class="axis-label" font-size="11">{{ b.label }}</text>
+              <rect x="80" y="0" :width="b.w" height="20" rx="3" :fill="b.color"/>
+              <text :x="80+b.w+6" y="14" class="axis-label" font-size="11" font-weight="600" fill="#1f2937">{{ b.value }}</text>
+            </g>
+          </svg>
+        </div>
+        <!-- 折线 -->
+        <div class="chart-body" v-else>
+          <svg class="bar-svg-h" viewBox="0 0 460 240" preserveAspectRatio="none">
+            <line v-for="i in 4" :key="'oclgl'+i" x1="50" x2="450" :y1="20+i*40" :y2="20+i*40" stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
+            <text v-for="(v,i) in orderClassLineData.yLabels" :key="'oclyl'+i" x="45" :y="25+i*40" text-anchor="end" class="axis-label">{{ v }}</text>
+            <path :d="orderClassLineData.linePath" fill="none" stroke="#1890ff" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+            <g v-for="(p,i) in orderClassLineData.points" :key="'oclp'+i">
+              <circle :cx="p.x" :cy="p.y" r="4" fill="#fff" stroke="#1890ff" stroke-width="2"/>
+            </g>
+            <text v-for="(p,i) in orderClassLineData.points" :key="'ocllbl'+i" :x="p.x" y="230" text-anchor="middle" class="axis-label">{{ p.label }}</text>
+          </svg>
+        </div>
       </div>
 
-      <!-- 饼图：紧急程度 -->
+      <!-- 紧急程度 -->
       <div class="chart-card chart-side">
         <div class="chart-header">
-          <span class="chart-title">紧急程度</span>
-          <span class="chart-sub">工单紧迫度分布</span>
+          <div class="chart-title-group">
+            <span class="chart-title">紧急程度</span>
+            <span class="chart-sub">工单紧迫度分布</span>
+          </div>
+          <div class="chart-type-tabs">
+            <button :class="['chart-type-tab', {active: urgencyChartType==='pie'}]" @click="urgencyChartType='pie'">饼图</button>
+            <button :class="['chart-type-tab', {active: urgencyChartType==='bar'}]" @click="urgencyChartType='bar'">柱状</button>
+            <button :class="['chart-type-tab', {active: urgencyChartType==='hbar'}]" @click="urgencyChartType='hbar'">条形</button>
+            <button :class="['chart-type-tab', {active: urgencyChartType==='line'}]" @click="urgencyChartType='line'">折线</button>
+          </div>
         </div>
-        <div class="chart-body pie-body">
+        <!-- 饼图 -->
+        <div class="chart-body pie-body" v-if="urgencyChartType==='pie'">
           <svg class="pie-svg" viewBox="0 0 200 200">
             <g transform="translate(100,100)">
               <circle r="48" fill="#fff" stroke="#eef0f4" stroke-width="1"/>
@@ -218,18 +321,62 @@
             </div>
           </div>
         </div>
+        <!-- 柱状 -->
+        <div class="chart-body" v-else-if="urgencyChartType==='bar'">
+          <svg class="bar-svg-h" viewBox="0 0 460 240" preserveAspectRatio="none">
+            <line v-for="i in 4" :key="'ucbgl'+i" x1="50" x2="450" :y1="20+i*40" :y2="20+i*40" stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
+            <text v-for="(v,i) in urgencyBarData.yLabels" :key="'ucbyl'+i" x="45" :y="25+i*40" text-anchor="end" class="axis-label">{{ v }}</text>
+            <g v-for="(b,i) in urgencyBarData.bars" :key="'ucbg'+i">
+              <rect :x="b.x" :y="b.y" :width="b.w" :height="b.h" rx="3" :fill="b.color"/>
+              <text :x="b.x+b.w/2" :y="b.y-5" text-anchor="middle" class="axis-label" font-size="10" font-weight="600" fill="#1f2937">{{ b.value }}</text>
+            </g>
+            <text v-for="(b,i) in urgencyBarData.bars" :key="'uclbl'+i" :x="b.x+b.w/2" y="230" text-anchor="middle" class="axis-label">{{ b.label }}</text>
+          </svg>
+        </div>
+        <!-- 条形 -->
+        <div class="chart-body" v-else-if="urgencyChartType==='hbar'">
+          <svg class="bar-svg-h" viewBox="0 0 460 240" preserveAspectRatio="none">
+            <line v-for="i in 4" :key="'uchgl'+i" :x1="80" x2="450" :y1="20+i*40" :y2="20+i*40" stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
+            <g v-for="(b,i) in urgencyHBarData.bars" :key="'uchb'+i" :transform="'translate(0,'+b.y+')'">
+              <text x="75" y="11" text-anchor="end" class="axis-label" font-size="11">{{ b.label }}</text>
+              <rect x="80" y="0" :width="b.w" height="20" rx="3" :fill="b.color"/>
+              <text :x="80+b.w+6" y="14" class="axis-label" font-size="11" font-weight="600" fill="#1f2937">{{ b.value }}</text>
+            </g>
+          </svg>
+        </div>
+        <!-- 折线 -->
+        <div class="chart-body" v-else>
+          <svg class="bar-svg-h" viewBox="0 0 460 240" preserveAspectRatio="none">
+            <line v-for="i in 4" :key="'uclgl'+i" x1="50" x2="450" :y1="20+i*40" :y2="20+i*40" stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
+            <text v-for="(v,i) in urgencyLineData.yLabels" :key="'uclyl'+i" x="45" :y="25+i*40" text-anchor="end" class="axis-label">{{ v }}</text>
+            <path :d="urgencyLineData.linePath" fill="none" stroke="#1890ff" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+            <g v-for="(p,i) in urgencyLineData.points" :key="'uclp'+i">
+              <circle :cx="p.x" :cy="p.y" r="4" fill="#fff" stroke="#1890ff" stroke-width="2"/>
+            </g>
+            <text v-for="(p,i) in urgencyLineData.points" :key="'ucllbl'+i" :x="p.x" y="230" text-anchor="middle" class="axis-label">{{ p.label }}</text>
+          </svg>
+        </div>
       </div>
     </div>
 
     <!-- 第二行：诉求目的 + 科室分类 -->
     <div class="charts-row charts-row-2">
-      <!-- 饼图：诉求目的 -->
+      <!-- 诉求目的分布 -->
       <div class="chart-card">
         <div class="chart-header">
-          <span class="chart-title">诉求目的分布</span>
-          <span class="chart-sub">投诉/求助/表扬/举报/建议/咨询</span>
+          <div class="chart-title-group">
+            <span class="chart-title">诉求目的分布</span>
+            <span class="chart-sub">投诉/求助/表扬/举报/建议/咨询</span>
+          </div>
+          <div class="chart-type-tabs">
+            <button :class="['chart-type-tab', {active: purposeChartType==='pie'}]" @click="purposeChartType='pie'">饼图</button>
+            <button :class="['chart-type-tab', {active: purposeChartType==='bar'}]" @click="purposeChartType='bar'">柱状</button>
+            <button :class="['chart-type-tab', {active: purposeChartType==='hbar'}]" @click="purposeChartType='hbar'">条形</button>
+            <button :class="['chart-type-tab', {active: purposeChartType==='line'}]" @click="purposeChartType='line'">折线</button>
+          </div>
         </div>
-        <div class="chart-body pie-body">
+        <!-- 饼图 -->
+        <div class="chart-body pie-body" v-if="purposeChartType==='pie'">
           <svg class="pie-svg" viewBox="0 0 200 200">
             <g transform="translate(100,100)">
               <circle r="42" fill="#fff" stroke="#eef0f4" stroke-width="1"/>
@@ -249,15 +396,88 @@
             </div>
           </div>
         </div>
+        <!-- 柱状 -->
+        <div class="chart-body" v-else-if="purposeChartType==='bar'">
+          <svg class="bar-svg-h" viewBox="0 0 460 240" preserveAspectRatio="none">
+            <line v-for="i in 4" :key="'pcbgl'+i" x1="50" x2="450" :y1="20+i*40" :y2="20+i*40" stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
+            <text v-for="(v,i) in purposeBarData.yLabels" :key="'pcbyl'+i" x="45" :y="25+i*40" text-anchor="end" class="axis-label">{{ v }}</text>
+            <g v-for="(b,i) in purposeBarData.bars" :key="'pcbg'+i">
+              <rect :x="b.x" :y="b.y" :width="b.w" :height="b.h" rx="3" :fill="b.color"/>
+              <text :x="b.x+b.w/2" :y="b.y-5" text-anchor="middle" class="axis-label" font-size="10" font-weight="600" fill="#1f2937">{{ b.value }}</text>
+            </g>
+            <text v-for="(b,i) in purposeBarData.bars" :key="'pclbl'+i" :x="b.x+b.w/2" y="230" text-anchor="middle" class="axis-label">{{ b.label }}</text>
+          </svg>
+        </div>
+        <!-- 条形 -->
+        <div class="chart-body" v-else-if="purposeChartType==='hbar'">
+          <svg class="bar-svg-h" viewBox="0 0 460 240" preserveAspectRatio="none">
+            <line v-for="i in 4" :key="'pchgl'+i" :x1="80" x2="450" :y1="20+i*40" :y2="20+i*40" stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
+            <g v-for="(b,i) in purposeHBarData.bars" :key="'pchb'+i" :transform="'translate(0,'+b.y+')'">
+              <text x="75" y="11" text-anchor="end" class="axis-label" font-size="11">{{ b.label }}</text>
+              <rect x="80" y="0" :width="b.w" height="20" rx="3" :fill="b.color"/>
+              <text :x="80+b.w+6" y="14" class="axis-label" font-size="11" font-weight="600" fill="#1f2937">{{ b.value }}</text>
+            </g>
+          </svg>
+        </div>
+        <!-- 折线 -->
+        <div class="chart-body" v-else>
+          <svg class="bar-svg-h" viewBox="0 0 460 240" preserveAspectRatio="none">
+            <line v-for="i in 4" :key="'pclgl'+i" x1="50" x2="450" :y1="20+i*40" :y2="20+i*40" stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
+            <text v-for="(v,i) in purposeLineData.yLabels" :key="'pclyl'+i" x="45" :y="25+i*40" text-anchor="end" class="axis-label">{{ v }}</text>
+            <path :d="purposeLineData.linePath" fill="none" stroke="#1890ff" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+            <g v-for="(p,i) in purposeLineData.points" :key="'pclp'+i">
+              <circle :cx="p.x" :cy="p.y" r="4" fill="#fff" stroke="#1890ff" stroke-width="2"/>
+            </g>
+            <text v-for="(p,i) in purposeLineData.points" :key="'pcllbl'+i" :x="p.x" y="230" text-anchor="middle" class="axis-label">{{ p.label }}</text>
+          </svg>
+        </div>
       </div>
 
-      <!-- 柱状图：科室分类 -->
+      <!-- 科室分类 -->
       <div class="chart-card">
         <div class="chart-header">
-          <span class="chart-title">科室分类</span>
-          <span class="chart-sub">各科室工单量排名</span>
+          <div class="chart-title-group">
+            <span class="chart-title">科室分类</span>
+            <span class="chart-sub">各科室工单量排名</span>
+          </div>
+          <div class="chart-type-tabs">
+            <button :class="['chart-type-tab', {active: deptChartType==='pie'}]" @click="deptChartType='pie'">饼图</button>
+            <button :class="['chart-type-tab', {active: deptChartType==='bar'}]" @click="deptChartType='bar'">柱状</button>
+            <button :class="['chart-type-tab', {active: deptChartType==='hbar'}]" @click="deptChartType='hbar'">条形</button>
+            <button :class="['chart-type-tab', {active: deptChartType==='line'}]" @click="deptChartType='line'">折线</button>
+          </div>
         </div>
-        <div class="chart-body">
+        <!-- 饼图 -->
+        <div class="chart-body pie-body" v-if="deptChartType==='pie'">
+          <svg class="pie-svg" viewBox="0 0 200 200">
+            <g transform="translate(100,100)">
+              <circle r="40" fill="#fff" stroke="#eef0f4" stroke-width="1"/>
+            </g>
+            <g transform="translate(100,100)" v-for="(s,i) in deptPieSlices" :key="'dps'+i">
+              <path :d="s.path" :fill="s.color" stroke="#fff" stroke-width="1.5"/>
+            </g>
+          </svg>
+          <div class="pie-legend pie-legend-grid">
+            <div class="leg-row" v-for="(d,i) in deptDistribution" :key="'dpl'+i">
+              <span class="leg-dot" :style="{background: deptColors[i%deptColors.length]}"></span>
+              <span class="leg-name">{{ d.label }}</span>
+              <span class="leg-val">{{ d.count }}</span>
+            </div>
+          </div>
+        </div>
+        <!-- 柱状 -->
+        <div class="chart-body" v-else-if="deptChartType==='bar'">
+          <svg class="bar-svg-h" viewBox="0 0 460 240" preserveAspectRatio="none">
+            <line v-for="i in 4" :key="'dcbgl'+i" x1="50" x2="450" :y1="20+i*40" :y2="20+i*40" stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
+            <text v-for="(v,i) in deptVBarData.yLabels" :key="'dcbyl'+i" x="45" :y="25+i*40" text-anchor="end" class="axis-label">{{ v }}</text>
+            <g v-for="(b,i) in deptVBarData.bars" :key="'dcbg'+i">
+              <rect :x="b.x" :y="b.y" :width="b.w" :height="b.h" rx="3" :fill="b.color"/>
+            </g>
+            <text v-for="(b,i) in deptVBarData.bars" :key="'dclbl'+i" :x="b.x+b.w/2" y="230" text-anchor="middle" class="axis-label" font-size="9">{{ b.label }}</text>
+          </svg>
+        </div>
+        <!-- 条形 -->
+        <div class="chart-body" v-else-if="deptChartType==='hbar'">
           <svg class="bar-svg-h" viewBox="0 0 460 240" preserveAspectRatio="none">
             <line v-for="i in 4" :key="'dcgl'+i" x1="80" x2="450" :y1="20+i*40" :y2="20+i*40" stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
             <text v-for="(v,i) in [400,300,200,100,0]" :key="'dcyl'+i" x="75" :y="25+i*40" text-anchor="end" class="axis-label">{{ v }}</text>
@@ -268,24 +488,86 @@
             </g>
           </svg>
         </div>
+        <!-- 折线 -->
+        <div class="chart-body" v-else>
+          <svg class="bar-svg-h" viewBox="0 0 460 240" preserveAspectRatio="none">
+            <line v-for="i in 4" :key="'dclgl'+i" x1="50" x2="450" :y1="20+i*40" :y2="20+i*40" stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
+            <text v-for="(v,i) in deptLineData.yLabels" :key="'dclyl'+i" x="45" :y="25+i*40" text-anchor="end" class="axis-label">{{ v }}</text>
+            <path :d="deptLineData.linePath" fill="none" stroke="#1890ff" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+            <g v-for="(p,i) in deptLineData.points" :key="'dclp'+i">
+              <circle :cx="p.x" :cy="p.y" r="3.5" fill="#fff" stroke="#1890ff" stroke-width="2"/>
+            </g>
+            <text v-for="(p,i) in deptLineData.points" :key="'dcllbl'+i" :x="p.x" y="230" text-anchor="middle" class="axis-label" font-size="9">{{ p.label }}</text>
+          </svg>
+        </div>
       </div>
     </div>
 
     <!-- 第三行：涉及环节 -->
     <div class="chart-card chart-full">
       <div class="chart-header">
-        <span class="chart-title">涉及环节</span>
-        <span class="chart-sub">各类环节工单量分布</span>
+        <div class="chart-title-group">
+          <span class="chart-title">涉及环节</span>
+          <span class="chart-sub">各类环节工单量分布</span>
+        </div>
+        <div class="chart-type-tabs">
+          <button :class="['chart-type-tab', {active: linkChartType==='pie'}]" @click="linkChartType='pie'">饼图</button>
+          <button :class="['chart-type-tab', {active: linkChartType==='bar'}]" @click="linkChartType='bar'">柱状</button>
+          <button :class="['chart-type-tab', {active: linkChartType==='hbar'}]" @click="linkChartType='hbar'">条形</button>
+          <button :class="['chart-type-tab', {active: linkChartType==='line'}]" @click="linkChartType='line'">折线</button>
+        </div>
       </div>
-      <div class="chart-body">
-        <svg class="bar-svg-h" viewBox="0 0 920 320" preserveAspectRatio="none">
-          <line v-for="i in 4" :key="'eggl'+i" x1="120" x2="910" :y1="20+i*60" :y2="20+i*60" stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
-          <text v-for="(v,i) in [300,225,150,75,0]" :key="'egyl'+i" x="115" :y="25+i*60" text-anchor="end" class="axis-label">{{ v }}</text>
+      <!-- 饼图 -->
+      <div class="chart-body pie-body" v-if="linkChartType==='pie'">
+        <svg class="pie-svg pie-svg-lg" viewBox="0 0 200 200">
+          <g transform="translate(100,100)">
+            <circle r="40" fill="#fff" stroke="#eef0f4" stroke-width="1"/>
+          </g>
+          <g transform="translate(100,100)" v-for="(s,i) in linkPieSlices" :key="'lps'+i">
+            <path :d="s.path" :fill="s.color" stroke="#fff" stroke-width="1.5"/>
+          </g>
+        </svg>
+        <div class="pie-legend pie-legend-grid">
+          <div class="leg-row" v-for="(d,i) in linkDistribution" :key="'lpl'+i">
+            <span class="leg-dot" :style="{background: linkColors[i%linkColors.length]}"></span>
+            <span class="leg-name">{{ d.name }}</span>
+            <span class="leg-val">{{ d.count }}</span>
+          </div>
+        </div>
+      </div>
+      <!-- 柱状 -->
+      <div class="chart-body" v-else-if="linkChartType==='bar'">
+        <svg class="bar-svg-h bar-svg-h-lg" viewBox="0 0 920 320" preserveAspectRatio="none">
+          <line v-for="i in 4" :key="'lcbgl'+i" x1="50" x2="910" :y1="20+i*60" :y2="20+i*60" stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
+          <text v-for="(v,i) in linkVBarData.yLabels" :key="'lcbyl'+i" x="45" :y="25+i*60" text-anchor="end" class="axis-label">{{ v }}</text>
+          <g v-for="(b,i) in linkVBarData.bars" :key="'lcbg'+i">
+            <rect :x="b.x" :y="b.y" :width="b.w" :height="b.h" rx="3" :fill="b.color"/>
+          </g>
+          <text v-for="(b,i) in linkVBarData.bars" :key="'lclbl'+i" :x="b.x+b.w/2" y="315" text-anchor="middle" class="axis-label" font-size="9">{{ b.label }}</text>
+        </svg>
+      </div>
+      <!-- 条形 -->
+      <div class="chart-body" v-else-if="linkChartType==='hbar'">
+        <svg class="bar-svg-h bar-svg-h-lg" viewBox="0 0 920 320" preserveAspectRatio="none">
+          <line v-for="i in 4" :key="'lggl'+i" x1="120" x2="910" :y1="20+i*60" :y2="20+i*60" stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
+          <text v-for="(v,i) in [300,225,150,75,0]" :key="'lyl'+i" x="115" :y="25+i*60" text-anchor="end" class="axis-label">{{ v }}</text>
           <g v-for="(item,i) in linkBarData" :key="'elg'+i" :transform="'translate(0,'+(30+i*22)+')'">
             <text x="115" y="6" text-anchor="end" class="axis-label" font-size="11">{{ item.label }}</text>
             <rect x="120" y="0" :width="item.w" height="14" rx="3" :fill="linkColors[i]"/>
             <text :x="120+item.w+6" y="11" class="axis-label" font-size="11" font-weight="600" fill="#1f2937">{{ item.count }}</text>
           </g>
+        </svg>
+      </div>
+      <!-- 折线 -->
+      <div class="chart-body" v-else>
+        <svg class="bar-svg-h bar-svg-h-lg" viewBox="0 0 920 320" preserveAspectRatio="none">
+          <line v-for="i in 4" :key="'llgl'+i" x1="50" x2="910" :y1="20+i*60" :y2="20+i*60" stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
+          <text v-for="(v,i) in linkLineData.yLabels" :key="'llyl'+i" x="45" :y="25+i*60" text-anchor="end" class="axis-label">{{ v }}</text>
+          <path :d="linkLineData.linePath" fill="none" stroke="#1890ff" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+          <g v-for="(p,i) in linkLineData.points" :key="'llp'+i">
+            <circle :cx="p.x" :cy="p.y" r="3.5" fill="#fff" stroke="#1890ff" stroke-width="2"/>
+          </g>
+          <text v-for="(p,i) in linkLineData.points" :key="'lllbl'+i" :x="p.x" y="315" text-anchor="middle" class="axis-label" font-size="9">{{ p.label }}</text>
         </svg>
       </div>
     </div>
@@ -341,6 +623,14 @@ const activeTime = ref('month')
 const startDate = ref('2026-01-01')
 const endDate = ref('2026-06-18')
 const deptFilter = ref('')
+
+// 各图表类型切换状态
+const trendChartType = ref('line')
+const orderClassChartType = ref('pie')
+const urgencyChartType = ref('pie')
+const purposeChartType = ref('pie')
+const deptChartType = ref('hbar')
+const linkChartType = ref('hbar')
 
 const refreshData = () => {}
 
@@ -407,6 +697,63 @@ const peakMonth = computed(() => {
   return trendData.value.find(d => d.value === max)?.month?.slice(0, 7) || '-'
 })
 
+// 工单趋势 - 饼图切片
+const trendPieSlices = computed(() => {
+  const r = 78
+  const total = trendData.value.reduce((s, d) => s + d.value, 0)
+  let start = -Math.PI / 2, slices = []
+  trendData.value.forEach((d, i) => {
+    const angle = (d.value / total) * Math.PI * 2
+    const end = start + angle
+    const x1 = Math.cos(start) * r, y1 = Math.sin(start) * r
+    const x2 = Math.cos(end) * r, y2 = Math.sin(end) * r
+    const la = angle > Math.PI ? 1 : 0
+    slices.push({
+      path: `M 0 0 L ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 ${la} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z`,
+      color: linkColors[i % linkColors.length]
+    })
+    start = end
+  })
+  return slices
+})
+
+// 工单趋势 - 柱状图（viewBox 540x200）
+const trendBarData = computed(() => {
+  const max = 200, yB = 180, yT = 20, scale = (yB - yT) / max
+  const xS = 45, xE = 525, n = trendData.value.length
+  const slot = (xE - xS) / n
+  const bw = slot * 0.5
+  const bars = trendData.value.map((d, i) => ({
+    x: xS + i * slot + (slot - bw) / 2,
+    y: yB - d.value * scale,
+    w: bw,
+    h: d.value * scale,
+    label: d.month.slice(5) + '月',
+    value: d.value,
+    color: '#1890ff'
+  }))
+  const yLabels = [200, 150, 100, 50, 0]
+  return { bars, yLabels }
+})
+
+// 工单趋势 - 条形图（viewBox 540x200）
+const trendHBarData = computed(() => {
+  const max = Math.max(...trendData.value.map(d => d.value)) * 1.15
+  const xS = 60, xE = 525, scale = (xE - xS) / max
+  const yT = 15, yB = 185, n = trendData.value.length
+  const slot = (yB - yT) / n
+  const bh = slot * 0.6
+  const bars = trendData.value.map((d, i) => ({
+    y: yT + i * slot + (slot - bh) / 2,
+    h: bh,
+    w: d.value * scale,
+    label: d.month.slice(5) + '月',
+    value: d.value,
+    color: '#1890ff'
+  }))
+  return { bars }
+})
+
 // 工单分类（首件/重复件）
 const orderClassDistribution = ref([
   { name: '首件', count: 1428, percent: 77.4 },
@@ -427,6 +774,15 @@ const orderClassPieSlices = computed(() => {
   })
   return slices
 })
+
+// 工单分类 - 柱状图（viewBox 460x240）
+const orderClassBarData = computed(() => buildVBarData(orderClassDistribution.value, 'count', orderClassColors, { xS: 50, xE: 450, yT: 20, yB: 200 }))
+
+// 工单分类 - 条形图（viewBox 460x240）
+const orderClassHBarData = computed(() => buildHBarData(orderClassDistribution.value, 'count', 'name', orderClassColors, { xS: 80, xE: 450, yT: 30, yB: 190 }))
+
+// 工单分类 - 折线图（viewBox 460x240）
+const orderClassLineData = computed(() => buildLineData(orderClassDistribution.value, 'count', 'name', { xS: 50, xE: 450, yT: 20, yB: 200 }))
 
 // 紧急程度
 const urgencyDistribution = ref([
@@ -450,6 +806,11 @@ const urgencyPieSlices = computed(() => {
   })
   return slices
 })
+
+// 紧急程度 - 柱状/条形/折线（viewBox 460x240）
+const urgencyBarData = computed(() => buildVBarData(urgencyDistribution.value, 'count', urgencyColors, { xS: 50, xE: 450, yT: 20, yB: 200 }))
+const urgencyHBarData = computed(() => buildHBarData(urgencyDistribution.value, 'count', 'name', urgencyColors, { xS: 80, xE: 450, yT: 30, yB: 190 }))
+const urgencyLineData = computed(() => buildLineData(urgencyDistribution.value, 'count', 'name', { xS: 50, xE: 450, yT: 20, yB: 200 }))
 
 // 诉求目的
 const purposeDistribution = ref([
@@ -476,6 +837,11 @@ const purposePieSlices = computed(() => {
   return slices
 })
 
+// 诉求目的 - 柱状/条形/折线（viewBox 460x240）
+const purposeBarData = computed(() => buildVBarData(purposeDistribution.value, 'count', purposeColors, { xS: 50, xE: 450, yT: 20, yB: 200 }))
+const purposeHBarData = computed(() => buildHBarData(purposeDistribution.value, 'count', 'name', purposeColors, { xS: 80, xE: 450, yT: 20, yB: 220 }))
+const purposeLineData = computed(() => buildLineData(purposeDistribution.value, 'count', 'name', { xS: 50, xE: 450, yT: 20, yB: 200 }))
+
 // 科室分类
 const deptDistribution = ref([
   { name: '门诊', count: 386, label: '门诊' },
@@ -490,6 +856,27 @@ const deptDistribution = ref([
   { name: '其他', count: 100, label: '其他' }
 ])
 
+// 科室分类 - 饼图切片（新）
+const deptPieSlices = computed(() => {
+  const r = 78
+  const total = deptDistribution.value.reduce((s, d) => s + d.count, 0)
+  let start = -Math.PI / 2, slices = []
+  deptDistribution.value.forEach((d, i) => {
+    const angle = (d.count / total) * Math.PI * 2
+    const end = start + angle
+    const x1 = Math.cos(start) * r, y1 = Math.sin(start) * r
+    const x2 = Math.cos(end) * r, y2 = Math.sin(end) * r
+    const la = angle > Math.PI ? 1 : 0
+    slices.push({
+      path: `M 0 0 L ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 ${la} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z`,
+      color: deptColors[i % deptColors.length]
+    })
+    start = end
+  })
+  return slices
+})
+
+// 科室分类 - 原有条形图（保留）
 const deptBarData = computed(() => {
   const max = 400, xS = 80, xE = 450, scale = (xE - xS) / max
   return deptDistribution.value.map(d => ({
@@ -498,6 +885,12 @@ const deptBarData = computed(() => {
     count: d.count
   }))
 })
+
+// 科室分类 - 柱状图（viewBox 460x240）
+const deptVBarData = computed(() => buildVBarData(deptDistribution.value, 'count', deptColors, { xS: 50, xE: 450, yT: 20, yB: 200 }, 'label'))
+
+// 科室分类 - 折线图（viewBox 460x240）
+const deptLineData = computed(() => buildLineData(deptDistribution.value, 'count', 'label', { xS: 50, xE: 450, yT: 20, yB: 200 }))
 
 // 涉及环节
 const linkDistribution = ref([
@@ -516,6 +909,27 @@ const linkDistribution = ref([
   { name: '后勤服务', count: 34 }
 ])
 
+// 涉及环节 - 饼图切片（新）
+const linkPieSlices = computed(() => {
+  const r = 78
+  const total = linkDistribution.value.reduce((s, d) => s + d.count, 0)
+  let start = -Math.PI / 2, slices = []
+  linkDistribution.value.forEach((d, i) => {
+    const angle = (d.count / total) * Math.PI * 2
+    const end = start + angle
+    const x1 = Math.cos(start) * r, y1 = Math.sin(start) * r
+    const x2 = Math.cos(end) * r, y2 = Math.sin(end) * r
+    const la = angle > Math.PI ? 1 : 0
+    slices.push({
+      path: `M 0 0 L ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 ${la} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z`,
+      color: linkColors[i % linkColors.length]
+    })
+    start = end
+  })
+  return slices
+})
+
+// 涉及环节 - 原有条形图（保留）
 const linkBarData = computed(() => {
   const max = 300, xS = 120, xE = 910, scale = (xE - xS) / max
   return linkDistribution.value.map(d => ({
@@ -524,6 +938,74 @@ const linkBarData = computed(() => {
     count: d.count
   }))
 })
+
+// 涉及环节 - 柱状图（viewBox 920x320）
+const linkVBarData = computed(() => buildVBarData(linkDistribution.value, 'count', linkColors, { xS: 50, xE: 910, yT: 20, yB: 260, rowH: 60 }))
+
+// 涉及环节 - 折线图（viewBox 920x320）
+const linkLineData = computed(() => buildLineData(linkDistribution.value, 'count', 'name', { xS: 50, xE: 910, yT: 20, yB: 260, rowH: 60 }))
+
+// 通用构建函数 - 柱状图（垂直）
+function buildVBarData (data, countKey, colors, opts, labelKey = null) {
+  const { xS, xE, yT = 20, yB = 200 } = opts
+  const vals = data.map(d => d[countKey])
+  const max = Math.max(...vals) * 1.1
+  const scale = (yB - yT) / max
+  const n = data.length
+  const slot = (xE - xS) / Math.max(1, n)
+  const bw = slot * 0.55
+  const bars = data.map((d, i) => ({
+    x: xS + i * slot + (slot - bw) / 2,
+    y: yB - d[countKey] * scale,
+    w: bw,
+    h: d[countKey] * scale,
+    label: labelKey ? d[labelKey] : (d.label || d.name),
+    value: d[countKey],
+    color: colors[i % colors.length]
+  }))
+  const yLabels = Array.from({ length: 5 }, (_, i) => Math.round(max * (4 - i) / 4))
+  return { bars, yLabels }
+}
+
+// 通用构建函数 - 条形图（水平）
+function buildHBarData (data, countKey, labelKey, colors, opts) {
+  const { xS, xE, yT = 20, yB = 200 } = opts
+  const vals = data.map(d => d[countKey])
+  const max = Math.max(...vals) * 1.1
+  const scale = (xE - xS) / max
+  const n = data.length
+  const slot = (yB - yT) / Math.max(1, n)
+  const bh = slot * 0.6
+  const bars = data.map((d, i) => ({
+    y: yT + i * slot + (slot - bh) / 2,
+    h: bh,
+    w: d[countKey] * scale,
+    label: d[labelKey] || d.label || d.name,
+    value: d[countKey],
+    color: colors[i % colors.length]
+  }))
+  return { bars }
+}
+
+// 通用构建函数 - 折线图
+function buildLineData (data, countKey, labelKey, opts) {
+  const { xS, xE, yT = 20, yB = 200, rowH = 40 } = opts
+  const vals = data.map(d => d[countKey])
+  const max = Math.max(...vals) * 1.1
+  const scale = (yB - yT) / max
+  const n = data.length
+  const slot = n > 1 ? (xE - xS) / (n - 1) : (xE - xS) / 2
+  const points = data.map((d, i) => ({
+    x: xS + (n > 1 ? i * slot : (xE - xS) / 2),
+    y: yB - d[countKey] * scale,
+    label: d[labelKey] || d.label || d.name,
+    value: d[countKey]
+  }))
+  const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`).join(' ')
+  const yLabels = Array.from({ length: 5 }, (_, i) => Math.round(max * (4 - i) / 4))
+  // rowH 用于 y 轴刻度线间距（保留参数以匹配 60px 大刻度场景）
+  return { points, linePath, yLabels, _rowH: rowH }
+}
 
 // 详细表格
 const detailTable = ref([
@@ -712,7 +1194,11 @@ const exportReport = () => {
   align-items: center;
   padding: 12px 16px;
   border-bottom: 1px solid #f3f4f6;
+  gap: 8px;
+  flex-wrap: wrap;
 }
+
+.chart-title-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
 .chart-title { font-size: 14px; font-weight: 600; color: #1f2937; }
 .chart-sub { font-size: 11px; color: #9ca3af; background: #f3f4f6; padding: 3px 8px; border-radius: 4px; font-weight: 500; }
@@ -721,11 +1207,13 @@ const exportReport = () => {
 
 .pie-body { display: flex; align-items: center; gap: 12px; }
 .pie-svg { width: 150px; height: 150px; flex-shrink: 0; }
+.pie-svg-lg { width: 200px; height: 200px; }
 .pie-total-num { font-size: 20px; font-weight: 700; fill: #1f2937; }
 .pie-total-label { font-size: 10px; fill: #9ca3af; }
 
 .line-svg { width: 100%; height: 180px; }
 .bar-svg-h { width: 100%; height: 240px; }
+.bar-svg-h-lg { height: 320px; }
 .axis-label { font-size: 10px; fill: #9ca3af; font-weight: 500; }
 
 .chart-legend {
@@ -743,6 +1231,12 @@ const exportReport = () => {
 .leg-peak { color: #ff4d4f; font-weight: 600; }
 
 .pie-legend { flex: 1; }
+.pie-legend-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 12px;
+  align-content: center;
+}
 .leg-row { display: flex; align-items: center; gap: 6px; padding: 3px 0; font-size: 11px; }
 .leg-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
 .leg-name { flex: 1; color: #374151; font-weight: 500; }
@@ -753,6 +1247,31 @@ const exportReport = () => {
 .leg-line.blue { background: #1890ff; }
 .leg-line.red { background: #ff4d4f; }
 .leg-line.green { background: #52c41a; }
+
+/* 图表类型切换 Tab */
+.chart-type-tabs {
+  display: inline-flex;
+  gap: 4px;
+}
+.chart-type-tab {
+  padding: 3px 10px;
+  font-size: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  background: #fff;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.chart-type-tab:hover {
+  color: #1890ff;
+  border-color: #1890ff;
+}
+.chart-type-tab.active {
+  background: #1890ff;
+  color: #fff;
+  border-color: #1890ff;
+}
 
 /* 表格 */
 .data-card { background: #fff; border-radius: 10px; border: 1px solid #eef0f4; overflow: hidden; margin-bottom: 14px; }

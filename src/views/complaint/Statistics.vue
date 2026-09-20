@@ -8,7 +8,7 @@
         </svg>
       </span>
       <span class="breadcrumb-separator">/</span>
-      <span class="breadcrumb-item">投诉管理</span>
+      <span class="breadcrumb-item">线上反馈</span>
       <span class="breadcrumb-separator">/</span>
       <span class="breadcrumb-item active">数据统计</span>
     </div>
@@ -92,10 +92,19 @@
         <!-- 饼图：反馈类型分布 -->
         <div class="chart-block">
           <div class="chart-title">
-            <span>反馈类型分布</span>
-            <span class="chart-sub">占比分析</span>
+            <div class="chart-title-left">
+              <span>反馈类型分布</span>
+              <span class="chart-sub">占比分析</span>
+            </div>
+            <div class="chart-type-tabs">
+              <button class="chart-type-tab" :class="{ active: chart1Type === 'pie' }" @click="chart1Type = 'pie'">饼图</button>
+              <button class="chart-type-tab" :class="{ active: chart1Type === 'bar' }" @click="chart1Type = 'bar'">柱状</button>
+              <button class="chart-type-tab" :class="{ active: chart1Type === 'hbar' }" @click="chart1Type = 'hbar'">条形</button>
+              <button class="chart-type-tab" :class="{ active: chart1Type === 'line' }" @click="chart1Type = 'line'">折线</button>
+            </div>
           </div>
-          <div class="pie-wrap">
+          <!-- 饼图 -->
+          <div v-if="chart1Type === 'pie'" class="pie-wrap">
             <svg class="pie-svg" viewBox="0 0 200 200">
               <g transform="translate(100, 100)">
                 <!-- 中心装饰 -->
@@ -106,6 +115,62 @@
               <!-- 饼图各扇区 -->
               <g transform="translate(100, 100)" v-for="(slice, idx) in pieSlices" :key="'slice-' + idx">
                 <path :d="slice.path" :fill="slice.color" class="pie-slice" :stroke="'#fff'" stroke-width="2"/>
+              </g>
+            </svg>
+          </div>
+          <!-- 柱状 -->
+          <div v-else-if="chart1Type === 'bar'" class="bar-wrap">
+            <svg class="bar-svg" viewBox="0 0 400 220" preserveAspectRatio="none">
+              <!-- 水平网格线 -->
+              <line v-for="i in 4" :key="'c1bgrid-' + i"
+                    :x1="40" :x2="390"
+                    :y1="20 + i * 40" :y2="20 + i * 40"
+                    stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
+              <!-- Y轴标签 -->
+              <text v-for="(val, i) in [80, 60, 40, 20, 0]" :key="'c1bylbl-' + i"
+                    x="35" :y="25 + i * 40" text-anchor="end" class="bar-axis-label">{{ val }}</text>
+              <!-- 柱状图数据 -->
+              <g v-for="(item, idx) in chart1BarData" :key="'c1bar-' + idx">
+                <rect :x="item.cx - 12" :y="item.y" width="24" :height="item.h" :fill="item.color" rx="3"/>
+                <text :x="item.cx" y="210" text-anchor="middle" class="bar-axis-label">{{ item.label }}</text>
+              </g>
+            </svg>
+          </div>
+          <!-- 条形 -->
+          <div v-else-if="chart1Type === 'hbar'" class="bar-wrap">
+            <svg class="bar-svg" viewBox="0 0 400 220" preserveAspectRatio="none">
+              <!-- 垂直网格线 -->
+              <line v-for="i in 4" :key="'c1hgrid-' + i"
+                    :x1="70 + i * 80" :x2="70 + i * 80"
+                    :y1="20" :y2="190"
+                    stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
+              <!-- X轴标签 -->
+              <text v-for="(val, i) in [0, 20, 40, 60, 80]" :key="'c1hxlbl-' + i"
+                    :x="70 + i * 80" y="205" text-anchor="middle" class="bar-axis-label">{{ val }}</text>
+              <!-- 条形图数据 -->
+              <g v-for="(item, idx) in chart1HBarData" :key="'c1hbar-' + idx">
+                <rect x="70" :y="item.y" :width="item.w" height="14" :fill="item.color" rx="2"/>
+                <text x="65" :y="item.y + 11" text-anchor="end" class="bar-axis-label">{{ item.label }}</text>
+              </g>
+            </svg>
+          </div>
+          <!-- 折线 -->
+          <div v-else class="line-wrap">
+            <svg class="line-svg" viewBox="0 0 400 220" preserveAspectRatio="none">
+              <!-- 背景网格线 -->
+              <line v-for="i in 4" :key="'c1lgrid-' + i"
+                    :x1="40" :x2="390"
+                    :y1="20 + i * 40" :y2="20 + i * 40"
+                    stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
+              <!-- Y轴标签 -->
+              <text v-for="(val, i) in [80, 60, 40, 20, 0]" :key="'c1lylbl-' + i"
+                    x="35" :y="25 + i * 40" text-anchor="end" class="line-axis-label">{{ val }}</text>
+              <!-- 折线 -->
+              <path :d="chart1LinePath" fill="none" stroke="#1890ff" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+              <!-- 数据点 -->
+              <g v-for="(p, idx) in chart1LinePoints" :key="'c1lp-' + idx">
+                <circle :cx="p.x" :cy="p.y" r="4" fill="#fff" stroke="#1890ff" stroke-width="2"/>
+                <text :x="p.x" y="210" text-anchor="middle" class="line-axis-label">{{ p.label }}</text>
               </g>
             </svg>
           </div>
@@ -121,10 +186,70 @@
         <!-- 折线图：一周提交趋势 -->
         <div class="chart-block">
           <div class="chart-title">
-            <span>一周提交趋势</span>
-            <span class="chart-sub">日均 12.7 件</span>
+            <div class="chart-title-left">
+              <span>一周提交趋势</span>
+              <span class="chart-sub">日均 12.7 件</span>
+            </div>
+            <div class="chart-type-tabs">
+              <button class="chart-type-tab" :class="{ active: chart2Type === 'pie' }" @click="chart2Type = 'pie'">饼图</button>
+              <button class="chart-type-tab" :class="{ active: chart2Type === 'bar' }" @click="chart2Type = 'bar'">柱状</button>
+              <button class="chart-type-tab" :class="{ active: chart2Type === 'hbar' }" @click="chart2Type = 'hbar'">条形</button>
+              <button class="chart-type-tab" :class="{ active: chart2Type === 'line' }" @click="chart2Type = 'line'">折线</button>
+            </div>
           </div>
-          <div class="line-wrap">
+          <!-- 饼图 -->
+          <div v-if="chart2Type === 'pie'" class="pie-wrap">
+            <svg class="pie-svg" viewBox="0 0 200 200">
+              <g transform="translate(100, 100)">
+                <circle r="48" fill="#fff" stroke="#eef0f4" stroke-width="1"/>
+                <text y="-4" text-anchor="middle" class="pie-total-num">147</text>
+                <text y="12" text-anchor="middle" class="pie-total-label">本周总量</text>
+              </g>
+              <g transform="translate(100, 100)" v-for="(slice, idx) in chart2PieSlices" :key="'c2slice-' + idx">
+                <path :d="slice.path" :fill="slice.color" class="pie-slice" :stroke="'#fff'" stroke-width="2"/>
+              </g>
+            </svg>
+          </div>
+          <!-- 柱状 -->
+          <div v-else-if="chart2Type === 'bar'" class="bar-wrap">
+            <svg class="bar-svg" viewBox="0 0 400 220" preserveAspectRatio="none">
+              <!-- 水平网格线 -->
+              <line v-for="i in 4" :key="'c2bgrid-' + i"
+                    :x1="50" :x2="390"
+                    :y1="20 + i * 40" :y2="20 + i * 40"
+                    stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
+              <!-- Y轴标签 -->
+              <text v-for="(val, i) in [20, 15, 10, 5, 0]" :key="'c2bylbl-' + i"
+                    x="45" :y="25 + i * 40" text-anchor="end" class="bar-axis-label">{{ val }}</text>
+              <!-- 柱状图数据 -->
+              <g v-for="(item, idx) in chart2BarData" :key="'c2bar-' + idx" :transform="'translate(' + item.tx + ', 0)'">
+                <rect x="0" :y="item.complaintY" width="18" :height="item.complaintH" rx="3" fill="#1890ff"/>
+                <rect x="22" :y="item.suggestionY" width="18" :height="item.suggestionH" rx="3" fill="#52c41a"/>
+                <text x="20" y="210" text-anchor="middle" class="bar-axis-label">{{ item.label }}</text>
+              </g>
+            </svg>
+          </div>
+          <!-- 条形 -->
+          <div v-else-if="chart2Type === 'hbar'" class="bar-wrap">
+            <svg class="bar-svg" viewBox="0 0 400 220" preserveAspectRatio="none">
+              <!-- 垂直网格线 -->
+              <line v-for="i in 4" :key="'c2hgrid-' + i"
+                    :x1="50 + i * 82.5" :x2="50 + i * 82.5"
+                    :y1="20" :y2="190"
+                    stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
+              <!-- X轴标签 -->
+              <text v-for="(val, i) in [0, 5, 10, 15, 20]" :key="'c2hxlbl-' + i"
+                    :x="50 + i * 82.5" y="205" text-anchor="middle" class="bar-axis-label">{{ val }}</text>
+              <!-- 条形图数据 -->
+              <g v-for="(item, idx) in chart2HBarData" :key="'c2hbar-' + idx">
+                <rect x="50" :y="item.y" :width="item.complaintW" height="8" fill="#1890ff" rx="2"/>
+                <rect x="50" :y="item.y + 10" :width="item.suggestionW" height="8" fill="#52c41a" rx="2"/>
+                <text x="45" :y="item.y + 9" text-anchor="end" class="bar-axis-label">{{ item.label }}</text>
+              </g>
+            </svg>
+          </div>
+          <!-- 折线 -->
+          <div v-else class="line-wrap">
             <svg class="line-svg" viewBox="0 0 400 220" preserveAspectRatio="none">
               <!-- 背景网格线 -->
               <line v-for="i in 4" :key="'grid-' + i"
@@ -176,10 +301,32 @@
         <!-- 柱状图：处理效率对比 -->
         <div class="chart-block">
           <div class="chart-title">
-            <span>各类型处理情况</span>
-            <span class="chart-sub">提交 vs 已处理</span>
+            <div class="chart-title-left">
+              <span>各类型处理情况</span>
+              <span class="chart-sub">提交 vs 已处理</span>
+            </div>
+            <div class="chart-type-tabs">
+              <button class="chart-type-tab" :class="{ active: chart3Type === 'pie' }" @click="chart3Type = 'pie'">饼图</button>
+              <button class="chart-type-tab" :class="{ active: chart3Type === 'bar' }" @click="chart3Type = 'bar'">柱状</button>
+              <button class="chart-type-tab" :class="{ active: chart3Type === 'hbar' }" @click="chart3Type = 'hbar'">条形</button>
+              <button class="chart-type-tab" :class="{ active: chart3Type === 'line' }" @click="chart3Type = 'line'">折线</button>
+            </div>
           </div>
-          <div class="bar-wrap">
+          <!-- 饼图 -->
+          <div v-if="chart3Type === 'pie'" class="pie-wrap">
+            <svg class="pie-svg" viewBox="0 0 200 200">
+              <g transform="translate(100, 100)">
+                <circle r="48" fill="#fff" stroke="#eef0f4" stroke-width="1"/>
+                <text y="-4" text-anchor="middle" class="pie-total-num">399</text>
+                <text y="12" text-anchor="middle" class="pie-total-label">合计</text>
+              </g>
+              <g transform="translate(100, 100)" v-for="(slice, idx) in chart3PieSlices" :key="'c3slice-' + idx">
+                <path :d="slice.path" :fill="slice.color" class="pie-slice" :stroke="'#fff'" stroke-width="2"/>
+              </g>
+            </svg>
+          </div>
+          <!-- 柱状 -->
+          <div v-else-if="chart3Type === 'bar'" class="bar-wrap">
             <svg class="bar-svg" viewBox="0 0 400 220" preserveAspectRatio="none">
               <!-- 水平网格线 -->
               <line v-for="i in 4" :key="'bgrid-' + i"
@@ -209,6 +356,54 @@
                   <stop offset="100%" stop-color="#52c41a"/>
                 </linearGradient>
               </defs>
+            </svg>
+          </div>
+          <!-- 条形 -->
+          <div v-else-if="chart3Type === 'hbar'" class="bar-wrap">
+            <svg class="bar-svg" viewBox="0 0 400 220" preserveAspectRatio="none">
+              <!-- 垂直网格线 -->
+              <line v-for="i in 4" :key="'c3hgrid-' + i"
+                    :x1="60 + i * 80" :x2="60 + i * 80"
+                    :y1="20" :y2="190"
+                    stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
+              <!-- X轴标签 -->
+              <text v-for="(val, i) in [0, 20, 40, 60, 80]" :key="'c3hxlbl-' + i"
+                    :x="60 + i * 80" y="205" text-anchor="middle" class="bar-axis-label">{{ val }}</text>
+              <!-- 条形图数据 -->
+              <g v-for="(item, idx) in chart3HBarData" :key="'c3hbar-' + idx">
+                <rect x="60" :y="item.y" :width="item.submitW" height="8" fill="#1890ff" rx="2"/>
+                <rect x="60" :y="item.y + 10" :width="item.resolvedW" height="8" fill="#52c41a" rx="2"/>
+                <text x="55" :y="item.y + 9" text-anchor="end" class="bar-axis-label">{{ item.label }}</text>
+              </g>
+            </svg>
+          </div>
+          <!-- 折线 -->
+          <div v-else class="line-wrap">
+            <svg class="line-svg" viewBox="0 0 400 220" preserveAspectRatio="none">
+              <!-- 背景网格线 -->
+              <line v-for="i in 4" :key="'c3lgrid-' + i"
+                    :x1="50" :x2="390"
+                    :y1="20 + i * 40" :y2="20 + i * 40"
+                    stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
+              <!-- Y轴标签 -->
+              <text v-for="(val, i) in [80, 60, 40, 20, 0]" :key="'c3lylbl-' + i"
+                    x="45" :y="25 + i * 40" text-anchor="end" class="line-axis-label">{{ val }}</text>
+              <!-- 折线 - 提交 -->
+              <path :d="chart3SubmitLinePath" fill="none" stroke="#1890ff" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+              <!-- 折线 - 已处理 -->
+              <path :d="chart3ResolvedLinePath" fill="none" stroke="#52c41a" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+              <!-- 数据点 - 提交 -->
+              <g v-for="(p, idx) in chart3LineData" :key="'c3sp-' + idx">
+                <circle :cx="p.x" :cy="p.submitY" r="4" fill="#fff" stroke="#1890ff" stroke-width="2"/>
+              </g>
+              <!-- 数据点 - 已处理 -->
+              <g v-for="(p, idx) in chart3LineData" :key="'c3rp-' + idx">
+                <circle :cx="p.x" :cy="p.resolvedY" r="4" fill="#fff" stroke="#52c41a" stroke-width="2"/>
+              </g>
+              <!-- X轴标签 -->
+              <g v-for="(p, idx) in chart3LineData" :key="'c3xlbl-' + idx">
+                <text :x="p.x" y="210" text-anchor="middle" class="line-axis-label">{{ p.label }}</text>
+              </g>
             </svg>
           </div>
           <div class="line-legend">
@@ -311,6 +506,11 @@
 import { ref, computed } from 'vue'
 
 const activeTime = ref('month')
+
+// 各图表当前选中的类型
+const chart1Type = ref('pie')
+const chart2Type = ref('line')
+const chart3Type = ref('bar')
 
 const chartColors = [
   '#1890ff', '#52c41a', '#fa8c16', '#ff4d4f',
@@ -452,6 +652,224 @@ const barData = computed(() => {
       resolvedH
     }
   })
+})
+
+// ============= 图表1（反馈类型分布）其他类型计算 =============
+// 柱状图（垂直）
+const chart1BarData = computed(() => {
+  const maxVal = 80
+  const yBase = 180
+  const yTop = 20
+  const scale = (yBase - yTop) / maxVal
+  return typeDistribution.value.map((item, idx) => {
+    const h = Math.max(2, item.count * scale)
+    return {
+      label: item.name.slice(0, 2),
+      cx: 65 + idx * 50,
+      y: yBase - h,
+      h,
+      color: chartColors[idx % chartColors.length]
+    }
+  })
+})
+
+// 条形图（水平）
+const chart1HBarData = computed(() => {
+  const maxVal = 80
+  const xStart = 70
+  const xEnd = 390
+  const scale = (xEnd - xStart) / maxVal
+  const yStart = 25
+  const yStep = 22
+  return typeDistribution.value.map((item, idx) => {
+    const w = Math.max(2, item.count * scale)
+    return {
+      label: item.name.slice(0, 2),
+      y: yStart + idx * yStep,
+      w,
+      color: chartColors[idx % chartColors.length],
+      count: item.count
+    }
+  })
+})
+
+// 折线图
+const chart1LinePoints = computed(() => {
+  const maxVal = 80
+  const xStart = 60
+  const xEnd = 380
+  const yBase = 180
+  const yTop = 20
+  const n = typeDistribution.value.length
+  const step = n > 1 ? (xEnd - xStart) / (n - 1) : 0
+  const scale = (yBase - yTop) / maxVal
+  return typeDistribution.value.map((item, idx) => ({
+    x: xStart + idx * step,
+    y: yBase - item.count * scale,
+    label: item.name.slice(0, 2),
+    count: item.count
+  }))
+})
+
+const chart1LinePath = computed(() => {
+  return chart1LinePoints.value.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ')
+})
+
+// ============= 图表2（一周提交趋势）其他类型计算 =============
+// 饼图（投诉 vs 建议 总量）
+const chart2PieSlices = computed(() => {
+  const totalComplaint = weekTrend.value.reduce((s, d) => s + d.complaint, 0)
+  const totalSuggestion = weekTrend.value.reduce((s, d) => s + d.suggestion, 0)
+  const total = totalComplaint + totalSuggestion
+  const radius = 78
+  let startAngle = -Math.PI / 2
+  const slices = []
+  const items = [
+    { name: '投诉', count: totalComplaint, color: '#1890ff' },
+    { name: '建议', count: totalSuggestion, color: '#52c41a' }
+  ]
+  items.forEach(item => {
+    const angle = (item.count / total) * Math.PI * 2
+    const endAngle = startAngle + angle
+    const x1 = Math.cos(startAngle) * radius
+    const y1 = Math.sin(startAngle) * radius
+    const x2 = Math.cos(endAngle) * radius
+    const y2 = Math.sin(endAngle) * radius
+    const largeArc = angle > Math.PI ? 1 : 0
+    const path = `M 0 0 L ${x1.toFixed(2)} ${y1.toFixed(2)} A ${radius} ${radius} 0 ${largeArc} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z`
+    slices.push({
+      path,
+      color: item.color,
+      name: item.name,
+      count: item.count,
+      percent: ((item.count / total) * 100).toFixed(1)
+    })
+    startAngle = endAngle
+  })
+  return slices
+})
+
+// 柱状图（按日分组双柱）
+const chart2BarData = computed(() => {
+  const maxVal = 20
+  const yBase = 180
+  const yTop = 20
+  const scale = (yBase - yTop) / maxVal
+  return weekTrend.value.map((item, idx) => {
+    const complaintH = Math.max(2, item.complaint * scale)
+    const suggestionH = Math.max(2, item.suggestion * scale)
+    return {
+      label: item.label,
+      tx: 55 + idx * 48,
+      complaintY: yBase - complaintH,
+      complaintH,
+      suggestionY: yBase - suggestionH,
+      suggestionH
+    }
+  })
+})
+
+// 条形图（按日分组双横柱）
+const chart2HBarData = computed(() => {
+  const maxVal = 20
+  const xStart = 50
+  const xEnd = 380
+  const scale = (xEnd - xStart) / maxVal
+  const yStart = 25
+  const yStep = 22
+  return weekTrend.value.map((item, idx) => {
+    const complaintW = Math.max(2, item.complaint * scale)
+    const suggestionW = Math.max(2, item.suggestion * scale)
+    return {
+      label: item.label,
+      y: yStart + idx * yStep,
+      complaintW,
+      suggestionW
+    }
+  })
+})
+
+// ============= 图表3（各类型处理情况）其他类型计算 =============
+// 饼图（提交 vs 已处理 总量）
+const chart3PieSlices = computed(() => {
+  const items = efficiencyData.value.slice(0, 6)
+  const totalSubmit = items.reduce((s, d) => s + d.submit, 0)
+  const totalResolved = items.reduce((s, d) => s + d.resolved, 0)
+  const total = totalSubmit + totalResolved
+  const radius = 78
+  let startAngle = -Math.PI / 2
+  const slices = []
+  const dataItems = [
+    { name: '提交', count: totalSubmit, color: '#1890ff' },
+    { name: '已处理', count: totalResolved, color: '#52c41a' }
+  ]
+  dataItems.forEach(item => {
+    const angle = (item.count / total) * Math.PI * 2
+    const endAngle = startAngle + angle
+    const x1 = Math.cos(startAngle) * radius
+    const y1 = Math.sin(startAngle) * radius
+    const x2 = Math.cos(endAngle) * radius
+    const y2 = Math.sin(endAngle) * radius
+    const largeArc = angle > Math.PI ? 1 : 0
+    const path = `M 0 0 L ${x1.toFixed(2)} ${y1.toFixed(2)} A ${radius} ${radius} 0 ${largeArc} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z`
+    slices.push({
+      path,
+      color: item.color,
+      name: item.name,
+      count: item.count,
+      percent: ((item.count / total) * 100).toFixed(1)
+    })
+    startAngle = endAngle
+  })
+  return slices
+})
+
+// 条形图（水平：每类提交+已处理）
+const chart3HBarData = computed(() => {
+  const items = efficiencyData.value.slice(0, 6)
+  const maxVal = 80
+  const xStart = 60
+  const xEnd = 380
+  const scale = (xEnd - xStart) / maxVal
+  const yStart = 25
+  const yStep = 25
+  return items.map((item, idx) => {
+    const submitW = Math.max(2, item.submit * scale)
+    const resolvedW = Math.max(2, item.resolved * scale)
+    return {
+      label: item.name.slice(0, 2),
+      y: yStart + idx * yStep,
+      submitW,
+      resolvedW
+    }
+  })
+})
+
+// 折线图（提交 + 已处理 双线）
+const chart3LineData = computed(() => {
+  const items = efficiencyData.value.slice(0, 6)
+  const maxVal = 80
+  const xStart = 60
+  const xEnd = 380
+  const yBase = 180
+  const yTop = 20
+  const n = items.length
+  const step = n > 1 ? (xEnd - xStart) / (n - 1) : 0
+  const scale = (yBase - yTop) / maxVal
+  return items.map((item, idx) => ({
+    x: xStart + idx * step,
+    submitY: yBase - item.submit * scale,
+    resolvedY: yBase - item.resolved * scale,
+    label: item.name.slice(0, 2)
+  }))
+})
+
+const chart3SubmitLinePath = computed(() => {
+  return chart3LineData.value.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.submitY}`).join(' ')
+})
+
+const chart3ResolvedLinePath = computed(() => {
+  return chart3LineData.value.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.resolvedY}`).join(' ')
 })
 </script>
 
@@ -735,10 +1153,43 @@ const barData = computed(() => {
   margin-bottom: 10px;
 }
 
+.chart-title-left {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
 .chart-sub {
   font-size: 11px;
   color: #9ca3af;
   font-weight: 500;
+}
+
+.chart-type-tabs {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.chart-type-tab {
+  padding: 3px 10px;
+  font-size: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  background: #fff;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.chart-type-tab:hover {
+  color: #1890ff;
+  border-color: #1890ff;
+}
+
+.chart-type-tab.active {
+  background: #1890ff;
+  color: #fff;
+  border-color: #1890ff;
 }
 
 /* 饼图 */
