@@ -643,10 +643,6 @@
           <input type="date" class="form-input" v-model="caseCatStartDate"/>
           <span class="date-sep">至</span>
           <input type="date" class="form-input" v-model="caseCatEndDate"/>
-          <span class="filter-label">维度</span>
-          <select class="form-select" v-model="caseCatLink" @change="onLinkChange">
-            <option value="link">涉及环节-原因(联动)</option>
-          </select>
           <span class="filter-label">涉及环节</span>
           <select class="form-select" v-model="selectedLink" @change="onLinkSelect">
             <option value="">全部环节</option>
@@ -2030,7 +2026,6 @@ const rateLineData = computed(() => {
 const caseCatChartType = ref('bar')
 const caseCatStartDate = ref('2026-01-01')
 const caseCatEndDate = ref('2026-06-18')
-const caseCatLink = ref('link')
 const selectedLink = ref('')
 const selectedReason = ref('')
 const linkReasonMap = ref({
@@ -2045,7 +2040,6 @@ const caseCatLinkData = {
   '医患关系类': { yoy: [168, 152, 86, 72], mom: [182, 165, 92, 78] }
 }
 const onLinkSelect = () => { selectedReason.value = '' }
-const onLinkChange = () => {}
 // 案件类 - 根据 联动 选择构建数据
 const caseCatData = computed(() => {
   if (!selectedLink.value) {
