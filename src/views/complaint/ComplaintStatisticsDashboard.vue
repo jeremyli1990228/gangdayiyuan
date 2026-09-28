@@ -444,7 +444,7 @@
       <div class="chart-card">
         <div class="chart-header">
           <div class="chart-title-group">
-            <span class="chart-title">同比/环比对比</span>
+            <span class="chart-title">案件量</span>
             <span class="chart-sub">案件总量/投诉量/表扬量</span>
           </div>
           <div class="chart-type-tabs">
@@ -453,6 +453,12 @@
             <button :class="['chart-type-tab', {active: yoyChartType==='hbar'}]" @click="yoyChartType='hbar'">条形</button>
             <button :class="['chart-type-tab', {active: yoyChartType==='line'}]" @click="yoyChartType='line'">折线</button>
           </div>
+        </div>
+        <div class="chart-filter">
+          <span class="filter-label">时间区间</span>
+          <input type="date" class="form-input" v-model="yoyStartDate"/>
+          <span class="date-sep">至</span>
+          <input type="date" class="form-input" v-model="yoyEndDate"/>
         </div>
         <!-- 饼图 -->
         <div class="chart-body pie-body" v-if="yoyChartType==='pie'">
@@ -516,6 +522,204 @@
               <circle :cx="p.x" :cy="p.y" r="4" fill="#fff" stroke="#fa8c16" stroke-width="2"/>
             </g>
             <text v-for="(p,i) in yoyLineData.momPoints" :key="'yollbl'+i" :x="p.x" y="215" text-anchor="middle" class="axis-label" font-size="9">{{ p.label }}</text>
+          </svg>
+          <div class="chart-legend">
+            <span class="leg-item"><span class="leg-line blue"></span>同比</span>
+            <span class="leg-item"><span class="leg-line" style="background:#fa8c16"></span>环比</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 新增行：案件率 同比/环比 -->
+    <div class="charts-row charts-row-single">
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title-group">
+            <span class="chart-title">案件率</span>
+            <span class="chart-sub">同比/环比对比</span>
+          </div>
+          <div class="chart-type-tabs">
+            <button :class="['chart-type-tab', rateChartType === 'pie' ? 'active' : '']" @click="rateChartType = 'pie'">饼图</button>
+            <button :class="['chart-type-tab', rateChartType === 'bar' ? 'active' : '']" @click="rateChartType = 'bar'">柱状</button>
+            <button :class="['chart-type-tab', rateChartType === 'hbar' ? 'active' : '']" @click="rateChartType = 'hbar'">条形</button>
+            <button :class="['chart-type-tab', rateChartType === 'line' ? 'active' : '']" @click="rateChartType = 'line'">折线</button>
+          </div>
+        </div>
+        <div class="chart-filter">
+          <span class="filter-label">时间区间</span>
+          <input type="date" class="form-input" v-model="rateStartDate"/>
+          <span class="date-sep">至</span>
+          <input type="date" class="form-input" v-model="rateEndDate"/>
+        </div>
+        <!-- 饼图 -->
+        <div class="chart-body pie-body" v-if="rateChartType==='pie'">
+          <svg class="pie-svg" viewBox="0 0 200 200">
+            <g transform="translate(100,100)">
+              <circle r="40" fill="#fff" stroke="#eef0f4" stroke-width="1"/>
+            </g>
+            <g transform="translate(100,100)" v-for="(s,i) in ratePieSlices" :key="'rateps'+i">
+              <path :d="s.path" :fill="s.color" stroke="#fff" stroke-width="2"/>
+            </g>
+          </svg>
+          <div class="pie-legend">
+            <div class="leg-row" v-for="(s,i) in ratePieSlices" :key="'ratepl'+i">
+              <span class="leg-dot" :style="{background: s.color}"></span>
+              <span class="leg-name">{{ s.name }}</span>
+              <span class="leg-val">{{ s.count }}%</span>
+            </div>
+          </div>
+        </div>
+        <!-- 柱状 -->
+        <div class="chart-body" v-else-if="rateChartType==='bar'">
+          <svg class="bar-svg" viewBox="0 0 700 240" preserveAspectRatio="none">
+            <line v-for="i in 4" :key="'ratebgl'+i" x1="50" x2="650" :y1="20+i*40" :y2="20+i*40" stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
+            <g v-for="(b,i) in rateBarData" :key="'ratebg'+i">
+              <rect :x="b.x" :y="b.yoyY" :width="b.bw" :height="b.yoyH" rx="3" fill="#1890ff"/>
+              <rect :x="b.x+b.bw+2" :y="b.momY" :width="b.bw" :height="b.momH" rx="3" fill="#fa8c16"/>
+              <text :x="b.x+b.bw" y="220" text-anchor="middle" class="axis-label" font-size="10">{{ b.label }}</text>
+            </g>
+          </svg>
+          <div class="chart-legend">
+            <span class="leg-item"><span class="leg-dot-sm" style="background:#1890ff"></span>同比</span>
+            <span class="leg-item"><span class="leg-dot-sm" style="background:#fa8c16"></span>环比</span>
+          </div>
+        </div>
+        <!-- 条形 -->
+        <div class="chart-body" v-else-if="rateChartType==='hbar'">
+          <svg class="bar-svg" viewBox="0 0 700 240" preserveAspectRatio="none">
+            <line v-for="i in 4" :key="'ratehgl'+i" x1="80" x2="650" :y1="20+i*40" :y2="20+i*40" stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
+            <g v-for="(b,i) in rateHBarData" :key="'ratehb'+i" :transform="'translate(0,'+b.y+')'">
+              <text x="75" y="9" text-anchor="end" class="axis-label" font-size="10">{{ b.label }}</text>
+              <rect x="80" y="0" :width="b.yoyW" :height="b.h" rx="3" fill="#1890ff"/>
+              <rect x="80" :y="b.h+2" :width="b.momW" :height="b.h" rx="3" fill="#fa8c16"/>
+            </g>
+          </svg>
+          <div class="chart-legend">
+            <span class="leg-item"><span class="leg-dot-sm" style="background:#1890ff"></span>同比</span>
+            <span class="leg-item"><span class="leg-dot-sm" style="background:#fa8c16"></span>环比</span>
+          </div>
+        </div>
+        <!-- 折线 -->
+        <div class="chart-body" v-else>
+          <svg class="bar-svg" viewBox="0 0 700 240" preserveAspectRatio="none">
+            <line v-for="i in 4" :key="'ratelgl'+i" x1="50" x2="650" :y1="20+i*40" :y2="20+i*40" stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
+            <text v-for="(v,i) in rateLineData.yLabels" :key="'ratelyl'+i" x="45" :y="25+i*40" text-anchor="end" class="axis-label">{{ v }}</text>
+            <path :d="rateLineData.yoyPath" fill="none" stroke="#1890ff" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+            <path :d="rateLineData.momPath" fill="none" stroke="#fa8c16" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+            <g v-for="(p,i) in rateLineData.yoyPoints" :key="'ratelyp'+i">
+              <circle :cx="p.x" :cy="p.y" r="4" fill="#fff" stroke="#1890ff" stroke-width="2"/>
+            </g>
+            <g v-for="(p,i) in rateLineData.momPoints" :key="'ratelmp'+i">
+              <circle :cx="p.x" :cy="p.y" r="4" fill="#fff" stroke="#fa8c16" stroke-width="2"/>
+            </g>
+            <text v-for="(p,i) in rateLineData.momPoints" :key="'ratelbl'+i" :x="p.x" y="220" text-anchor="middle" class="axis-label" font-size="10">{{ p.label }}</text>
+          </svg>
+          <div class="chart-legend">
+            <span class="leg-item"><span class="leg-line blue"></span>同比</span>
+            <span class="leg-item"><span class="leg-line" style="background:#fa8c16"></span>环比</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 新增行：案件类 同比/环比 -->
+    <div class="charts-row charts-row-single">
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title-group">
+            <span class="chart-title">案件类</span>
+            <span class="chart-sub">同比/环比对比</span>
+          </div>
+          <div class="chart-type-tabs">
+            <button :class="['chart-type-tab', caseCatChartType === 'pie' ? 'active' : '']" @click="caseCatChartType = 'pie'">饼图</button>
+            <button :class="['chart-type-tab', caseCatChartType === 'bar' ? 'active' : '']" @click="caseCatChartType = 'bar'">柱状</button>
+            <button :class="['chart-type-tab', caseCatChartType === 'hbar' ? 'active' : '']" @click="caseCatChartType = 'hbar'">条形</button>
+            <button :class="['chart-type-tab', caseCatChartType === 'line' ? 'active' : '']" @click="caseCatChartType = 'line'">折线</button>
+          </div>
+        </div>
+        <div class="chart-filter case-cat-filter">
+          <span class="filter-label">时间区间</span>
+          <input type="date" class="form-input" v-model="caseCatStartDate"/>
+          <span class="date-sep">至</span>
+          <input type="date" class="form-input" v-model="caseCatEndDate"/>
+          <span class="filter-label">维度</span>
+          <select class="form-select" v-model="caseCatLink" @change="onLinkChange">
+            <option value="link">涉及环节-原因(联动)</option>
+          </select>
+          <span class="filter-label">涉及环节</span>
+          <select class="form-select" v-model="selectedLink" @change="onLinkSelect">
+            <option value="">全部环节</option>
+            <option v-for="(l,i) in Object.keys(linkReasonMap)" :key="i" :value="l">{{ l }}</option>
+          </select>
+          <span class="filter-label" v-if="selectedLink">原因</span>
+          <select class="form-select" v-if="selectedLink" v-model="selectedReason">
+            <option value="">全部原因</option>
+            <option v-for="(r,i) in (linkReasonMap[selectedLink] || [])" :key="i" :value="r">{{ r }}</option>
+          </select>
+        </div>
+        <!-- 饼图 -->
+        <div class="chart-body pie-body" v-if="caseCatChartType==='pie'">
+          <svg class="pie-svg" viewBox="0 0 200 200">
+            <g transform="translate(100,100)">
+              <circle r="40" fill="#fff" stroke="#eef0f4" stroke-width="1"/>
+            </g>
+            <g transform="translate(100,100)" v-for="(s,i) in caseCatPieSlices" :key="'ccps'+i">
+              <path :d="s.path" :fill="s.color" stroke="#fff" stroke-width="2"/>
+            </g>
+          </svg>
+          <div class="pie-legend pie-legend-grid">
+            <div class="leg-row" v-for="(s,i) in caseCatPieSlices" :key="'ccpl'+i">
+              <span class="leg-dot" :style="{background: s.color}"></span>
+              <span class="leg-name">{{ s.name }}</span>
+              <span class="leg-val">{{ s.count }}</span>
+            </div>
+          </div>
+        </div>
+        <!-- 柱状 -->
+        <div class="chart-body" v-else-if="caseCatChartType==='bar'">
+          <svg class="bar-svg" viewBox="0 0 700 240" preserveAspectRatio="none">
+            <line v-for="i in 4" :key="'ccbgl'+i" x1="50" x2="650" :y1="20+i*40" :y2="20+i*40" stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
+            <g v-for="(b,i) in caseCatBarData" :key="'ccbg'+i">
+              <rect :x="b.x" :y="b.yoyY" :width="b.bw" :height="b.yoyH" rx="3" fill="#1890ff"/>
+              <rect :x="b.x+b.bw+2" :y="b.momY" :width="b.bw" :height="b.momH" rx="3" fill="#fa8c16"/>
+              <text :x="b.x+b.bw" y="220" text-anchor="middle" class="axis-label" font-size="10">{{ b.label }}</text>
+            </g>
+          </svg>
+          <div class="chart-legend">
+            <span class="leg-item"><span class="leg-dot-sm" style="background:#1890ff"></span>同比</span>
+            <span class="leg-item"><span class="leg-dot-sm" style="background:#fa8c16"></span>环比</span>
+          </div>
+        </div>
+        <!-- 条形 -->
+        <div class="chart-body" v-else-if="caseCatChartType==='hbar'">
+          <svg class="bar-svg" viewBox="0 0 700 240" preserveAspectRatio="none">
+            <line v-for="i in 4" :key="'cchgl'+i" x1="80" x2="650" :y1="20+i*40" :y2="20+i*40" stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
+            <g v-for="(b,i) in caseCatHBarData" :key="'cchb'+i" :transform="'translate(0,'+b.y+')'">
+              <text x="75" y="9" text-anchor="end" class="axis-label" font-size="10">{{ b.label }}</text>
+              <rect x="80" y="0" :width="b.yoyW" :height="b.h" rx="3" fill="#1890ff"/>
+              <rect x="80" :y="b.h+2" :width="b.momW" :height="b.h" rx="3" fill="#fa8c16"/>
+            </g>
+          </svg>
+          <div class="chart-legend">
+            <span class="leg-item"><span class="leg-dot-sm" style="background:#1890ff"></span>同比</span>
+            <span class="leg-item"><span class="leg-dot-sm" style="background:#fa8c16"></span>环比</span>
+          </div>
+        </div>
+        <!-- 折线 -->
+        <div class="chart-body" v-else>
+          <svg class="bar-svg" viewBox="0 0 700 240" preserveAspectRatio="none">
+            <line v-for="i in 4" :key="'cclgl'+i" x1="50" x2="650" :y1="20+i*40" :y2="20+i*40" stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
+            <text v-for="(v,i) in caseCatLineData.yLabels" :key="'cclyl'+i" x="45" :y="25+i*40" text-anchor="end" class="axis-label">{{ v }}</text>
+            <path :d="caseCatLineData.yoyPath" fill="none" stroke="#1890ff" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+            <path :d="caseCatLineData.momPath" fill="none" stroke="#fa8c16" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+            <g v-for="(p,i) in caseCatLineData.yoyPoints" :key="'cclyp'+i">
+              <circle :cx="p.x" :cy="p.y" r="4" fill="#fff" stroke="#1890ff" stroke-width="2"/>
+            </g>
+            <g v-for="(p,i) in caseCatLineData.momPoints" :key="'cclmp'+i">
+              <circle :cx="p.x" :cy="p.y" r="4" fill="#fff" stroke="#fa8c16" stroke-width="2"/>
+            </g>
+            <text v-for="(p,i) in caseCatLineData.momPoints" :key="'cclbl'+i" :x="p.x" y="220" text-anchor="middle" class="axis-label" font-size="10">{{ p.label }}</text>
           </svg>
           <div class="chart-legend">
             <span class="leg-item"><span class="leg-line blue"></span>同比</span>
@@ -1084,6 +1288,8 @@ const staffChartType = ref('pie')
 const ratioChartType = ref('line')
 const topDeptChartType = ref('bar')
 const yoyChartType = ref('line')
+const yoyStartDate = ref('2026-01-01')
+const yoyEndDate = ref('2026-06-18')
 
 const refreshData = () => {}
 
@@ -1618,9 +1824,9 @@ const topDeptHBarData = computed(() => buildHBarData(topDeptRankData.value, 'cou
 const topDeptLineData = computed(() => buildLineData(topDeptRankData.value, 'count', 'name', { xS: 50, xE: 450, yT: 20, yB: 200 }))
 
 const yoyData = ref({
-  categories: ['案件总量', '投诉量', '表扬量'],
-  yoy: [1542, 1153, 334],
-  mom: [1680, 1248, 386]
+  categories: ['案件总量', '投诉量', '表扬量', '投诉（现场处理）量'],
+  yoy: [1542, 1153, 334, 0],
+  mom: [1680, 1248, 386, 320]
 })
 const yoyPieSlices = computed(() => {
   const r = 78
@@ -1696,6 +1902,251 @@ const yoyLineData = computed(() => {
   const mom = yoyData.value.mom
   const max = Math.max(...mom, ...yoy) * 1.1
   const xS = 50, xE = 450, yT = 20, yB = 200, scale = (yB - yT) / max
+  const n = cats.length
+  const slot = n > 1 ? (xE - xS) / (n - 1) : (xE - xS) / 2
+  const yoyPoints = yoy.map((v, i) => ({
+    x: xS + (n > 1 ? i * slot : (xE - xS) / 2),
+    y: yB - v * scale,
+    label: cats[i],
+    value: v
+  }))
+  const momPoints = mom.map((v, i) => ({
+    x: xS + (n > 1 ? i * slot : (xE - xS) / 2),
+    y: yB - v * scale,
+    label: cats[i],
+    value: v
+  }))
+  const yoyPath = yoyPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`).join(' ')
+  const momPath = momPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`).join(' ')
+  const yLabels = Array.from({ length: 5 }, (_, i) => Math.round(max * (4 - i) / 4))
+  return { yoyPoints, momPoints, yoyPath, momPath, yLabels }
+})
+
+// === 新增：案件率 同比/环比 ===
+const rateChartType = ref('bar')
+const rateStartDate = ref('2026-01-01')
+const rateEndDate = ref('2026-06-18')
+const rateData = ref({
+  categories: ['结案率', '投诉率', '表扬率'],
+  yoy: [82.5, 76.4, 23.6],
+  mom: [87.0, 78.2, 25.1]
+})
+// 案件率 - 饼图（基于 mom 值）
+const ratePieSlices = computed(() => {
+  const r = 78
+  const data = rateData.value.categories.map((cat, i) => ({
+    name: cat,
+    count: rateData.value.mom[i],
+    color: topDeptColors[i % topDeptColors.length]
+  }))
+  const total = data.reduce((s, d) => s + d.count, 0) || 1
+  let start = -Math.PI / 2, slices = []
+  data.forEach((d) => {
+    const angle = (d.count / total) * Math.PI * 2
+    const end = start + angle
+    const x1 = Math.cos(start) * r, y1 = Math.sin(start) * r
+    const x2 = Math.cos(end) * r, y2 = Math.sin(end) * r
+    const la = angle > Math.PI ? 1 : 0
+    slices.push({
+      path: `M 0 0 L ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 ${la} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z`,
+      color: d.color,
+      name: d.name,
+      count: d.count
+    })
+    start = end
+  })
+  return slices
+})
+// 案件率 - 柱状图（grouped）
+const rateBarData = computed(() => {
+  const cats = rateData.value.categories
+  const yoy = rateData.value.yoy
+  const mom = rateData.value.mom
+  const max = Math.max(...mom, ...yoy) * 1.1
+  const xS = 50, xE = 650, yT = 20, yB = 200, scale = (yB - yT) / max
+  const n = cats.length
+  const slot = (xE - xS) / n
+  const bw = slot * 0.3
+  return cats.map((label, i) => ({
+    label,
+    x: xS + i * slot + (slot - bw * 2) / 2,
+    bw,
+    yoyY: yB - yoy[i] * scale,
+    yoyH: yoy[i] * scale,
+    momY: yB - mom[i] * scale,
+    momH: mom[i] * scale,
+    yoyVal: yoy[i],
+    momVal: mom[i]
+  }))
+})
+// 案件率 - 条形图（grouped horizontal）
+const rateHBarData = computed(() => {
+  const cats = rateData.value.categories
+  const yoy = rateData.value.yoy
+  const mom = rateData.value.mom
+  const max = Math.max(...mom, ...yoy) * 1.1
+  const xS = 80, xE = 650, scale = (xE - xS) / max
+  const yT = 30, yB = 210, n = cats.length
+  const slot = (yB - yT) / n
+  const bh = slot * 0.35
+  return cats.map((label, i) => ({
+    y: yT + i * slot + (slot - bh * 2) / 2,
+    h: bh,
+    label,
+    yoyW: yoy[i] * scale,
+    momW: mom[i] * scale,
+    yoyVal: yoy[i],
+    momVal: mom[i]
+  }))
+})
+// 案件率 - 折线图（2 lines）
+const rateLineData = computed(() => {
+  const cats = rateData.value.categories
+  const yoy = rateData.value.yoy
+  const mom = rateData.value.mom
+  const max = Math.max(...mom, ...yoy) * 1.1
+  const xS = 50, xE = 650, yT = 20, yB = 200, scale = (yB - yT) / max
+  const n = cats.length
+  const slot = n > 1 ? (xE - xS) / (n - 1) : (xE - xS) / 2
+  const yoyPoints = yoy.map((v, i) => ({
+    x: xS + (n > 1 ? i * slot : (xE - xS) / 2),
+    y: yB - v * scale,
+    label: cats[i],
+    value: v
+  }))
+  const momPoints = mom.map((v, i) => ({
+    x: xS + (n > 1 ? i * slot : (xE - xS) / 2),
+    y: yB - v * scale,
+    label: cats[i],
+    value: v
+  }))
+  const yoyPath = yoyPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`).join(' ')
+  const momPath = momPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x.toFixed(2)} ${p.y.toFixed(2)}`).join(' ')
+  const yLabels = Array.from({ length: 5 }, (_, i) => Math.round(max * (4 - i) / 4))
+  return { yoyPoints, momPoints, yoyPath, momPath, yLabels }
+})
+
+// === 新增：案件类 同比/环比（联动） ===
+const caseCatChartType = ref('bar')
+const caseCatStartDate = ref('2026-01-01')
+const caseCatEndDate = ref('2026-06-18')
+const caseCatLink = ref('link')
+const selectedLink = ref('')
+const selectedReason = ref('')
+const linkReasonMap = ref({
+  '挂号环节': ['挂号流程复杂', '挂号系统故障', '挂号费用问题'],
+  '就诊环节': ['医生沟通不足', '诊疗效果不理想', '服务态度差'],
+  '检查环节': ['等候时间长', '检查流程不清', '检查费用问题'],
+  '取药环节': ['用药说明不清', '药房服务差', '药品缺货'],
+  '收费环节': ['收费不透明', '退费流程复杂', '医保结算问题'],
+  '离院环节': ['出院流程慢', '结账等候长', '停车不便']
+})
+// 案件类 - 每个环节下各原因的同比/环比值（mock 数据）
+const caseCatLinkData = {
+  '挂号环节': { yoy: [120, 85, 65], mom: [135, 92, 70] },
+  '就诊环节': { yoy: [180, 145, 110], mom: [195, 158, 120] },
+  '检查环节': { yoy: [95, 75, 60], mom: [105, 82, 65] },
+  '取药环节': { yoy: [70, 55, 45], mom: [78, 60, 50] },
+  '收费环节': { yoy: [110, 90, 75], mom: [120, 98, 82] },
+  '离院环节': { yoy: [85, 70, 55], mom: [92, 76, 60] }
+}
+const onLinkSelect = () => { selectedReason.value = '' }
+const onLinkChange = () => {}
+// 案件类 - 根据 联动 选择构建数据
+const caseCatData = computed(() => {
+  if (!selectedLink.value) {
+    const links = Object.keys(linkReasonMap.value)
+    const yoy = links.map(l => caseCatLinkData[l].yoy.reduce((s, v) => s + v, 0))
+    const mom = links.map(l => caseCatLinkData[l].mom.reduce((s, v) => s + v, 0))
+    return { categories: links, yoy, mom }
+  }
+  const reasons = linkReasonMap.value[selectedLink.value] || []
+  const linkData = caseCatLinkData[selectedLink.value]
+  if (!linkData) return { categories: [], yoy: [], mom: [] }
+  if (!selectedReason.value) {
+    return { categories: reasons, yoy: linkData.yoy, mom: linkData.mom }
+  }
+  const idx = reasons.indexOf(selectedReason.value)
+  if (idx >= 0) {
+    return { categories: [selectedReason.value], yoy: [linkData.yoy[idx]], mom: [linkData.mom[idx]] }
+  }
+  return { categories: reasons, yoy: linkData.yoy, mom: linkData.mom }
+})
+// 案件类 - 饼图
+const caseCatPieSlices = computed(() => {
+  const r = 78
+  const data = caseCatData.value.categories.map((cat, i) => ({
+    name: cat,
+    count: caseCatData.value.yoy[i] + caseCatData.value.mom[i],
+    color: topDeptColors[i % topDeptColors.length]
+  }))
+  const total = data.reduce((s, d) => s + d.count, 0) || 1
+  let start = -Math.PI / 2, slices = []
+  data.forEach((d) => {
+    const angle = (d.count / total) * Math.PI * 2
+    const end = start + angle
+    const x1 = Math.cos(start) * r, y1 = Math.sin(start) * r
+    const x2 = Math.cos(end) * r, y2 = Math.sin(end) * r
+    const la = angle > Math.PI ? 1 : 0
+    slices.push({
+      path: `M 0 0 L ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 ${la} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z`,
+      color: d.color,
+      name: d.name,
+      count: d.count
+    })
+    start = end
+  })
+  return slices
+})
+// 案件类 - 柱状图（grouped）
+const caseCatBarData = computed(() => {
+  const cats = caseCatData.value.categories
+  const yoy = caseCatData.value.yoy
+  const mom = caseCatData.value.mom
+  const max = Math.max(...mom, ...yoy, 1) * 1.1
+  const xS = 50, xE = 650, yT = 20, yB = 200, scale = (yB - yT) / max
+  const n = cats.length
+  const slot = (xE - xS) / Math.max(1, n)
+  const bw = slot * 0.3
+  return cats.map((label, i) => ({
+    label,
+    x: xS + i * slot + (slot - bw * 2) / 2,
+    bw,
+    yoyY: yB - yoy[i] * scale,
+    yoyH: yoy[i] * scale,
+    momY: yB - mom[i] * scale,
+    momH: mom[i] * scale,
+    yoyVal: yoy[i],
+    momVal: mom[i]
+  }))
+})
+// 案件类 - 条形图（grouped horizontal）
+const caseCatHBarData = computed(() => {
+  const cats = caseCatData.value.categories
+  const yoy = caseCatData.value.yoy
+  const mom = caseCatData.value.mom
+  const max = Math.max(...mom, ...yoy, 1) * 1.1
+  const xS = 80, xE = 650, scale = (xE - xS) / max
+  const yT = 30, yB = 210, n = cats.length
+  const slot = (yB - yT) / Math.max(1, n)
+  const bh = slot * 0.35
+  return cats.map((label, i) => ({
+    y: yT + i * slot + (slot - bh * 2) / 2,
+    h: bh,
+    label,
+    yoyW: yoy[i] * scale,
+    momW: mom[i] * scale,
+    yoyVal: yoy[i],
+    momVal: mom[i]
+  }))
+})
+// 案件类 - 折线图（2 lines）
+const caseCatLineData = computed(() => {
+  const cats = caseCatData.value.categories
+  const yoy = caseCatData.value.yoy
+  const mom = caseCatData.value.mom
+  const max = Math.max(...mom, ...yoy, 1) * 1.1
+  const xS = 50, xE = 650, yT = 20, yB = 200, scale = (yB - yT) / max
   const n = cats.length
   const slot = n > 1 ? (xE - xS) / (n - 1) : (xE - xS) / 2
   const yoyPoints = yoy.map((v, i) => ({
@@ -1996,6 +2447,26 @@ const exportReport = () => {
 }
 .charts-row-2 {
   grid-template-columns: 1fr 1fr;
+}
+.charts-row-single {
+  grid-template-columns: 1fr;
+}
+.chart-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-bottom: 1px solid #f3f4f6;
+  flex-wrap: wrap;
+}
+.filter-label {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.case-cat-filter .form-select {
+  width: 140px;
 }
 .pie-legend-grid {
   display: grid;
