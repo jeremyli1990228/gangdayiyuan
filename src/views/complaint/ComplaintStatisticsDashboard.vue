@@ -26,6 +26,7 @@
 
     <!-- 筛选区 -->
     <div class="filter-bar">
+      <span class="filter-scope-label">KPI卡片 & 数据明细</span>
       <div class="quick-btns">
         <button :class="['quick-btn', activeTime === 'today' ? 'active' : '']" @click="activeTime = 'today'">今日</button>
         <button :class="['quick-btn', activeTime === 'week' ? 'active' : '']" @click="activeTime = 'week'">本周</button>
@@ -140,6 +141,47 @@
       </div>
     </div>
 
+    <!-- 详细数据明细（受全局筛选控制） -->
+    <div class="data-card">
+      <div class="card-header">
+        <h3 class="card-title">详细数据明细</h3>
+      </div>
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>序号</th>
+              <th>月份</th>
+              <th>投诉量</th>
+              <th>已处理</th>
+              <th>待处理</th>
+              <th>表扬量</th>
+              <th>投诉/表扬率</th>
+              <th>赔付金额(元)</th>
+              <th>门急诊</th>
+              <th>住院</th>
+              <th>主要投诉原因</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(row,idx) in detailTable" :key="idx">
+              <td>{{ idx+1 }}</td>
+              <td>{{ row.month }}</td>
+              <td class="text-warn">{{ row.complaints }}</td>
+              <td class="text-success">{{ row.resolved }}</td>
+              <td class="text-orange">{{ row.pending }}</td>
+              <td class="text-green">{{ row.praise }}</td>
+              <td>{{ row.ratio }}</td>
+              <td class="text-red">¥{{ row.compensation }}</td>
+              <td>{{ row.outpatient }}</td>
+              <td>{{ row.inpatient }}</td>
+              <td>{{ row.topReason }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- 第一行：投诉趋势 + 科室分布 + 投诉类型 -->
     <div class="charts-row">
       <!-- 折线图：月度投诉趋势 -->
@@ -155,6 +197,18 @@
             <button :class="['chart-type-tab', {active: trendChartType==='hbar'}]" @click="trendChartType='hbar'">条形</button>
             <button :class="['chart-type-tab', {active: trendChartType==='line'}]" @click="trendChartType='line'">折线</button>
           </div>
+        </div>
+        <div class="chart-filter">
+          <span class="filter-label">时间区间</span>
+          <input type="date" class="form-input" v-model="trendStartDate"/>
+          <span class="date-sep">至</span>
+          <input type="date" class="form-input" v-model="trendEndDate"/>
+          <button class="chart-export-btn" @click="exportTrendChart">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            导出
+          </button>
         </div>
         <!-- 饼图 -->
         <div class="chart-body pie-body" v-if="trendChartType==='pie'">
@@ -238,6 +292,18 @@
             <button :class="['chart-type-tab', {active: deptChartType==='line'}]" @click="deptChartType='line'">折线</button>
           </div>
         </div>
+        <div class="chart-filter">
+          <span class="filter-label">时间区间</span>
+          <input type="date" class="form-input" v-model="deptStartDate"/>
+          <span class="date-sep">至</span>
+          <input type="date" class="form-input" v-model="deptEndDate"/>
+          <button class="chart-export-btn" @click="exportDeptChart">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            导出
+          </button>
+        </div>
         <!-- 饼图 -->
         <div class="chart-body pie-body" v-if="deptChartType==='pie'">
           <svg class="pie-svg" viewBox="0 0 200 200">
@@ -309,6 +375,18 @@
             <button :class="['chart-type-tab', {active: typeChartType==='hbar'}]" @click="typeChartType='hbar'">条形</button>
             <button :class="['chart-type-tab', {active: typeChartType==='line'}]" @click="typeChartType='line'">折线</button>
           </div>
+        </div>
+        <div class="chart-filter">
+          <span class="filter-label">时间区间</span>
+          <input type="date" class="form-input" v-model="typeStartDate"/>
+          <span class="date-sep">至</span>
+          <input type="date" class="form-input" v-model="typeEndDate"/>
+          <button class="chart-export-btn" @click="exportTypeChart">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            导出
+          </button>
         </div>
         <!-- 饼图 -->
         <div class="chart-body pie-body" v-if="typeChartType==='pie'">
@@ -384,6 +462,18 @@
             <button :class="['chart-type-tab', {active: topDeptChartType==='hbar'}]" @click="topDeptChartType='hbar'">条形</button>
             <button :class="['chart-type-tab', {active: topDeptChartType==='line'}]" @click="topDeptChartType='line'">折线</button>
           </div>
+        </div>
+        <div class="chart-filter">
+          <span class="filter-label">时间区间</span>
+          <input type="date" class="form-input" v-model="topDeptStartDate"/>
+          <span class="date-sep">至</span>
+          <input type="date" class="form-input" v-model="topDeptEndDate"/>
+          <button class="chart-export-btn" @click="exportTopDeptChart">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            导出
+          </button>
         </div>
         <!-- 饼图 -->
         <div class="chart-body pie-body" v-if="topDeptChartType==='pie'">
@@ -469,6 +559,12 @@
             <span class="date-sep">至</span>
             <input type="date" class="form-input" v-model="yoyEndB"/>
           </template>
+          <button class="chart-export-btn" @click="exportYoyChart">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            导出
+          </button>
         </div>
         <!-- 饼图 -->
         <div class="chart-body pie-body" v-if="yoyChartType==='pie'">
@@ -571,6 +667,12 @@
             <span class="date-sep">至</span>
             <input type="date" class="form-input" v-model="rateEndB"/>
           </template>
+          <button class="chart-export-btn" @click="exportRateChart">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            导出
+          </button>
         </div>
         <!-- 饼图 -->
         <div class="chart-body pie-body" v-if="rateChartType==='pie'">
@@ -683,6 +785,12 @@
             <option value="">全部原因</option>
             <option v-for="(r,i) in (linkReasonMap[selectedLink] || [])" :key="i" :value="r">{{ r }}</option>
           </select>
+          <button class="chart-export-btn" @click="exportCaseCatChart">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            导出
+          </button>
         </div>
         <!-- 饼图 -->
         <div class="chart-body pie-body" v-if="caseCatChartType==='pie'">
@@ -771,6 +879,18 @@
             <button :class="['chart-type-tab', {active: reasonChartType==='line'}]" @click="reasonChartType='line'">折线</button>
           </div>
         </div>
+        <div class="chart-filter">
+          <span class="filter-label">时间区间</span>
+          <input type="date" class="form-input" v-model="reasonStartDate"/>
+          <span class="date-sep">至</span>
+          <input type="date" class="form-input" v-model="reasonEndDate"/>
+          <button class="chart-export-btn" @click="exportReasonChart">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            导出
+          </button>
+        </div>
         <!-- 饼图 -->
         <div class="chart-body pie-body" v-if="reasonChartType==='pie'">
           <svg class="pie-svg" viewBox="0 0 200 200">
@@ -843,6 +963,18 @@
             <button :class="['chart-type-tab', {active: visitChartType==='hbar'}]" @click="visitChartType='hbar'">条形</button>
             <button :class="['chart-type-tab', {active: visitChartType==='line'}]" @click="visitChartType='line'">折线</button>
           </div>
+        </div>
+        <div class="chart-filter">
+          <span class="filter-label">时间区间</span>
+          <input type="date" class="form-input" v-model="visitStartDate"/>
+          <span class="date-sep">至</span>
+          <input type="date" class="form-input" v-model="visitEndDate"/>
+          <button class="chart-export-btn" @click="exportVisitChart">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            导出
+          </button>
         </div>
         <!-- 饼图 -->
         <div class="chart-body pie-body" v-if="visitChartType==='pie'">
@@ -941,6 +1073,18 @@
             <button :class="['chart-type-tab', {active: ageChartType==='line'}]" @click="ageChartType='line'">折线</button>
           </div>
         </div>
+        <div class="chart-filter">
+          <span class="filter-label">时间区间</span>
+          <input type="date" class="form-input" v-model="ageStartDate"/>
+          <span class="date-sep">至</span>
+          <input type="date" class="form-input" v-model="ageEndDate"/>
+          <button class="chart-export-btn" @click="exportAgeChart">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            导出
+          </button>
+        </div>
         <!-- 饼图 -->
         <div class="chart-body pie-body" v-if="ageChartType==='pie'">
           <svg class="pie-svg" viewBox="0 0 200 200">
@@ -1016,6 +1160,18 @@
             <button :class="['chart-type-tab', {active: compChartType==='hbar'}]" @click="compChartType='hbar'">条形</button>
             <button :class="['chart-type-tab', {active: compChartType==='line'}]" @click="compChartType='line'">折线</button>
           </div>
+        </div>
+        <div class="chart-filter">
+          <span class="filter-label">时间区间</span>
+          <input type="date" class="form-input" v-model="compStartDate"/>
+          <span class="date-sep">至</span>
+          <input type="date" class="form-input" v-model="compEndDate"/>
+          <button class="chart-export-btn" @click="exportCompChart">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            导出
+          </button>
         </div>
         <!-- 饼图 -->
         <div class="chart-body pie-body" v-if="compChartType==='pie'">
@@ -1096,6 +1252,18 @@
             <button :class="['chart-type-tab', {active: staffChartType==='line'}]" @click="staffChartType='line'">折线</button>
           </div>
         </div>
+        <div class="chart-filter">
+          <span class="filter-label">时间区间</span>
+          <input type="date" class="form-input" v-model="staffStartDate"/>
+          <span class="date-sep">至</span>
+          <input type="date" class="form-input" v-model="staffEndDate"/>
+          <button class="chart-export-btn" @click="exportStaffChart">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            导出
+          </button>
+        </div>
         <!-- 饼图 -->
         <div class="chart-body pie-body" v-if="staffChartType==='pie'">
           <svg class="pie-svg" viewBox="0 0 200 200">
@@ -1167,6 +1335,18 @@
             <button :class="['chart-type-tab', {active: ratioChartType==='hbar'}]" @click="ratioChartType='hbar'">条形</button>
             <button :class="['chart-type-tab', {active: ratioChartType==='line'}]" @click="ratioChartType='line'">折线</button>
           </div>
+        </div>
+        <div class="chart-filter">
+          <span class="filter-label">时间区间</span>
+          <input type="date" class="form-input" v-model="ratioStartDate"/>
+          <span class="date-sep">至</span>
+          <input type="date" class="form-input" v-model="ratioEndDate"/>
+          <button class="chart-export-btn" @click="exportRatioChart">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            导出
+          </button>
         </div>
         <!-- 饼图 -->
         <div class="chart-body pie-body" v-if="ratioChartType==='pie'">
@@ -1249,44 +1429,170 @@
       </div>
     </div>
 
-    <!-- 明细表格 -->
-    <div class="data-card">
-      <div class="card-header">
-        <h3 class="card-title">详细数据明细</h3>
+    <!-- 新增行：涉及环节分布 + 反馈方式分布 -->
+    <div class="charts-row charts-row-2">
+      <!-- 涉及环节分布 -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title-group">
+            <span class="chart-title">涉及环节分布</span>
+            <span class="chart-sub">按涉及环节统计</span>
+          </div>
+          <div class="chart-type-tabs">
+            <button :class="['chart-type-tab', {active: linkDistChartType==='pie'}]" @click="linkDistChartType='pie'">饼图</button>
+            <button :class="['chart-type-tab', {active: linkDistChartType==='bar'}]" @click="linkDistChartType='bar'">柱状</button>
+            <button :class="['chart-type-tab', {active: linkDistChartType==='hbar'}]" @click="linkDistChartType='hbar'">条形</button>
+            <button :class="['chart-type-tab', {active: linkDistChartType==='line'}]" @click="linkDistChartType='line'">折线</button>
+          </div>
+        </div>
+        <div class="chart-filter">
+          <span class="filter-label">时间区间</span>
+          <input type="date" class="form-input" v-model="linkDistStartDate"/>
+          <span class="date-sep">至</span>
+          <input type="date" class="form-input" v-model="linkDistEndDate"/>
+          <button class="chart-export-btn" @click="exportLinkDistChart">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            导出
+          </button>
+        </div>
+        <!-- 饼图 -->
+        <div class="chart-body pie-body" v-if="linkDistChartType==='pie'">
+          <svg class="pie-svg" viewBox="0 0 200 200">
+            <g transform="translate(100,100)">
+              <circle r="48" fill="#fff" stroke="#eef0f4" stroke-width="1"/>
+            </g>
+            <g transform="translate(100,100)" v-for="(s,i) in linkDistPieSlices" :key="'ldps'+i">
+              <path :d="s.path" :fill="s.color" stroke="#fff" stroke-width="2"/>
+            </g>
+          </svg>
+          <div class="pie-legend">
+            <div class="leg-row" v-for="(d,i) in linkDistribution" :key="'ldl'+i">
+              <span class="leg-dot" :style="{background: linkDistColors[i]}"></span>
+              <span class="leg-name">{{ d.name }}</span>
+              <span class="leg-val">{{ d.count }}</span>
+              <span class="leg-pct">{{ d.percent }}%</span>
+            </div>
+          </div>
+        </div>
+        <!-- 柱状 -->
+        <div class="chart-body" v-else-if="linkDistChartType==='bar'">
+          <svg class="bar-svg" viewBox="0 0 460 220" preserveAspectRatio="none">
+            <line v-for="i in 4" :key="'ldbgl'+i" x1="50" x2="450" :y1="20+i*40" :y2="20+i*40" stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
+            <text v-for="(v,i) in linkDistVBarData.yLabels" :key="'ldbyl'+i" x="45" :y="25+i*40" text-anchor="end" class="axis-label">{{ v }}</text>
+            <g v-for="(b,i) in linkDistVBarData.bars" :key="'ldbg'+i">
+              <rect :x="b.x" :y="b.y" :width="b.w" :height="b.h" rx="3" :fill="b.color"/>
+              <text :x="b.x+b.w/2" :y="b.y-3" text-anchor="middle" class="axis-label" font-size="10" font-weight="600" fill="#1f2937">{{ b.value }}</text>
+            </g>
+            <text v-for="(b,i) in linkDistVBarData.bars" :key="'ldlbl'+i" :x="b.x+b.w/2" y="215" text-anchor="middle" class="axis-label" font-size="9">{{ b.label }}</text>
+          </svg>
+        </div>
+        <!-- 条形 -->
+        <div class="chart-body" v-else-if="linkDistChartType==='hbar'">
+          <svg class="bar-svg" viewBox="0 0 460 220" preserveAspectRatio="none">
+            <line v-for="i in 4" :key="'ldhgl'+i" :x1="80" x2="450" :y1="20+i*40" :y2="20+i*40" stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
+            <g v-for="(b,i) in linkDistHBarData.bars" :key="'ldhb'+i" :transform="'translate(0,'+b.y+')'">
+              <text x="75" y="9" text-anchor="end" class="axis-label" font-size="10">{{ b.label }}</text>
+              <rect x="80" y="0" :width="b.w" :height="b.h" rx="3" :fill="b.color"/>
+              <text :x="80+b.w+4" y="9" class="axis-label" font-size="9" font-weight="600" fill="#1f2937">{{ b.value }}</text>
+            </g>
+          </svg>
+        </div>
+        <!-- 折线 -->
+        <div class="chart-body" v-else>
+          <svg class="bar-svg" viewBox="0 0 460 220" preserveAspectRatio="none">
+            <line v-for="i in 4" :key="'ldlgl'+i" x1="50" x2="450" :y1="20+i*40" :y2="20+i*40" stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
+            <text v-for="(v,i) in linkDistLineData.yLabels" :key="'ldlyl'+i" x="45" :y="25+i*40" text-anchor="end" class="axis-label">{{ v }}</text>
+            <path :d="linkDistLineData.linePath" fill="none" stroke="#1890ff" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+            <g v-for="(p,i) in linkDistLineData.points" :key="'ldlp'+i">
+              <circle :cx="p.x" :cy="p.y" r="3.5" fill="#fff" stroke="#1890ff" stroke-width="2"/>
+            </g>
+            <text v-for="(p,i) in linkDistLineData.points" :key="'ldllbl'+i" :x="p.x" y="215" text-anchor="middle" class="axis-label" font-size="9">{{ p.label }}</text>
+          </svg>
+        </div>
       </div>
-      <div class="table-container">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>序号</th>
-              <th>月份</th>
-              <th>投诉量</th>
-              <th>已处理</th>
-              <th>待处理</th>
-              <th>表扬量</th>
-              <th>投诉/表扬率</th>
-              <th>赔付金额(元)</th>
-              <th>门急诊</th>
-              <th>住院</th>
-              <th>主要投诉原因</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(row,idx) in detailTable" :key="idx">
-              <td>{{ idx+1 }}</td>
-              <td>{{ row.month }}</td>
-              <td class="text-warn">{{ row.complaints }}</td>
-              <td class="text-success">{{ row.resolved }}</td>
-              <td class="text-orange">{{ row.pending }}</td>
-              <td class="text-green">{{ row.praise }}</td>
-              <td>{{ row.ratio }}</td>
-              <td class="text-red">¥{{ row.compensation }}</td>
-              <td>{{ row.outpatient }}</td>
-              <td>{{ row.inpatient }}</td>
-              <td>{{ row.topReason }}</td>
-            </tr>
-          </tbody>
-        </table>
+
+      <!-- 反馈方式分布 -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <div class="chart-title-group">
+            <span class="chart-title">反馈方式分布</span>
+            <span class="chart-sub">按反馈渠道统计</span>
+          </div>
+          <div class="chart-type-tabs">
+            <button :class="['chart-type-tab', {active: feedbackMethodChartType==='pie'}]" @click="feedbackMethodChartType='pie'">饼图</button>
+            <button :class="['chart-type-tab', {active: feedbackMethodChartType==='bar'}]" @click="feedbackMethodChartType='bar'">柱状</button>
+            <button :class="['chart-type-tab', {active: feedbackMethodChartType==='hbar'}]" @click="feedbackMethodChartType='hbar'">条形</button>
+            <button :class="['chart-type-tab', {active: feedbackMethodChartType==='line'}]" @click="feedbackMethodChartType='line'">折线</button>
+          </div>
+        </div>
+        <div class="chart-filter">
+          <span class="filter-label">时间区间</span>
+          <input type="date" class="form-input" v-model="feedbackMethodStartDate"/>
+          <span class="date-sep">至</span>
+          <input type="date" class="form-input" v-model="feedbackMethodEndDate"/>
+          <button class="chart-export-btn" @click="exportFeedbackMethodChart">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            导出
+          </button>
+        </div>
+        <!-- 饼图 -->
+        <div class="chart-body pie-body" v-if="feedbackMethodChartType==='pie'">
+          <svg class="pie-svg" viewBox="0 0 200 200">
+            <g transform="translate(100,100)">
+              <circle r="48" fill="#fff" stroke="#eef0f4" stroke-width="1"/>
+            </g>
+            <g transform="translate(100,100)" v-for="(s,i) in feedbackMethodPieSlices" :key="'fmps'+i">
+              <path :d="s.path" :fill="s.color" stroke="#fff" stroke-width="2"/>
+            </g>
+          </svg>
+          <div class="pie-legend">
+            <div class="leg-row" v-for="(d,i) in feedbackMethodDistribution" :key="'fml'+i">
+              <span class="leg-dot" :style="{background: feedbackMethodColors[i]}"></span>
+              <span class="leg-name">{{ d.name }}</span>
+              <span class="leg-val">{{ d.count }}</span>
+              <span class="leg-pct">{{ d.percent }}%</span>
+            </div>
+          </div>
+        </div>
+        <!-- 柱状 -->
+        <div class="chart-body" v-else-if="feedbackMethodChartType==='bar'">
+          <svg class="bar-svg" viewBox="0 0 460 220" preserveAspectRatio="none">
+            <line v-for="i in 4" :key="'fmbgl'+i" x1="50" x2="450" :y1="20+i*40" :y2="20+i*40" stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
+            <text v-for="(v,i) in feedbackMethodVBarData.yLabels" :key="'fmbyl'+i" x="45" :y="25+i*40" text-anchor="end" class="axis-label">{{ v }}</text>
+            <g v-for="(b,i) in feedbackMethodVBarData.bars" :key="'fmbg'+i">
+              <rect :x="b.x" :y="b.y" :width="b.w" :height="b.h" rx="3" :fill="b.color"/>
+              <text :x="b.x+b.w/2" :y="b.y-3" text-anchor="middle" class="axis-label" font-size="10" font-weight="600" fill="#1f2937">{{ b.value }}</text>
+            </g>
+            <text v-for="(b,i) in feedbackMethodVBarData.bars" :key="'fmlbl'+i" :x="b.x+b.w/2" y="215" text-anchor="middle" class="axis-label" font-size="9">{{ b.label }}</text>
+          </svg>
+        </div>
+        <!-- 条形 -->
+        <div class="chart-body" v-else-if="feedbackMethodChartType==='hbar'">
+          <svg class="bar-svg" viewBox="0 0 460 220" preserveAspectRatio="none">
+            <line v-for="i in 4" :key="'fmhgl'+i" :x1="80" x2="450" :y1="20+i*40" :y2="20+i*40" stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
+            <g v-for="(b,i) in feedbackMethodHBarData.bars" :key="'fmhb'+i" :transform="'translate(0,'+b.y+')'">
+              <text x="75" y="9" text-anchor="end" class="axis-label" font-size="10">{{ b.label }}</text>
+              <rect x="80" y="0" :width="b.w" :height="b.h" rx="3" :fill="b.color"/>
+              <text :x="80+b.w+4" y="9" class="axis-label" font-size="9" font-weight="600" fill="#1f2937">{{ b.value }}</text>
+            </g>
+          </svg>
+        </div>
+        <!-- 折线 -->
+        <div class="chart-body" v-else>
+          <svg class="bar-svg" viewBox="0 0 460 220" preserveAspectRatio="none">
+            <line v-for="i in 4" :key="'fmlgl'+i" x1="50" x2="450" :y1="20+i*40" :y2="20+i*40" stroke="#f0f2f5" stroke-width="1" stroke-dasharray="3,3"/>
+            <text v-for="(v,i) in feedbackMethodLineData.yLabels" :key="'fmlyl'+i" x="45" :y="25+i*40" text-anchor="end" class="axis-label">{{ v }}</text>
+            <path :d="feedbackMethodLineData.linePath" fill="none" stroke="#1890ff" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+            <g v-for="(p,i) in feedbackMethodLineData.points" :key="'fmlp'+i">
+              <circle :cx="p.x" :cy="p.y" r="3.5" fill="#fff" stroke="#1890ff" stroke-width="2"/>
+            </g>
+            <text v-for="(p,i) in feedbackMethodLineData.points" :key="'fmllbl'+i" :x="p.x" y="215" text-anchor="middle" class="axis-label" font-size="9">{{ p.label }}</text>
+          </svg>
+        </div>
       </div>
     </div>
   </div>
@@ -2280,6 +2586,120 @@ const exportReport = () => {
   link.download = `案件统计看板_${new Date().toISOString().slice(0,10)}.csv`
   link.click()
 }
+
+// === 各图表独立时间筛选变量 ===
+const trendStartDate = ref('2026-01-01')
+const trendEndDate = ref('2026-06-18')
+const deptStartDate = ref('2026-01-01')
+const deptEndDate = ref('2026-06-18')
+const typeStartDate = ref('2026-01-01')
+const typeEndDate = ref('2026-06-18')
+const topDeptStartDate = ref('2026-01-01')
+const topDeptEndDate = ref('2026-06-18')
+const reasonStartDate = ref('2026-01-01')
+const reasonEndDate = ref('2026-06-18')
+const visitStartDate = ref('2026-01-01')
+const visitEndDate = ref('2026-06-18')
+const ageStartDate = ref('2026-01-01')
+const ageEndDate = ref('2026-06-18')
+const compStartDate = ref('2026-01-01')
+const compEndDate = ref('2026-06-18')
+const staffStartDate = ref('2026-01-01')
+const staffEndDate = ref('2026-06-18')
+const ratioStartDate = ref('2026-01-01')
+const ratioEndDate = ref('2026-06-18')
+const linkDistStartDate = ref('2026-01-01')
+const linkDistEndDate = ref('2026-06-18')
+const feedbackMethodStartDate = ref('2026-01-01')
+const feedbackMethodEndDate = ref('2026-06-18')
+
+// === 涉及环节分布 ===
+const linkDistChartType = ref('pie')
+const linkDistColors = ['#ff4d4f', '#fa8c16', '#1890ff']
+const linkDistribution = ref([
+  { name: '医疗质量类', count: 625, percent: 50 },
+  { name: '医院管理类', count: 376, percent: 30 },
+  { name: '医患关系类', count: 247, percent: 20 }
+])
+const linkDistPieSlices = computed(() => {
+  const r = 78
+  const total = linkDistribution.value.reduce((s, d) => s + d.count, 0)
+  let start = -Math.PI / 2, slices = []
+  linkDistribution.value.forEach((d, i) => {
+    const angle = (d.count / total) * Math.PI * 2
+    const end = start + angle
+    const x1 = Math.cos(start) * r, y1 = Math.sin(start) * r
+    const x2 = Math.cos(end) * r, y2 = Math.sin(end) * r
+    const la = angle > Math.PI ? 1 : 0
+    slices.push({
+      path: `M 0 0 L ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 ${la} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z`,
+      color: linkDistColors[i]
+    })
+    start = end
+  })
+  return slices
+})
+const linkDistVBarData = computed(() => buildVBarData(linkDistribution.value, 'count', linkDistColors, { xS: 50, xE: 450, yT: 20, yB: 200 }, 'name'))
+const linkDistHBarData = computed(() => buildHBarData(linkDistribution.value, 'count', 'name', linkDistColors, { xS: 80, xE: 450, yT: 15, yB: 195 }))
+const linkDistLineData = computed(() => buildLineData(linkDistribution.value, 'count', 'name', { xS: 50, xE: 450, yT: 20, yB: 200 }))
+
+// === 反馈方式分布 ===
+const feedbackMethodChartType = ref('pie')
+const feedbackMethodColors = ['#1890ff', '#52c41a', '#fa8c16', '#ff4d4f', '#722ed1', '#13c2c2']
+const feedbackMethodDistribution = ref([
+  { name: '电话', count: 386, percent: 31 },
+  { name: '现场', count: 312, percent: 25 },
+  { name: '微信公众号', count: 248, percent: 20 },
+  { name: '邮件', count: 156, percent: 12 },
+  { name: '信访', count: 94, percent: 8 },
+  { name: '其他', count: 52, percent: 4 }
+])
+const feedbackMethodPieSlices = computed(() => {
+  const r = 78
+  const total = feedbackMethodDistribution.value.reduce((s, d) => s + d.count, 0)
+  let start = -Math.PI / 2, slices = []
+  feedbackMethodDistribution.value.forEach((d, i) => {
+    const angle = (d.count / total) * Math.PI * 2
+    const end = start + angle
+    const x1 = Math.cos(start) * r, y1 = Math.sin(start) * r
+    const x2 = Math.cos(end) * r, y2 = Math.sin(end) * r
+    const la = angle > Math.PI ? 1 : 0
+    slices.push({
+      path: `M 0 0 L ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 ${la} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z`,
+      color: feedbackMethodColors[i]
+    })
+    start = end
+  })
+  return slices
+})
+const feedbackMethodVBarData = computed(() => buildVBarData(feedbackMethodDistribution.value, 'count', feedbackMethodColors, { xS: 50, xE: 450, yT: 20, yB: 200 }, 'name'))
+const feedbackMethodHBarData = computed(() => buildHBarData(feedbackMethodDistribution.value, 'count', 'name', feedbackMethodColors, { xS: 80, xE: 450, yT: 15, yB: 195 }))
+const feedbackMethodLineData = computed(() => buildLineData(feedbackMethodDistribution.value, 'count', 'name', { xS: 50, xE: 450, yT: 20, yB: 200 }))
+
+// === 图表导出功能 ===
+function exportChartCSV(filename, headers, rows) {
+  const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n')
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' })
+  const link = document.createElement('a')
+  link.href = URL.createObjectURL(blob)
+  link.download = `${filename}_${new Date().toISOString().slice(0,10)}.csv`
+  link.click()
+}
+const exportTrendChart = () => exportChartCSV('投诉趋势', ['月份', '投诉量'], trendData.value.map(d => [d.month, d.value]))
+const exportDeptChart = () => exportChartCSV('科室投诉分布', ['科室', '投诉量', '占比(%)'], deptDistribution.value.map(d => [d.name, d.count, d.percent]))
+const exportTypeChart = () => exportChartCSV('投诉类型分布', ['类型', '投诉量', '占比(%)'], complaintTypeDistribution.value.map(d => [d.name, d.count, d.percent]))
+const exportTopDeptChart = () => exportChartCSV('科室TOP排名', ['科室', '投诉量'], topDeptRankData.value.map(d => [d.name, d.count]))
+const exportReasonChart = () => exportChartCSV('投诉原因分析', ['原因', '投诉量'], reasonDistribution.value.map(d => [d.name, d.count]))
+const exportVisitChart = () => exportChartCSV('门急诊住院投诉对比', ['就诊类型', '投诉量'], [['门急诊', visitTypeData.value.outpatient], ['住院', visitTypeData.value.inpatient]])
+const exportAgeChart = () => exportChartCSV('患者年龄分布', ['年龄段', '投诉量'], ageDistribution.value.map(d => [d.name, d.count]))
+const exportCompChart = () => exportChartCSV('赔付金额分布', ['金额区间', '案件数'], compensationDistribution.value.map(d => [d.name, d.count]))
+const exportStaffChart = () => exportChartCSV('涉及人员分布', ['人员角色', '投诉量', '占比(%)'], staffDistribution.value.map(d => [d.name, d.count, d.percent]))
+const exportRatioChart = () => exportChartCSV('投诉表扬率趋势', ['月份', '投诉率(%)', '表扬率(%)'], ratioData.value.map(d => [d.month, d.complaint, d.praise]))
+const exportYoyChart = () => exportChartCSV('案件量', ['类别', '同比', '环比'], yoyData.value.categories.map((c, i) => [c, yoyData.value.yoy[i], yoyData.value.mom[i]]))
+const exportRateChart = () => exportChartCSV('案件率', ['类别', '同比', '环比'], rateData.value.categories.map((c, i) => [c, rateData.value.yoy[i], rateData.value.mom[i]]))
+const exportCaseCatChart = () => exportChartCSV('案件类', ['类别', '同比', '环比'], caseCatData.value.categories.map((c, i) => [c, caseCatData.value.yoy[i], caseCatData.value.mom[i]]))
+const exportLinkDistChart = () => exportChartCSV('涉及环节分布', ['环节', '投诉量', '占比(%)'], linkDistribution.value.map(d => [d.name, d.count, d.percent]))
+const exportFeedbackMethodChart = () => exportChartCSV('反馈方式分布', ['反馈方式', '投诉量', '占比(%)'], feedbackMethodDistribution.value.map(d => [d.name, d.count, d.percent]))
 </script>
 
 <style scoped>
@@ -2642,5 +3062,39 @@ const exportReport = () => {
 @media (max-width: 768px) {
   .kpi-grid { grid-template-columns: repeat(2, 1fr); }
   .filter-bar { flex-direction: column; align-items: flex-start; }
+}
+
+.chart-export-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  background: #fff;
+  color: #6b7280;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-left: auto;
+}
+.chart-export-btn:hover {
+  color: #1890ff;
+  border-color: #1890ff;
+  background: #f0f9ff;
+}
+.chart-export-btn .btn-icon {
+  width: 12px;
+  height: 12px;
+}
+.filter-scope-label {
+  font-size: 11px;
+  color: #9ca3af;
+  background: #f3f4f6;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-weight: 500;
+  white-space: nowrap;
 }
 </style>
