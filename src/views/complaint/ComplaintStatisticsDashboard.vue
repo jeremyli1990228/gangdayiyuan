@@ -455,10 +455,20 @@
           </div>
         </div>
         <div class="chart-filter">
-          <span class="filter-label">时间区间</span>
+          <div class="mode-toggle">
+            <button :class="['mode-btn', {active: yoyMode==='yoy'}]" @click="yoyMode='yoy'">同比/环比</button>
+            <button :class="['mode-btn', {active: yoyMode==='custom'}]" @click="yoyMode='custom'">自定义对比</button>
+          </div>
+          <span class="filter-label">{{ yoyMode==='yoy' ? '时间区间' : '期间A' }}</span>
           <input type="date" class="form-input" v-model="yoyStartDate"/>
           <span class="date-sep">至</span>
           <input type="date" class="form-input" v-model="yoyEndDate"/>
+          <template v-if="yoyMode==='custom'">
+            <span class="filter-label">期间B</span>
+            <input type="date" class="form-input" v-model="yoyStartB"/>
+            <span class="date-sep">至</span>
+            <input type="date" class="form-input" v-model="yoyEndB"/>
+          </template>
         </div>
         <!-- 饼图 -->
         <div class="chart-body pie-body" v-if="yoyChartType==='pie'">
@@ -489,8 +499,8 @@
             </g>
           </svg>
           <div class="chart-legend">
-            <span class="leg-item"><span class="leg-dot-sm" style="background:#1890ff"></span>同比</span>
-            <span class="leg-item"><span class="leg-dot-sm" style="background:#fa8c16"></span>环比</span>
+            <span class="leg-item"><span class="leg-dot-sm" style="background:#1890ff"></span>{{ yoyLegendA }}</span>
+            <span class="leg-item"><span class="leg-dot-sm" style="background:#fa8c16"></span>{{ yoyLegendB }}</span>
           </div>
         </div>
         <!-- 条形 -->
@@ -504,8 +514,8 @@
             </g>
           </svg>
           <div class="chart-legend">
-            <span class="leg-item"><span class="leg-dot-sm" style="background:#1890ff"></span>同比</span>
-            <span class="leg-item"><span class="leg-dot-sm" style="background:#fa8c16"></span>环比</span>
+            <span class="leg-item"><span class="leg-dot-sm" style="background:#1890ff"></span>{{ yoyLegendA }}</span>
+            <span class="leg-item"><span class="leg-dot-sm" style="background:#fa8c16"></span>{{ yoyLegendB }}</span>
           </div>
         </div>
         <!-- 折线 -->
@@ -524,8 +534,8 @@
             <text v-for="(p,i) in yoyLineData.momPoints" :key="'yollbl'+i" :x="p.x" y="215" text-anchor="middle" class="axis-label" font-size="9">{{ p.label }}</text>
           </svg>
           <div class="chart-legend">
-            <span class="leg-item"><span class="leg-line blue"></span>同比</span>
-            <span class="leg-item"><span class="leg-line" style="background:#fa8c16"></span>环比</span>
+            <span class="leg-item"><span class="leg-line blue"></span>{{ yoyLegendA }}</span>
+            <span class="leg-item"><span class="leg-line" style="background:#fa8c16"></span>{{ yoyLegendB }}</span>
           </div>
         </div>
       </div>
@@ -547,10 +557,20 @@
           </div>
         </div>
         <div class="chart-filter">
-          <span class="filter-label">时间区间</span>
+          <div class="mode-toggle">
+            <button :class="['mode-btn', {active: rateMode==='yoy'}]" @click="rateMode='yoy'">同比/环比</button>
+            <button :class="['mode-btn', {active: rateMode==='custom'}]" @click="rateMode='custom'">自定义对比</button>
+          </div>
+          <span class="filter-label">{{ rateMode==='yoy' ? '时间区间' : '期间A' }}</span>
           <input type="date" class="form-input" v-model="rateStartDate"/>
           <span class="date-sep">至</span>
           <input type="date" class="form-input" v-model="rateEndDate"/>
+          <template v-if="rateMode==='custom'">
+            <span class="filter-label">期间B</span>
+            <input type="date" class="form-input" v-model="rateStartB"/>
+            <span class="date-sep">至</span>
+            <input type="date" class="form-input" v-model="rateEndB"/>
+          </template>
         </div>
         <!-- 饼图 -->
         <div class="chart-body pie-body" v-if="rateChartType==='pie'">
@@ -581,8 +601,8 @@
             </g>
           </svg>
           <div class="chart-legend">
-            <span class="leg-item"><span class="leg-dot-sm" style="background:#1890ff"></span>同比</span>
-            <span class="leg-item"><span class="leg-dot-sm" style="background:#fa8c16"></span>环比</span>
+            <span class="leg-item"><span class="leg-dot-sm" style="background:#1890ff"></span>{{ rateLegendA }}</span>
+            <span class="leg-item"><span class="leg-dot-sm" style="background:#fa8c16"></span>{{ rateLegendB }}</span>
           </div>
         </div>
         <!-- 条形 -->
@@ -596,8 +616,8 @@
             </g>
           </svg>
           <div class="chart-legend">
-            <span class="leg-item"><span class="leg-dot-sm" style="background:#1890ff"></span>同比</span>
-            <span class="leg-item"><span class="leg-dot-sm" style="background:#fa8c16"></span>环比</span>
+            <span class="leg-item"><span class="leg-dot-sm" style="background:#1890ff"></span>{{ rateLegendA }}</span>
+            <span class="leg-item"><span class="leg-dot-sm" style="background:#fa8c16"></span>{{ rateLegendB }}</span>
           </div>
         </div>
         <!-- 折线 -->
@@ -616,8 +636,8 @@
             <text v-for="(p,i) in rateLineData.momPoints" :key="'ratelbl'+i" :x="p.x" y="220" text-anchor="middle" class="axis-label" font-size="10">{{ p.label }}</text>
           </svg>
           <div class="chart-legend">
-            <span class="leg-item"><span class="leg-line blue"></span>同比</span>
-            <span class="leg-item"><span class="leg-line" style="background:#fa8c16"></span>环比</span>
+            <span class="leg-item"><span class="leg-line blue"></span>{{ rateLegendA }}</span>
+            <span class="leg-item"><span class="leg-line" style="background:#fa8c16"></span>{{ rateLegendB }}</span>
           </div>
         </div>
       </div>
@@ -639,10 +659,20 @@
           </div>
         </div>
         <div class="chart-filter case-cat-filter">
-          <span class="filter-label">时间区间</span>
+          <div class="mode-toggle">
+            <button :class="['mode-btn', {active: caseCatMode==='yoy'}]" @click="caseCatMode='yoy'">同比/环比</button>
+            <button :class="['mode-btn', {active: caseCatMode==='custom'}]" @click="caseCatMode='custom'">自定义对比</button>
+          </div>
+          <span class="filter-label">{{ caseCatMode==='yoy' ? '时间区间' : '期间A' }}</span>
           <input type="date" class="form-input" v-model="caseCatStartDate"/>
           <span class="date-sep">至</span>
           <input type="date" class="form-input" v-model="caseCatEndDate"/>
+          <template v-if="caseCatMode==='custom'">
+            <span class="filter-label">期间B</span>
+            <input type="date" class="form-input" v-model="caseCatStartB"/>
+            <span class="date-sep">至</span>
+            <input type="date" class="form-input" v-model="caseCatEndB"/>
+          </template>
           <span class="filter-label">涉及环节</span>
           <select class="form-select" v-model="selectedLink" @change="onLinkSelect">
             <option value="">全部环节</option>
@@ -683,8 +713,8 @@
             </g>
           </svg>
           <div class="chart-legend">
-            <span class="leg-item"><span class="leg-dot-sm" style="background:#1890ff"></span>同比</span>
-            <span class="leg-item"><span class="leg-dot-sm" style="background:#fa8c16"></span>环比</span>
+            <span class="leg-item"><span class="leg-dot-sm" style="background:#1890ff"></span>{{ caseCatLegendA }}</span>
+            <span class="leg-item"><span class="leg-dot-sm" style="background:#fa8c16"></span>{{ caseCatLegendB }}</span>
           </div>
         </div>
         <!-- 条形 -->
@@ -698,8 +728,8 @@
             </g>
           </svg>
           <div class="chart-legend">
-            <span class="leg-item"><span class="leg-dot-sm" style="background:#1890ff"></span>同比</span>
-            <span class="leg-item"><span class="leg-dot-sm" style="background:#fa8c16"></span>环比</span>
+            <span class="leg-item"><span class="leg-dot-sm" style="background:#1890ff"></span>{{ caseCatLegendA }}</span>
+            <span class="leg-item"><span class="leg-dot-sm" style="background:#fa8c16"></span>{{ caseCatLegendB }}</span>
           </div>
         </div>
         <!-- 折线 -->
@@ -718,8 +748,8 @@
             <text v-for="(p,i) in caseCatLineData.momPoints" :key="'cclbl'+i" :x="p.x" y="220" text-anchor="middle" class="axis-label" font-size="10">{{ p.label }}</text>
           </svg>
           <div class="chart-legend">
-            <span class="leg-item"><span class="leg-line blue"></span>同比</span>
-            <span class="leg-item"><span class="leg-line" style="background:#fa8c16"></span>环比</span>
+            <span class="leg-item"><span class="leg-line blue"></span>{{ caseCatLegendA }}</span>
+            <span class="leg-item"><span class="leg-line" style="background:#fa8c16"></span>{{ caseCatLegendB }}</span>
           </div>
         </div>
       </div>
@@ -1286,6 +1316,11 @@ const topDeptChartType = ref('bar')
 const yoyChartType = ref('line')
 const yoyStartDate = ref('2026-01-01')
 const yoyEndDate = ref('2026-06-18')
+const yoyMode = ref('yoy') // 'yoy' | 'custom'
+const yoyStartB = ref('2025-07-01')
+const yoyEndB = ref('2025-12-31')
+const yoyLegendA = computed(() => yoyMode.value === 'yoy' ? '同比' : '期间A')
+const yoyLegendB = computed(() => yoyMode.value === 'yoy' ? '环比' : '期间B')
 
 const refreshData = () => {}
 
@@ -1922,6 +1957,11 @@ const yoyLineData = computed(() => {
 const rateChartType = ref('bar')
 const rateStartDate = ref('2026-01-01')
 const rateEndDate = ref('2026-06-18')
+const rateMode = ref('yoy')
+const rateStartB = ref('2025-07-01')
+const rateEndB = ref('2025-12-31')
+const rateLegendA = computed(() => rateMode.value === 'yoy' ? '同比' : '期间A')
+const rateLegendB = computed(() => rateMode.value === 'yoy' ? '环比' : '期间B')
 const rateData = ref({
   categories: ['结案率', '投诉率', '表扬率'],
   yoy: [82.5, 76.4, 23.6],
@@ -2026,6 +2066,11 @@ const rateLineData = computed(() => {
 const caseCatChartType = ref('bar')
 const caseCatStartDate = ref('2026-01-01')
 const caseCatEndDate = ref('2026-06-18')
+const caseCatMode = ref('yoy')
+const caseCatStartB = ref('2025-07-01')
+const caseCatEndB = ref('2025-12-31')
+const caseCatLegendA = computed(() => caseCatMode.value === 'yoy' ? '同比' : '期间A')
+const caseCatLegendB = computed(() => caseCatMode.value === 'yoy' ? '环比' : '期间B')
 const selectedLink = ref('')
 const selectedReason = ref('')
 const linkReasonMap = ref({
@@ -2429,6 +2474,29 @@ const exportReport = () => {
   border-color: #1890ff;
 }
 .chart-type-tab.active {
+  background: #1890ff;
+  color: #fff;
+  border-color: #1890ff;
+}
+.mode-toggle {
+  display: inline-flex;
+  gap: 4px;
+}
+.mode-btn {
+  padding: 3px 10px;
+  font-size: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  background: #fff;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.mode-btn:hover {
+  color: #1890ff;
+  border-color: #1890ff;
+}
+.mode-btn.active {
   background: #1890ff;
   color: #fff;
   border-color: #1890ff;
