@@ -1257,6 +1257,11 @@
           <input type="date" class="form-input" v-model="staffStartDate"/>
           <span class="date-sep">至</span>
           <input type="date" class="form-input" v-model="staffEndDate"/>
+          <span class="filter-label">分类</span>
+          <select class="form-select" v-model="staffCategoryFilter">
+            <option value="投诉">投诉</option>
+            <option value="表扬">表扬</option>
+          </select>
           <button class="chart-export-btn" @click="exportStaffChart">
             <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1269,8 +1274,8 @@
           <svg class="pie-svg" viewBox="0 0 200 200">
             <g transform="translate(100,100)">
               <circle r="42" fill="#fff" stroke="#eef0f4" stroke-width="1"/>
-              <text y="-2" text-anchor="middle" class="pie-total-num">{{ kpiData.totalComplaints }}</text>
-              <text y="12" text-anchor="middle" class="pie-total-label">总投诉</text>
+              <text y="-2" text-anchor="middle" class="pie-total-num">{{ staffTotal }}</text>
+              <text y="12" text-anchor="middle" class="pie-total-label">总{{ staffCategoryFilter }}</text>
             </g>
             <g transform="translate(100,100)" v-for="(s,i) in staffPieSlices" :key="'ss'+i">
               <path :d="s.path" :fill="s.color" stroke="#fff" stroke-width="2"/>
@@ -1810,18 +1815,31 @@ const compensationBarData = computed(() => {
   }))
 })
 
-// 涉及人员分布
-const staffDistribution = ref([
-  { name: '医生', count: 486, percent: 39 },
-  { name: '护士', count: 312, percent: 25 },
-  { name: '药师', count: 156, percent: 12 },
-  { name: '技师', count: 124, percent: 10 },
-  { name: '行政', count: 94, percent: 8 },
-  { name: '其他', count: 76, percent: 6 }
-])
+// 涉及人员分布（按分类：投诉 / 表扬）
+const staffCategoryFilter = ref('投诉')
+const staffDataByCategory = {
+  投诉: [
+    { name: '医生', count: 486, percent: 39 },
+    { name: '护士', count: 312, percent: 25 },
+    { name: '药师', count: 156, percent: 12 },
+    { name: '技师', count: 124, percent: 10 },
+    { name: '行政', count: 94, percent: 8 },
+    { name: '其他', count: 76, percent: 6 }
+  ],
+  表扬: [
+    { name: '医生', count: 142, percent: 37 },
+    { name: '护士', count: 108, percent: 28 },
+    { name: '药师', count: 36, percent: 9 },
+    { name: '技师', count: 28, percent: 7 },
+    { name: '行政', count: 42, percent: 11 },
+    { name: '其他', count: 30, percent: 8 }
+  ]
+}
+const staffDistribution = computed(() => staffDataByCategory[staffCategoryFilter.value] || [])
+const staffTotal = computed(() => staffDistribution.value.reduce((s, d) => s + d.count, 0))
 
 const staffPieSlices = computed(() => {
-  const r = 72, total = kpiData.value.totalComplaints
+  const r = 72, total = staffTotal.value
   let start = -Math.PI / 2, slices = []
   staffDistribution.value.forEach((d,i) => {
     const angle = (d.count / total) * Math.PI * 2
@@ -2693,7 +2711,7 @@ const exportReasonChart = () => exportChartCSV('投诉原因分析', ['原因', 
 const exportVisitChart = () => exportChartCSV('门急诊住院投诉对比', ['就诊类型', '投诉量'], [['门急诊', visitTypeData.value.outpatient], ['住院', visitTypeData.value.inpatient]])
 const exportAgeChart = () => exportChartCSV('患者年龄分布', ['年龄段', '投诉量'], ageDistribution.value.map(d => [d.name, d.count]))
 const exportCompChart = () => exportChartCSV('赔付金额分布', ['金额区间', '案件数'], compensationDistribution.value.map(d => [d.name, d.count]))
-const exportStaffChart = () => exportChartCSV('涉及人员分布', ['人员角色', '投诉量', '占比(%)'], staffDistribution.value.map(d => [d.name, d.count, d.percent]))
+const exportStaffChart = () => exportChartCSV(`涉及人员分布_${staffCategoryFilter.value}`, ['人员角色', `${staffCategoryFilter.value}量`, '占比(%)'], staffDistribution.value.map(d => [d.name, d.count, d.percent]))
 const exportRatioChart = () => exportChartCSV('投诉表扬率趋势', ['月份', '投诉率(%)', '表扬率(%)'], ratioData.value.map(d => [d.month, d.complaint, d.praise]))
 const exportYoyChart = () => exportChartCSV('案件量', ['类别', '同比', '环比'], yoyData.value.categories.map((c, i) => [c, yoyData.value.yoy[i], yoyData.value.mom[i]]))
 const exportRateChart = () => exportChartCSV('案件率', ['类别', '同比', '环比'], rateData.value.categories.map((c, i) => [c, rateData.value.yoy[i], rateData.value.mom[i]]))
