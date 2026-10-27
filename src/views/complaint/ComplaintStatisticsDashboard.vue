@@ -1252,7 +1252,7 @@
             <button :class="['chart-type-tab', {active: staffChartType==='line'}]" @click="staffChartType='line'">折线</button>
           </div>
         </div>
-        <div class="chart-filter">
+        <div class="chart-filter staff-filter">
           <span class="filter-label">时间区间</span>
           <input type="date" class="form-input" v-model="staffStartDate"/>
           <span class="date-sep">至</span>
@@ -2961,6 +2961,28 @@ const exportFeedbackMethodChart = () => exportChartCSV('反馈方式分布', ['�
 }
 .case-cat-filter .form-select {
   width: 140px;
+}
+/* 涉及人员分布：时间区间与分类同一行展示 */
+.staff-filter {
+  gap: 6px;
+  padding: 10px 12px;
+}
+.staff-filter .form-input {
+  width: 104px;
+  height: 30px;
+  padding: 0 6px;
+  font-size: 12px;
+}
+.staff-filter .form-select {
+  width: 72px;
+  height: 30px;
+  padding: 0 6px;
+  font-size: 12px;
+}
+.staff-filter .chart-export-btn {
+  height: 28px;
+  padding: 0 8px;
+  margin-left: auto;
 }
 .pie-legend-grid {
   display: grid;
