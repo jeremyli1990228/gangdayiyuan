@@ -454,7 +454,7 @@
         <div class="chart-header">
           <div class="chart-title-group">
             <span class="chart-title">科室TOP排名</span>
-            <span class="chart-sub">科室投诉量TOP</span>
+            <span class="chart-sub">科室{{ topDeptCategoryFilter }}量TOP</span>
           </div>
           <div class="chart-type-tabs">
             <button :class="['chart-type-tab', {active: topDeptChartType==='pie'}]" @click="topDeptChartType='pie'">饼图</button>
@@ -468,6 +468,11 @@
           <input type="date" class="form-input" v-model="topDeptStartDate"/>
           <span class="date-sep">至</span>
           <input type="date" class="form-input" v-model="topDeptEndDate"/>
+          <span class="filter-label">分类</span>
+          <select class="form-select" v-model="topDeptCategoryFilter">
+            <option value="投诉">投诉</option>
+            <option value="表扬">表扬</option>
+          </select>
           <button class="chart-export-btn" @click="exportTopDeptChart">
             <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -2146,16 +2151,30 @@ const ratioHBarData = computed(() => {
 })
 
 // === 新增：科室TOP排名 + 同比/环比对比 ===
-const topDeptRankData = ref([
-  { name: '门诊', count: 312 },
-  { name: '急诊', count: 248 },
-  { name: '内科', count: 187 },
-  { name: '外科', count: 156 },
-  { name: '儿科', count: 125 },
-  { name: '妇产科', count: 87 },
-  { name: '骨科', count: 75 },
-  { name: '眼科', count: 42 }
-])
+const topDeptCategoryFilter = ref('投诉')
+const topDeptDataByCategory = {
+  投诉: [
+    { name: '门诊', count: 312 },
+    { name: '急诊', count: 248 },
+    { name: '内科', count: 187 },
+    { name: '外科', count: 156 },
+    { name: '儿科', count: 125 },
+    { name: '妇产科', count: 87 },
+    { name: '骨科', count: 75 },
+    { name: '眼科', count: 42 }
+  ],
+  表扬: [
+    { name: '门诊', count: 128 },
+    { name: '急诊', count: 62 },
+    { name: '内科', count: 54 },
+    { name: '外科', count: 38 },
+    { name: '儿科', count: 46 },
+    { name: '妇产科', count: 28 },
+    { name: '骨科', count: 18 },
+    { name: '眼科', count: 12 }
+  ]
+}
+const topDeptRankData = computed(() => topDeptDataByCategory[topDeptCategoryFilter.value] || [])
 const topDeptPieSlices = computed(() => {
   const r = 78
   const total = topDeptRankData.value.reduce((s, d) => s + d.count, 0)
@@ -2706,7 +2725,7 @@ function exportChartCSV(filename, headers, rows) {
 const exportTrendChart = () => exportChartCSV('投诉趋势', ['月份', '投诉量'], trendData.value.map(d => [d.month, d.value]))
 const exportDeptChart = () => exportChartCSV('科室投诉分布', ['科室', '投诉量', '占比(%)'], deptDistribution.value.map(d => [d.name, d.count, d.percent]))
 const exportTypeChart = () => exportChartCSV('投诉类型分布', ['类型', '投诉量', '占比(%)'], complaintTypeDistribution.value.map(d => [d.name, d.count, d.percent]))
-const exportTopDeptChart = () => exportChartCSV('科室TOP排名', ['科室', '投诉量'], topDeptRankData.value.map(d => [d.name, d.count]))
+const exportTopDeptChart = () => exportChartCSV(`科室TOP排名_${topDeptCategoryFilter.value}`, ['科室', `${topDeptCategoryFilter.value}量`], topDeptRankData.value.map(d => [d.name, d.count]))
 const exportReasonChart = () => exportChartCSV('投诉原因分析', ['原因', '投诉量'], reasonDistribution.value.map(d => [d.name, d.count]))
 const exportVisitChart = () => exportChartCSV('门急诊住院投诉对比', ['就诊类型', '投诉量'], [['门急诊', visitTypeData.value.outpatient], ['住院', visitTypeData.value.inpatient]])
 const exportAgeChart = () => exportChartCSV('患者年龄分布', ['年龄段', '投诉量'], ageDistribution.value.map(d => [d.name, d.count]))
