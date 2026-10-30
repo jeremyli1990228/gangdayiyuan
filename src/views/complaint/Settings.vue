@@ -121,6 +121,78 @@
             </div>
           </div>
         </div>
+        <transition name="collapse">
+          <div class="settings-row recipient-row" v-if="settings.emailNotify">
+            <div class="settings-item">
+              <label class="settings-label">收件人</label>
+              <div class="settings-input-group">
+                <div class="recipient-picker" ref="pickerRef">
+                  <div class="recipient-trigger" @click.stop="togglePicker">
+                    <template v-if="recipients.length">
+                      <span class="recipient-tag" v-for="r in recipients" :key="r.email">
+                        {{ r.name }}
+                        <span class="tag-close" @click.stop="removeRecipient(r.email)">×</span>
+                      </span>
+                    </template>
+                    <span class="recipient-placeholder" v-else>请选择收件人</span>
+                    <svg class="picker-arrow" :class="{ open: pickerOpen }" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <polyline points="6 9 12 15 18 9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
+                  <div class="picker-panel" v-if="pickerOpen">
+                    <div class="picker-search">
+                      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="11" cy="11" r="7" stroke-width="2"/>
+                        <path d="M21 21L16.65 16.65" stroke-width="2" stroke-linecap="round"/>
+                      </svg>
+                      <input type="text" class="picker-search-input" v-model="pickerKeyword" placeholder="请输入内容"/>
+                    </div>
+                    <div class="picker-body">
+                      <template v-if="pickerKeyword.trim()">
+                        <div class="picker-result-list">
+                          <div class="picker-result-item" v-for="m in searchMembers" :key="m.email" @click="toggleRecipient(m)">
+                            <div class="result-info">
+                              <div class="result-name">{{ m.name }}</div>
+                              <div class="result-mail">{{ m.email }}</div>
+                            </div>
+                            <span class="picker-check" v-if="isSelected(m.email)">✓</span>
+                          </div>
+                          <div class="picker-empty" v-if="searchMembers.length === 0">无匹配人员</div>
+                        </div>
+                      </template>
+                      <template v-else>
+                        <div class="picker-col">
+                          <div class="picker-col-item" v-for="d in recipientTree" :key="d.name"
+                            :class="{ active: d.name === activeRootName }"
+                            @click="selectRoot(d.name)">
+                            <span>{{ d.name }}</span>
+                            <span class="col-arrow">›</span>
+                          </div>
+                        </div>
+                        <div class="picker-col" v-if="activeRoot">
+                          <div class="picker-col-item" v-for="s in activeRoot.children" :key="s.name"
+                            :class="{ active: s.name === activeSubName }"
+                            @click="activeSubName = s.name">
+                            <span>{{ s.name }}</span>
+                            <span class="col-arrow">›</span>
+                          </div>
+                        </div>
+                        <div class="picker-col picker-col-members" v-if="activeSub">
+                          <div class="picker-member" v-for="m in activeSub.members" :key="m.email" @click="toggleRecipient(m)">
+                            <span class="member-name">{{ m.name }}</span>
+                            <span class="picker-check" v-if="isSelected(m.email)">✓</span>
+                          </div>
+                          <div class="picker-empty" v-if="activeSub.members.length === 0">该部门暂无人员</div>
+                        </div>
+                      </template>
+                    </div>
+                  </div>
+                </div>
+                <span class="input-tip">开启邮件通知后，新反馈将发送至所选收件人邮箱</span>
+              </div>
+            </div>
+          </div>
+        </transition>
         <div class="settings-row">
           <div class="settings-item">
             <label class="settings-label">公众号通知</label>
@@ -223,7 +295,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useHandleResultTemplates } from '../../composables/useHandleResultTemplates'
 
 const settings = ref({
@@ -236,6 +308,120 @@ const settings = ref({
   smsNotify: true,
   emailNotify: true,
   wechatNotify: true
+})
+
+// 邮件通知 - 收件人选择
+const recipientTree = [
+  {
+    name: '服务测试',
+    children: [
+      { name: '医疗改善部', members: [
+        { name: '王小明', email: 'wangxiaoming@hku-szh.org' },
+        { name: '付世平', email: 'fushingping@hku-szh.org' }
+      ] },
+      { name: '门诊', members: [
+        { name: '李静', email: 'lijing@hku-szh.org' },
+        { name: '陈慧', email: 'chenhui@hku-szh.org' }
+      ] },
+      { name: '医疗关系部', members: [
+        { name: '张伟', email: 'zhangwei@hku-szh.org' },
+        { name: '刘敏', email: 'liumin@hku-szh.org' }
+      ] },
+      { name: '测试心血管内科', members: [
+        { name: '赵磊', email: 'zhaolei@hku-szh.org' }
+      ] },
+      { name: '机构事务部', members: [
+        { name: '周倩', email: 'zhouqian@hku-szh.org' }
+      ] }
+    ]
+  },
+  {
+    name: '医务管理部',
+    children: [
+      { name: '医务科', members: [
+        { name: '孙强', email: 'sunqiang@hku-szh.org' },
+        { name: '吴倩', email: 'wuqian@hku-szh.org' }
+      ] },
+      { name: '质控科', members: [
+        { name: '郑楠', email: 'zhengnan@hku-szh.org' }
+      ] }
+    ]
+  },
+  {
+    name: '护理部',
+    children: [
+      { name: '护理管理组', members: [
+        { name: '林芳', email: 'linfang@hku-szh.org' },
+        { name: '何敏', email: 'hemin@hku-szh.org' }
+      ] }
+    ]
+  }
+]
+
+const recipients = ref([])
+const pickerOpen = ref(false)
+const pickerKeyword = ref('')
+const activeRootName = ref(recipientTree[0].name)
+const activeSubName = ref(recipientTree[0].children[0].name)
+
+const activeRoot = computed(() => recipientTree.find(d => d.name === activeRootName.value) || null)
+const activeSub = computed(() => activeRoot.value?.children.find(s => s.name === activeSubName.value) || null)
+const allMembers = computed(() =>
+  recipientTree.flatMap(d => d.children.flatMap(s => s.members.map(m => ({ ...m, dept: s.name }))))
+)
+const searchMembers = computed(() => {
+  const k = pickerKeyword.value.trim().toLowerCase()
+  if (!k) return []
+  return allMembers.value.filter(m =>
+    m.name.toLowerCase().includes(k) ||
+    m.email.toLowerCase().includes(k) ||
+    m.dept.toLowerCase().includes(k)
+  )
+})
+
+const togglePicker = () => {
+  if (!pickerOpen.value) pickerKeyword.value = ''
+  pickerOpen.value = !pickerOpen.value
+}
+
+const selectRoot = (name) => {
+  activeRootName.value = name
+  const root = recipientTree.find(d => d.name === name)
+  activeSubName.value = root?.children[0]?.name || ''
+}
+
+const isSelected = (email) => recipients.value.some(r => r.email === email)
+
+const toggleRecipient = (member) => {
+  const idx = recipients.value.findIndex(r => r.email === member.email)
+  if (idx > -1) {
+    recipients.value.splice(idx, 1)
+  } else {
+    recipients.value.push({ name: member.name, email: member.email, dept: member.dept })
+  }
+}
+
+const removeRecipient = (email) => {
+  const idx = recipients.value.findIndex(r => r.email === email)
+  if (idx > -1) recipients.value.splice(idx, 1)
+}
+
+// 点击选择器外部或按 Esc 关闭弹窗
+const pickerRef = ref(null)
+const handleOutsideClick = (e) => {
+  if (!pickerOpen.value) return
+  if (pickerRef.value && !pickerRef.value.contains(e.target)) pickerOpen.value = false
+}
+const handleEsc = (e) => {
+  if (e.key === 'Escape') pickerOpen.value = false
+}
+onMounted(() => {
+  document.addEventListener('mousedown', handleOutsideClick)
+  document.addEventListener('keydown', handleEsc)
+})
+onBeforeUnmount(() => {
+  document.removeEventListener('mousedown', handleOutsideClick)
+  document.removeEventListener('keydown', handleEsc)
 })
 
 const saveSettings = () => {
@@ -705,5 +891,231 @@ const deleteHandleTemplate = (id) => {
 
 .modal-body .form-input {
   width: 100%;
+}
+
+/* 邮件通知 - 收件人 */
+.recipient-picker {
+  position: relative;
+  width: 420px;
+  max-width: 100%;
+}
+
+.recipient-trigger {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 32px;
+  padding: 4px 28px 4px 8px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.recipient-trigger:hover {
+  border-color: #1890ff;
+}
+
+.recipient-placeholder {
+  font-size: 14px;
+  color: #bfbfbf;
+}
+
+.recipient-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 22px;
+  padding: 0 6px;
+  background: #e6f7ff;
+  border: 1px solid #91d5ff;
+  border-radius: 3px;
+  font-size: 12px;
+  color: #1890ff;
+}
+
+.tag-close {
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.tag-close:hover {
+  color: #ff4d4f;
+}
+
+.picker-arrow {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  color: #bfbfbf;
+  transform: translateY(-50%);
+  transition: transform 0.2s;
+}
+
+.picker-arrow.open {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.picker-panel {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 560px;
+  max-width: 70vw;
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 4px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  z-index: 1001;
+  overflow: hidden;
+}
+
+.picker-search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.search-icon {
+  width: 14px;
+  height: 14px;
+  color: #bfbfbf;
+  flex-shrink: 0;
+}
+
+.picker-search-input {
+  flex: 1;
+  min-width: 0;
+  height: 26px;
+  border: none;
+  outline: none;
+  font-size: 13px;
+  color: #333;
+}
+
+.picker-body {
+  display: flex;
+  max-height: 280px;
+  overflow: hidden;
+}
+
+.picker-col {
+  flex: 1;
+  min-width: 0;
+  max-height: 280px;
+  overflow-y: auto;
+  padding: 4px 0;
+  border-right: 1px solid #f0f0f0;
+}
+
+.picker-col:last-child {
+  border-right: none;
+}
+
+.picker-col-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 12px;
+  font-size: 13px;
+  color: #333;
+  cursor: pointer;
+}
+
+.picker-col-item:hover {
+  background: #f5f9ff;
+}
+
+.picker-col-item.active {
+  background: #e6f7ff;
+  color: #1890ff;
+  font-weight: 500;
+}
+
+.col-arrow {
+  color: #bfbfbf;
+}
+
+.picker-member {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 12px;
+  font-size: 13px;
+  color: #333;
+  cursor: pointer;
+}
+
+.picker-member:hover {
+  background: #f5f9ff;
+}
+
+.picker-check {
+  color: #1890ff;
+  font-weight: 600;
+}
+
+.picker-result-list {
+  width: 100%;
+  max-height: 280px;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.picker-result-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.picker-result-item:hover {
+  background: #f5f9ff;
+}
+
+.result-name {
+  font-size: 13px;
+  color: #333;
+}
+
+.result-mail {
+  font-size: 12px;
+  color: #999;
+  margin-top: 2px;
+}
+
+.picker-empty {
+  text-align: center;
+  color: #bfbfbf;
+  font-size: 12px;
+  padding: 16px 0;
+}
+
+.collapse-enter-active,
+.collapse-leave-active {
+  transition: opacity 0.22s ease, max-height 0.22s ease, margin-bottom 0.22s ease;
+  overflow: hidden;
+}
+
+.collapse-enter-from,
+.collapse-leave-to {
+  opacity: 0;
+  max-height: 0;
+  margin-bottom: 0;
+}
+
+.collapse-enter-to,
+.collapse-leave-from {
+  opacity: 1;
+  max-height: 120px;
 }
 </style>
