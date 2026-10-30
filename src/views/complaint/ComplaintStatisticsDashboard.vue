@@ -454,7 +454,7 @@
         <div class="chart-header">
           <div class="chart-title-group">
             <span class="chart-title">科室TOP排名</span>
-            <span class="chart-sub">科室{{ topDeptCategoryFilter }}量TOP</span>
+            <span class="chart-sub">{{ topDeptCategoryFilter === '全部' ? '科室案件量TOP' : '科室' + topDeptCategoryFilter + '量TOP' }}</span>
           </div>
           <div class="chart-type-tabs">
             <button :class="['chart-type-tab', {active: topDeptChartType==='pie'}]" @click="topDeptChartType='pie'">饼图</button>
@@ -470,6 +470,7 @@
           <input type="date" class="form-input" v-model="topDeptEndDate"/>
           <span class="filter-label">分类</span>
           <select class="form-select" v-model="topDeptCategoryFilter">
+            <option value="全部">全部</option>
             <option value="投诉">投诉</option>
             <option value="表扬">表扬</option>
           </select>
@@ -1264,6 +1265,7 @@
           <input type="date" class="form-input" v-model="staffEndDate"/>
           <span class="filter-label">分类</span>
           <select class="form-select" v-model="staffCategoryFilter">
+            <option value="全部">全部</option>
             <option value="投诉">投诉</option>
             <option value="表扬">表扬</option>
           </select>
@@ -1280,7 +1282,7 @@
             <g transform="translate(100,100)">
               <circle r="42" fill="#fff" stroke="#eef0f4" stroke-width="1"/>
               <text y="-2" text-anchor="middle" class="pie-total-num">{{ staffTotal }}</text>
-              <text y="12" text-anchor="middle" class="pie-total-label">总{{ staffCategoryFilter }}</text>
+              <text y="12" text-anchor="middle" class="pie-total-label">{{ staffTotalLabel }}</text>
             </g>
             <g transform="translate(100,100)" v-for="(s,i) in staffPieSlices" :key="'ss'+i">
               <path :d="s.path" :fill="s.color" stroke="#fff" stroke-width="2"/>
@@ -1820,9 +1822,17 @@ const compensationBarData = computed(() => {
   }))
 })
 
-// 涉及人员分布（按分类：投诉 / 表扬）
-const staffCategoryFilter = ref('投诉')
+// 涉及人员分布（按分类：全部 / 投诉 / 表扬）
+const staffCategoryFilter = ref('全部')
 const staffDataByCategory = {
+  全部: [
+    { name: '医生', count: 628, percent: 38 },
+    { name: '护士', count: 420, percent: 26 },
+    { name: '药师', count: 192, percent: 12 },
+    { name: '技师', count: 152, percent: 9 },
+    { name: '行政', count: 136, percent: 8 },
+    { name: '其他', count: 106, percent: 7 }
+  ],
   投诉: [
     { name: '医生', count: 486, percent: 39 },
     { name: '护士', count: 312, percent: 25 },
@@ -1842,6 +1852,7 @@ const staffDataByCategory = {
 }
 const staffDistribution = computed(() => staffDataByCategory[staffCategoryFilter.value] || [])
 const staffTotal = computed(() => staffDistribution.value.reduce((s, d) => s + d.count, 0))
+const staffTotalLabel = computed(() => staffCategoryFilter.value === '全部' ? '总量' : `总${staffCategoryFilter.value}`)
 
 const staffPieSlices = computed(() => {
   const r = 72, total = staffTotal.value
@@ -2151,8 +2162,18 @@ const ratioHBarData = computed(() => {
 })
 
 // === 新增：科室TOP排名 + 同比/环比对比 ===
-const topDeptCategoryFilter = ref('投诉')
+const topDeptCategoryFilter = ref('全部')
 const topDeptDataByCategory = {
+  全部: [
+    { name: '门诊', count: 440 },
+    { name: '急诊', count: 310 },
+    { name: '内科', count: 241 },
+    { name: '外科', count: 194 },
+    { name: '儿科', count: 171 },
+    { name: '妇产科', count: 115 },
+    { name: '骨科', count: 93 },
+    { name: '眼科', count: 54 }
+  ],
   投诉: [
     { name: '门诊', count: 312 },
     { name: '急诊', count: 248 },
@@ -2725,12 +2746,12 @@ function exportChartCSV(filename, headers, rows) {
 const exportTrendChart = () => exportChartCSV('投诉趋势', ['月份', '投诉量'], trendData.value.map(d => [d.month, d.value]))
 const exportDeptChart = () => exportChartCSV('科室投诉分布', ['科室', '投诉量', '占比(%)'], deptDistribution.value.map(d => [d.name, d.count, d.percent]))
 const exportTypeChart = () => exportChartCSV('投诉类型分布', ['类型', '投诉量', '占比(%)'], complaintTypeDistribution.value.map(d => [d.name, d.count, d.percent]))
-const exportTopDeptChart = () => exportChartCSV(`科室TOP排名_${topDeptCategoryFilter.value}`, ['科室', `${topDeptCategoryFilter.value}量`], topDeptRankData.value.map(d => [d.name, d.count]))
+const exportTopDeptChart = () => exportChartCSV(`科室TOP排名_${topDeptCategoryFilter.value}`, ['科室', topDeptCategoryFilter.value === '全部' ? '案件量' : `${topDeptCategoryFilter.value}量`], topDeptRankData.value.map(d => [d.name, d.count]))
 const exportReasonChart = () => exportChartCSV('投诉原因分析', ['原因', '投诉量'], reasonDistribution.value.map(d => [d.name, d.count]))
 const exportVisitChart = () => exportChartCSV('门急诊住院投诉对比', ['就诊类型', '投诉量'], [['门急诊', visitTypeData.value.outpatient], ['住院', visitTypeData.value.inpatient]])
 const exportAgeChart = () => exportChartCSV('患者年龄分布', ['年龄段', '投诉量'], ageDistribution.value.map(d => [d.name, d.count]))
 const exportCompChart = () => exportChartCSV('赔付金额分布', ['金额区间', '案件数'], compensationDistribution.value.map(d => [d.name, d.count]))
-const exportStaffChart = () => exportChartCSV(`涉及人员分布_${staffCategoryFilter.value}`, ['人员角色', `${staffCategoryFilter.value}量`, '占比(%)'], staffDistribution.value.map(d => [d.name, d.count, d.percent]))
+const exportStaffChart = () => exportChartCSV(`涉及人员分布_${staffCategoryFilter.value}`, ['人员角色', staffCategoryFilter.value === '全部' ? '数量' : `${staffCategoryFilter.value}量`, '占比(%)'], staffDistribution.value.map(d => [d.name, d.count, d.percent]))
 const exportRatioChart = () => exportChartCSV('投诉表扬率趋势', ['月份', '投诉率(%)', '表扬率(%)'], ratioData.value.map(d => [d.month, d.complaint, d.praise]))
 const exportYoyChart = () => exportChartCSV('案件量', ['类别', '同比', '环比'], yoyData.value.categories.map((c, i) => [c, yoyData.value.yoy[i], yoyData.value.mom[i]]))
 const exportRateChart = () => exportChartCSV('案件率', ['类别', '同比', '环比'], rateData.value.categories.map((c, i) => [c, rateData.value.yoy[i], rateData.value.mom[i]]))
